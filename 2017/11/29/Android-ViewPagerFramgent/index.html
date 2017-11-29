@@ -1,0 +1,624 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Blog Bom!!BO!">
+    <title>Android-ViewPagerFramgent - Blog Bom!!BO!</title>
+    <meta name="author" content="Eddie Lee">
+    
+    
+    
+    <meta name="description" content="I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of d">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Android-ViewPagerFramgent">
+<meta property="og:url" content="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/index.html">
+<meta property="og:site_name" content="Blog Bom!!BO!">
+<meta property="og:description" content="I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2017-11-29T02:22:23.345Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android-ViewPagerFramgent">
+<meta name="twitter:description" content="I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/photo.png"/>
+    
+    
+        <meta property="og:image" content="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg" />
+    
+    
+        <meta property="og:image" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg" />
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
+    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <!--STYLES END-->
+    
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Blog Bom!!BO!</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>As student</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-stack-overflow"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-left
+                    "
+             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title" itemprop="headline">
+            Android-ViewPagerFramgent
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time itemprop="datePublished" datetime="2017-11-29T09:45:07+08:00">
+	
+		    Nov 29, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Android/">Android</a>
+
+
+    
+</div>
+
+    
+</div>
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+    
+    <div class="post-content markdown" itemprop="articleBody">
+        <div class="main-content-wrap">
+            <p>I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”</p>
+<p><div align="right">-Rollen Holt</div><br><a id="more"></a></p>
+<h3 id="首先将MainActivity-改成-继承自FragmentActivity-最好这样做"><a href="#首先将MainActivity-改成-继承自FragmentActivity-最好这样做" class="headerlink" title="首先将MainActivity 改成 继承自FragmentActivity(最好这样做)"></a>首先将MainActivity 改成 继承自FragmentActivity(最好这样做)</h3><p><code>public class MainActivity extends FragmentActivity</code></p>
+<h3 id="编写menu菜单栏-新建menu文件夹-新建menu-xml文件-对应底部导航的按钮"><a href="#编写menu菜单栏-新建menu文件夹-新建menu-xml文件-对应底部导航的按钮" class="headerlink" title="编写menu菜单栏,新建menu文件夹,新建menu.xml文件,对应底部导航的按钮"></a>编写menu菜单栏,新建menu文件夹,新建menu.xml文件,对应底部导航的按钮</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;menu xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;&gt;</span><br><span class="line">    &lt;item android:id=&quot;@+id/bottom_nav_ui&quot;</span><br><span class="line">        android:enabled=&quot;true&quot;</span><br><span class="line">        app:showAsAction=&quot;ifRoom&quot;</span><br><span class="line">        android:title=&quot;页面1&quot;</span><br><span class="line">        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;</span><br><span class="line">    &lt;item android:id=&quot;@+id/bottom_nav_data&quot;</span><br><span class="line">        android:enabled=&quot;true&quot;</span><br><span class="line">        app:showAsAction=&quot;ifRoom&quot;</span><br><span class="line">        android:title=&quot;页面2&quot;</span><br><span class="line">        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;</span><br><span class="line">    &lt;item android:id=&quot;@+id/bottom_nav_service&quot;</span><br><span class="line">        android:enabled=&quot;true&quot;</span><br><span class="line">        app:showAsAction=&quot;ifRoom&quot;</span><br><span class="line">        android:title=&quot;页面3&quot;</span><br><span class="line">        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;</span><br><span class="line">    &lt;item android:id=&quot;@+id/bottom_nav_xxx&quot;</span><br><span class="line">        android:enabled=&quot;true&quot;</span><br><span class="line">        app:showAsAction=&quot;ifRoom&quot;</span><br><span class="line">        android:title=&quot;页面4&quot;</span><br><span class="line">        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;</span><br><span class="line">&lt;/menu&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="编写主界面，底部导航栏采用官方BottomNavigationView的Ex版本"><a href="#编写主界面，底部导航栏采用官方BottomNavigationView的Ex版本" class="headerlink" title="编写主界面，底部导航栏采用官方BottomNavigationView的Ex版本"></a>编写主界面，底部导航栏采用官方BottomNavigationView的Ex版本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot;</span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;</span><br><span class="line">    android:orientation=&quot;vertical&quot;</span><br><span class="line">    tools:context=&quot;com.example.eddie.test.activity.MainActivity&quot;&gt;</span><br><span class="line">    &lt;android.support.v7.widget.Toolbar</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;?attr/actionBarSize&quot;</span><br><span class="line">        android:background=&quot;?attr/colorPrimary&quot;</span><br><span class="line">        app:theme=&quot;@style/ToolbarTheme&quot;</span><br><span class="line">        android:id=&quot;@+id/toolbar&quot;/&gt;</span><br><span class="line">    &lt;android.support.v4.view.ViewPager</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;0dp&quot;</span><br><span class="line">        android:layout_weight=&quot;1&quot;</span><br><span class="line">        android:id=&quot;@+id/view_pager&quot;/&gt;</span><br><span class="line">    &lt;com.example.eddie.test.Util.BottomNavigationViewEx</span><br><span class="line">        android:id=&quot;@+id/bottom_navigation_bar&quot;</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_alignParentBottom=&quot;true&quot;</span><br><span class="line">        android:background=&quot;@color/white&quot;</span><br><span class="line">        app:menu=&quot;@menu/menu&quot;</span><br><span class="line">        app:itemIconTint=&quot;@color/selector&quot;</span><br><span class="line">        app:itemTextColor=&quot;@color/selector&quot;/&gt;</span><br><span class="line">&lt;/LinearLayout&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="创建与menu对应数量的XML布局文件（非new-Activity）"><a href="#创建与menu对应数量的XML布局文件（非new-Activity）" class="headerlink" title="创建与menu对应数量的XML布局文件（非new Activity）"></a>创建与menu对应数量的XML布局文件（非new Activity）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;</span><br><span class="line">    android:orientation=&quot;vertical&quot;&gt;</span><br><span class="line">    &lt;TextView</span><br><span class="line">        android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:textSize=&quot;18dp&quot;</span><br><span class="line">        android:text=&quot;这是第一个Fragment&quot;/&gt;</span><br><span class="line">&lt;/LinearLayout&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="创建与新建布局文件对应数量的class-继承自Fragment"><a href="#创建与新建布局文件对应数量的class-继承自Fragment" class="headerlink" title="创建与新建布局文件对应数量的class 继承自Fragment"></a>创建与新建布局文件对应数量的class 继承自Fragment</h3><p>继承自Fargment 重写onCreateView方法 其中View对象作为初始化控件的方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import android.os.Bundle;</span><br><span class="line">import android.support.v4.app.Fragment;</span><br><span class="line">import android.view.LayoutInflater;</span><br><span class="line">import android.view.View;</span><br><span class="line">import android.view.ViewGroup;</span><br><span class="line">import com.example.eddie.test.R;</span><br><span class="line">public class FirFragment extends Fragment &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) &#123;</span><br><span class="line">        View view= inflater.inflate(R.layout.fragment01, container, false);</span><br><span class="line">        return view;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="创建自定义FragmentPagerAdapter"><a href="#创建自定义FragmentPagerAdapter" class="headerlink" title="创建自定义FragmentPagerAdapter"></a>创建自定义FragmentPagerAdapter</h3><p>只需要写构造方法，并重写getItem() 和 getCount()方法即可<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">import android.support.v4.app.Fragment;</span><br><span class="line">import android.support.v4.app.FragmentManager;</span><br><span class="line">import android.support.v4.app.FragmentPagerAdapter;</span><br><span class="line">import java.util.List;</span><br><span class="line">public class FragAdapter extends FragmentPagerAdapter &#123;</span><br><span class="line">    private List mFragments;</span><br><span class="line">    public FragAdapter(FragmentManager fm,List fragments) &#123;</span><br><span class="line">        super(fm);</span><br><span class="line">        mFragments = fragments;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public Fragment getItem(int position) &#123;</span><br><span class="line">        return mFragments.get(position);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public int getCount() &#123;</span><br><span class="line">        return mFragments.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="在MainActivity中构造自定义FragmentPagerAdapter，绑定创建的Fragment"><a href="#在MainActivity中构造自定义FragmentPagerAdapter，绑定创建的Fragment" class="headerlink" title="在MainActivity中构造自定义FragmentPagerAdapter，绑定创建的Fragment"></a>在MainActivity中构造自定义FragmentPagerAdapter，绑定创建的Fragment</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">import android.support.v4.app.Fragment;</span><br><span class="line">import android.support.v4.app.FragmentActivity;</span><br><span class="line">import android.os.Bundle;</span><br><span class="line">import android.support.v4.view.ViewPager;</span><br><span class="line">import com.example.eddie.test.MyAdapter.FragAdapter;</span><br><span class="line">import com.example.eddie.test.R;</span><br><span class="line">import com.example.eddie.test.Util.BottomNavigationViewEx;</span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.List;</span><br><span class="line">public class MainActivity extends FragmentActivity&#123;</span><br><span class="line">    private ViewPager ViewPager;</span><br><span class="line">    private BottomNavigationViewEx bottomNavigationBar;</span><br><span class="line">    private List list = new ArrayList&lt;&gt;();</span><br><span class="line">    @Override</span><br><span class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">        super.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        initView();</span><br><span class="line">    &#125;</span><br><span class="line">    private void initView() &#123;</span><br><span class="line">        ViewPager = findViewById(R.id.view_pager);</span><br><span class="line">        list.add(new FirFragment());</span><br><span class="line">        list.add(new SecFragment());</span><br><span class="line">        list.add(new ThrFragment());</span><br><span class="line">        list.add(new FouFragment());</span><br><span class="line">        FragAdapter fragAdapter = new FragAdapter(getSupportFragmentManager(), list);</span><br><span class="line">        ViewPager.setAdapter(fragAdapter);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="最后对BottomNavigationViewEx做最后的设置，使其符合实际场景的需求"><a href="#最后对BottomNavigationViewEx做最后的设置，使其符合实际场景的需求" class="headerlink" title="最后对BottomNavigationViewEx做最后的设置，使其符合实际场景的需求"></a>最后对BottomNavigationViewEx做最后的设置，使其符合实际场景的需求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">bottomNavigationBar =findViewById(R.id.bottom_navigation_bar);</span><br><span class="line">bottomNavigationBar.enableAnimation(true);</span><br><span class="line">bottomNavigationBar.enableShiftingMode(false);</span><br><span class="line">bottomNavigationBar.enableItemShiftingMode(false);</span><br><span class="line">bottomNavigationBar.enableShiftingMode(false);</span><br><span class="line">bottomNavigationBar.setupWithViewPager(ViewPager);//设置与ViewPager绑定</span><br></pre></td></tr></table></figure>
+<p>随笔记附带<a href="https://github.com/RadianceL/ViewPagerActivity.git" target="_blank" rel="noopener">完整Demo</a></p>
+
+            
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Android/">Android</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/29/Java-Reference-Object/"  data-tooltip="Java Reference Object">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/25/hello-world/" data-tooltip="Hello World">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/&amp;title=Android-ViewPagerFramgent">
+                    <i class="fa fa-qq"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2017 Eddie Lee. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/29/Java-Reference-Object/"  data-tooltip="Java Reference Object">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/25/hello-world/" data-tooltip="Hello World">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/&amp;title=Android-ViewPagerFramgent">
+                    <i class="fa fa-qq"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/&amp;title=Android-ViewPagerFramgent">
+                    <i class="fa fa-qq"></i><span>Share on QQ</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Eddie Lee</h4>
+        
+            <div id="about-card-bio"><p>As student</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p> Assistant Teacher</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                LN
+            </div>
+        
+    </div>
+</div>
+
+        <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-close"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/13/JavaCommonType/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/13/JavaCommonType/">
+                            <h3 class="media-heading">Java Common Type</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Oct 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>This is java common type.All type like String come from this.The variable is to apply memory to store values. in other words,when you create variables. you need to apply space in memory</p>
+<div align="right">-note</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
+                            <img class="media-image" src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
+                            <h3 class="media-heading">Docker</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Oct 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.</p>
+<p><div align="right">—wikipedia</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/git/">
+                            <img class="media-image" src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1697833489,2364702298&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/git/">
+                            <h3 class="media-heading">Config Git</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Oct 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Git (/ɡɪt/) is a version control system for tracking changes in computer files and coordinating work on those files among multiple people. It is primarily used for source code management in software development    </p>
+<div align="right">—wikipedia</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/25/hello-world/">
+                            <h3 class="media-heading">Hello World</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Nov 25, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
+                            <img class="media-image" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
+                            <h3 class="media-heading">Android-ViewPagerFramgent</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Nov 29, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”</p>
+<p><div align="right">-Rollen Holt</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
+                            <h3 class="media-heading">Java Reference Object</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Nov 29, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>JReferences and Referents<br>A reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and the referent cannot be changed.</p>
+<p><div align="right">—Keith D Gregory</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="no post found"
+                data-message-one="1 post found"
+                data-message-other="{n} posts found">
+                6 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/jquery.js"></script>
+<script src="/assets/js/jquery.fancybox.js"></script>
+<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
+<script src="/assets/js/tranquilpeak.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+    </body>
+</html>

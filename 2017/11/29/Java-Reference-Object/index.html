@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="Blog Bom!!BO!">
 <meta property="og:description" content="JReferences and ReferentsA reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2017-11-29T02:18:47.692Z">
+<meta property="og:updated_time" content="2017-11-29T02:40:28.876Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java Reference Object">
 <meta name="twitter:description" content="JReferences and ReferentsA reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and">
@@ -233,7 +233,8 @@
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
             <p>JReferences and Referents<br>A reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and the referent cannot be changed.</p>
-<p><div align="right">—Keith D Gregory</div><br><a id="more"></a><br>初学Java时，在很长一段时间里，总觉得基本概念很模糊。后来才知道，在许多Java书中，把对象和对象的引用混为一谈。<br>可是，如果我分不清对象与对象引用，<br>那实在没法很好地理解下面的面向对象技术。把自己的一点认识写下来，或许能让初学Java的朋友们少走一点弯路。<br>为便于说明，我们先定义一个简单的类：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class Vehicle &#123;</span><br><span class="line">	int passengers;      </span><br><span class="line">	int fuelcap; </span><br><span class="line">	int mpg;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p><div align="right">—Keith D Gregory</div><br><a id="more"></a></p>
+<p>初学Java时，在很长一段时间里，总觉得基本概念很模糊。后来才知道，在许多Java书中，把对象和对象的引用混为一谈。<br>可是，如果我分不清对象与对象引用，<br>那实在没法很好地理解下面的面向对象技术。把自己的一点认识写下来，或许能让初学Java的朋友们少走一点弯路。<br>为便于说明，我们先定义一个简单的类：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class Vehicle &#123;</span><br><span class="line">	int passengers;      </span><br><span class="line">	int fuelcap; </span><br><span class="line">	int mpg;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
 <p>有了这个模板，就可以用它来创建对象：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vehicle veh1 = new Vehicle();</span><br></pre></td></tr></table></figure></p>
 <p>通常把这条语句的动作称之为创建一个对象，其实，它包含了四个动作.</p>
 <ul>

@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="Blog Bom!!BO!">
 <meta property="og:description" content="Auto-build tool from git to k8s">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-04-05T11:34:29.495Z">
+<meta property="og:updated_time" content="2018-04-05T12:27:57.253Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jenkins">
 <meta name="twitter:description" content="Auto-build tool from git to k8s">
@@ -234,7 +234,36 @@
         <div class="main-content-wrap">
             <p>Auto-build tool from git to k8s</p>
 <a id="more"></a>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>与Git无缝贴合，通过githook获取项目更新通知，完成编译-发布动作。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>环境：centos</p>
+<p>首先需要给yum引入源。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo</span><br></pre></td></tr></table></figure>
+<p>之后安装两个命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo rpm --importhttps://jenkins-ci.org/redhat/jenkins-ci.org.key</span><br><span class="line">sudo yum -y install jenkins</span><br></pre></td></tr></table></figure></p>
+<p>这里使用git作为更新管道，所以需要安装配置全局git账户git，安装java。测试git，clone一下。再安装maven<br>允许开机启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo chkconfig jenkins on</span><br><span class="line">sudo service jenkins start</span><br></pre></td></tr></table></figure></p>
+<p>开启端口，访问服务器8080端口.</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>首先进入界面，回要求输入密码，密码在服务器上，网页上标注了地址，cat一下就好。</p>
+<p>然后就可以创建项目了，选择一个自由的项目就可以，我们用git项目，所以勾选GitHub project，并把项目地址录入。</p>
+<p>Source Code Management选择git，url还是刚的项目地址，Credentials这里的类型选择用户名和密码，输入的就是你github的账号密码。</p>
+<p>Build使用xecute shell，执行maven构建命令，比如mvn clean package</p>
+<p>Build Triggers选择GitHub hook trigger for GITScm polling。githook的配置稍后再说。</p>
+<p>Build Environment里选择一个Add timestamps to the Console Output，可以看到命令行输出。</p>
+<p>Post-build Actions需要插件deploy to container这个插件，这个可以稍后配置，安装插件要重启。</p>
+<p>这样我们的项目就配置好了</p>
+<p>关于git的配置，先要弄一个Personal Access Token,在Settings/Developer settings/Personal access tokens里，生成一个新的token，对应项目的地址。</p>
+<p>到项目的setting里配置webhook。url就是jenkins的服务器地址：8080+/github-webhook/ 结尾要有/，否则可能出问题</p>
+<p>回到jenkins，到系统设置的GitHub /Github Servers配置服务，配置用户时使用Secret text权限。测试一下连接。</p>
+<p>以上就配置好了当git接受新push的时候，自动构建，测试项目。</p>
+<p>下一步就是发布</p>
+<p>##发布</p>
+<p>通常我们都使用Tomcat服务器，就使用deploy to container这个插件，再运行Tomcat的主机上，配置tomcat管理账户。</p>
+<ul>
+<li>WAR/EAR files：是相对于你前面配置的工作空间的。</li>
+<li>Context path：是你容器部署的目录，如果是tomcat，那么在webapps下，如果你不想要项目名称的话选”\”,填写”ROOT”是不可以的。</li>
+<li>Containers： tomcat8。当然你要有manager用户信息。在tomcat目录下的conf目录，tomcat-users.xml修改如下：<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"manager-gui"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"manager-script"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"manager-jmx"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"manager-status"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">password</span>=<span class="string">"tomcat"</span> <span class="attr">roles</span>=<span class="string">"manager-gui,manager-script,manager-jmx,manager-status"</span> <span class="attr">username</span>=<span class="string">"tomcat"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这样Tomcat就发布了。</p>
+
             
         </div>
     </div>

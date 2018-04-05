@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="Blog Bom!!BO!">
 <meta property="og:description" content="Auto-build tool from git to k8s">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-04-05T12:27:57.253Z">
+<meta property="og:updated_time" content="2018-04-05T12:29:22.215Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jenkins">
 <meta name="twitter:description" content="Auto-build tool from git to k8s">
@@ -254,8 +254,7 @@
 <p>回到jenkins，到系统设置的GitHub /Github Servers配置服务，配置用户时使用Secret text权限。测试一下连接。</p>
 <p>以上就配置好了当git接受新push的时候，自动构建，测试项目。</p>
 <p>下一步就是发布</p>
-<p>##发布</p>
-<p>通常我们都使用Tomcat服务器，就使用deploy to container这个插件，再运行Tomcat的主机上，配置tomcat管理账户。</p>
+<h2 id="发布"><a href="#发布" class="headerlink" title="发布"></a>发布</h2><p>通常我们都使用Tomcat服务器，就使用deploy to container这个插件，再运行Tomcat的主机上，配置tomcat管理账户。</p>
 <ul>
 <li>WAR/EAR files：是相对于你前面配置的工作空间的。</li>
 <li>Context path：是你容器部署的目录，如果是tomcat，那么在webapps下，如果你不想要项目名称的话选”\”,填写”ROOT”是不可以的。</li>

@@ -6,18 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Blog Bom!!BO!">
-    <title>Category: Library - Blog Bom!!BO!</title>
+    <title>Java-Annotation - Blog Bom!!BO!</title>
     <meta name="author" content="Eddie Lee">
     
     
     
-    <meta property="og:type" content="blog">
-<meta property="og:title" content="Blog Bom!!BO!">
-<meta property="og:url" content="http://yoursite.com/categories/Library/index.html">
+    <meta name="description" content="AnnotationFirst I want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Java-Annotation">
+<meta property="og:url" content="http://yoursite.com/2018/06/03/Java-Annotation/index.html">
 <meta property="og:site_name" content="Blog Bom!!BO!">
+<meta property="og:description" content="AnnotationFirst I want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.">
 <meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-06-03T06:01:52.818Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Blog Bom!!BO!">
+<meta name="twitter:title" content="Java-Annotation">
+<meta name="twitter:description" content="AnnotationFirst I want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.">
     
     
         
@@ -26,6 +31,12 @@
         <meta property="og:image" content="http://yoursite.com/assets/images/photo.png"/>
     
     
+        <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" />
+    
+    
+        <meta property="og:image" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg" />
     
     
     <!--STYLES-->
@@ -49,7 +60,7 @@
         
     
 
-<header id="header" data-behavior="1">
+<header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a class="header-title-link" href="/ ">Blog Bom!!BO!</a>
@@ -73,7 +84,7 @@
         
     
 
-<nav id="sidebar" data-behavior="1">
+<nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -178,124 +189,166 @@
 </nav>
 
             
-            <div id="main" data-behavior="1"
-                 class="
+        <div class="post-header-cover
+                    text-left
+                    "
+             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title" itemprop="headline">
+            Java-Annotation
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time itemprop="datePublished" datetime="2018-06-03T11:37:17+08:00">
+	
+		    Jun 03, 2018
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Java/">Java</a>
+
+
+    
+</div>
+
+    
+</div>
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
                         hasCoverMetaIn
                         ">
                 
-    <section class="postShorten-group main-content-wrap">
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
     
     
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/12/28/C-Pointer/">
-                            C-Pointer
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-12-28T13:49:07+08:00">
-	
-		    Dec 28, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Library/">Library</a>
+    <div class="post-content markdown" itemprop="articleBody">
+        <div class="main-content-wrap">
+            <p>Annotation<br>First I want to learn is by Spring <code>@bean</code>,Want to know how it work.<br>But toke a long time in busy.<br>Until today,There is my notes about Annotation.<br><a id="more"></a></p>
+<p>First you need a replace <code>class</code> to <code>@interface</code><br>All Annotation implicit inheritance from java.lang.annotation.Annotation<br>And all your annotation can use meta-annotation<br>There have four meta-annotation</p>
+<ol>
+<li><p><code>@Target</code> mark where your annotation can use, without <code>@Target</code>, your annotation can use everywhere</p>
+<ul>
+<li>ElementType.ANNOTATION_TYPE —mark annotation type</li>
+<li>ElementType.PACKAGE —above package</li>
+<li>ElementType.TYPE —above class and interface</li>
+<li>ElementType.METHOD — above method</li>
+<li>ElementType.CONSTRUCT —above construct</li>
+<li>ElementType.FIELD —member domain</li>
+<li>ElementType.PARAMETER —above method or whit parameter</li>
+<li>ElementType.LOCAL_VARIABLE —local variable</li>
+<li>TElementType.YPE_PARAMETER —type parameter</li>
+<li>ElementType.TYPE_USE —type use</li>
+</ul>
+</li>
+<li><p><code>@Retention</code> be used to mark a annotation keep time, without <code>@Retention</code>, default is RetentionPolicy.CLASS</p>
+<ul>
+<li>RetentionPolicy.SOURCE —not include class file</li>
+<li>RetentionPolicy.CLASS —include class file but <code>JVM</code> not load</li>
+<li>RetentionPolicy.RUNTIME —include class file and <code>JVM</code> will load, you can get them by reflex</li>
+</ul>
+</li>
+<li><p><code>@Document</code> create note for archive like JavaDoc</p>
+</li>
+<li><p><code>@Inherited</code> only be used to class, if a has extend annotation, then it all child class auto have the same annotation</p>
+</li>
+</ol>
+<hr>
+<p>ok, there is a demo.<br>first need create a annotation by yourself.<br>The meta-annotation above <code>public @interface Foo {}</code><br>you can chose which is necessary<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.annotation.*;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Foo &#123;</span><br><span class="line">    <span class="function">String <span class="title">name</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">count</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>this annotation <code>Foo</code> has two value, name and count.<br>that value type can be</p>
+<ul>
+<li>Base-Type (int, short, long, byte, char, double, float or boolean)</li>
+<li>String</li>
+<li>Class (such as Class&lt;? extend Bar&gt;)</li>
+<li>Enum</li>
+<li>Annotation</li>
+<li>Array (create from above type)</li>
+</ul>
+<p>so this <code>Foo</code> can be use now</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Foo</span>(value = <span class="string">"这是类注解"</span>,count = <span class="number">1</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bar</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Foo</span>(value = <span class="string">"这是属性注解"</span>,count = <span class="number">2</span>)</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Foo</span>(value = <span class="string">"这是方法注解"</span>,count = <span class="number">3</span>)</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">""</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>as you can see <code>@Foo</code> can use above class, property and method.<br>because of when i create it whit <code>@Target</code>, so <code>Foo</code> can use whit them.</p>
+<p>but only annotation can not do anything.<br>must be have a “process” to handle.</p>
+<p>so there is my “process”:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FooProcess</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">analyze</span><span class="params">(Class clazz)</span> <span class="keyword">throws</span> NoSuchMethodException </span>&#123;</span><br><span class="line">        <span class="comment">//get all class annotation information</span></span><br><span class="line">        Annotation[] classAnnotation = clazz.getAnnotations();</span><br><span class="line">        <span class="keyword">for</span>(Annotation annotation : classAnnotation)&#123;</span><br><span class="line">            Class annotationType =  annotation.annotationType();</span><br><span class="line">            <span class="keyword">boolean</span> equals = annotationType.equals(Foo.class);</span><br><span class="line">            <span class="keyword">if</span> (equals)&#123;</span><br><span class="line">                System.out.println(<span class="string">"Bar class has Foo annotation"</span>);</span><br><span class="line">                System.out.println(<span class="string">"info: "</span> + ((Foo)annotation).value() + <span class="string">","</span> + ((Foo)annotation).count());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//get all annotation type</span></span><br><span class="line">            System.out.println(<span class="string">"Bar class annotation is:"</span> + annotationType);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//get all property annotation information</span></span><br><span class="line">        Field[] fields = clazz.getDeclaredFields();</span><br><span class="line">        <span class="keyword">for</span> (Field field :fields)&#123;</span><br><span class="line">            String filedName = field.getName();</span><br><span class="line">            Annotation[] allAnnotations = field.getAnnotations();</span><br><span class="line">            <span class="keyword">for</span>(Annotation an : allAnnotations)&#123;</span><br><span class="line">                Class annotationType = an.annotationType();</span><br><span class="line">                System.out.println(<span class="string">"FiledName["</span>+filedName+<span class="string">"]property annotation: "</span> + annotationType);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (field.isAnnotationPresent(Foo.class))&#123;</span><br><span class="line">                Foo foo = field.getAnnotation(Foo.class);</span><br><span class="line">                System.out.println(<span class="string">"FiledName["</span>+filedName+<span class="string">"]property info: "</span>+ foo.value() + <span class="string">","</span> + foo.count());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//get all method annotation information</span></span><br><span class="line">        Method method = clazz.getDeclaredMethod(<span class="string">"test"</span>, <span class="keyword">null</span>);<span class="comment">//get private and public method</span></span><br><span class="line">        Annotation[] annotations = method.getAnnotations();</span><br><span class="line">        <span class="keyword">for</span> (Annotation annotation : annotations)&#123;</span><br><span class="line">            Class annotationType = annotation.annotationType();</span><br><span class="line">            System.out.println(<span class="string">"test method has annotation type: "</span> + annotationType);</span><br><span class="line">            <span class="keyword">if</span> (annotationType.equals(Foo.class)) &#123;</span><br><span class="line">                Foo mode = (Foo) annotation;</span><br><span class="line">                System.out.println(<span class="string">"info: "</span> + mode.value() + <span class="string">","</span> + mode.count());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>and run with :<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span></span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            FooProcess.analyze(Bar.class);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>see console<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Bar class has Foo annotation</span><br><span class="line">info: this is class annotation,1</span><br><span class="line">Bar class annotation is:interface com.eddie.annotation.Foo</span><br><span class="line"></span><br><span class="line">FiledName[name]property annotation: interface com.eddie.annotation.Foo</span><br><span class="line">FiledName[name]property info: this is property annotation,2</span><br><span class="line"></span><br><span class="line">test method has annotation type: interface com.eddie.annotation.Foo</span><br><span class="line">info: this is method annotation,3</span><br></pre></td></tr></table></figure></p>
+<p>you can do everything in process, but first you need use if to know target location<br>real have your annotation, if not, you will get a NullPointerException or maybe<br>ClassCastException. we don’t want to see them.<br>then you can get value and do what you want.</p>
 
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <p>Today learn pointer form enthusiastic netizen,really appreciate.</p>
-<p><div align="right">-土杜土杜</div><br>
-                    
-                        <a href="/2017/12/28/C-Pointer/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
             
         </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
         
-            <a href="/2017/12/28/C-Pointer/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" itemprop="image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/12/28/C-static-Library/">
-                            C-static-Library
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-12-28T13:49:07+08:00">
-	
-		    Dec 28, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Library/">Library</a>
-
-
-    
-</div>
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Java/">Java</a>
 
             </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <p>UNIX is very simple, it just needs a genius to understand its simplicity.</p>
-<p><div align="right">-Dennis MacAlistair Ritchie</div><br>
-                    
-                        <a href="/2017/12/28/C-static-Library/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
         
-            <a href="/2017/12/28/C-static-Library/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" itemprop="image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg"/>
-                </div>
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/05/02/Maven-error-list/" data-tooltip="Maven error list">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
             </a>
+        </li>
+        
             
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/06/03/Java-Annotation/&amp;title=Java-Annotation">
+                    <i class="fa fa-qq"></i>
+                </a>
+            </li>
         
-    </article>
-    
-    <div class="pagination-bar">
-    <ul class="pagination">
         
-        
-        <li class="pagination-number">page 1 of 1</li>
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
     </ul>
 </div>
 
-</section>
+
+        
+        
+            
+        
+    </div>
+</article>
 
 
 
@@ -306,6 +359,72 @@
 </footer>
 
             </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/05/02/Maven-error-list/" data-tooltip="Maven error list">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/06/03/Java-Annotation/&amp;title=Java-Annotation">
+                    <i class="fa fa-qq"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/06/03/Java-Annotation/&amp;title=Java-Annotation">
+                    <i class="fa fa-qq"></i><span>Share on QQ</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
             
         </div>
         
@@ -645,6 +764,8 @@
 <script src="/assets/js/jquery.fancybox-thumbs.js"></script>
 <script src="/assets/js/tranquilpeak.js"></script>
 <!--SCRIPTS END-->
+
+    
 
 
     </body>

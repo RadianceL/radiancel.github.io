@@ -20,7 +20,7 @@
 <meta property="og:description" content="Git (/ɡɪt/) is a version control system for tracking changes in computer files and coordinating work on those files among multiple people. It is primarily used for source code management in software d">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1697833489,2364702298&fm=27&gp=0.jpg">
-<meta property="og:updated_time" content="2017-10-14T08:33:46.000Z">
+<meta property="og:updated_time" content="2018-06-03T07:55:04.632Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Config Git">
 <meta name="twitter:description" content="Git (/ɡɪt/) is a version control system for tracking changes in computer files and coordinating work on those files among multiple people. It is primarily used for source code management in software d">
@@ -234,12 +234,11 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <p>Git (/ɡɪt/) is a version control system for tracking changes in computer files and coordinating work on those files among multiple people. It is primarily used for source code management in software development    </p>
+            <p>Git (/ɡɪt/) is a version control system for tracking changes in computer files and coordinating work on those files among multiple people. It is primarily used for source code management in software development</p>
 <div align="right">—wikipedia</div>
 
 <a id="more"></a>
 <div align="center"><br>    <img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1697833489,2364702298&fm=27&gp=0.jpg"><br></div>
-
 
 <h2 id="1、设置Git的user-name和email：-如果是第一次的话"><a href="#1、设置Git的user-name和email：-如果是第一次的话" class="headerlink" title="1、设置Git的user name和email：(如果是第一次的话)"></a>1、设置Git的user name和email：(如果是第一次的话)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global user.name &quot;Your Name&quot;</span><br><span class="line">$ git config --global user.email &quot;Your Email@example.com&quot;</span><br></pre></td></tr></table></figure>
 <h2 id="2、生成密钥"><a href="#2、生成密钥" class="headerlink" title="2、生成密钥"></a>2、生成密钥</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C &quot;Your Email@example.com&quot;</span><br></pre></td></tr></table></figure>
@@ -252,6 +251,7 @@
 <p>选择 <code>yes</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hi humingx! You&apos;ve successfully authenticated, but GitHub does not provide shell access.</span><br></pre></td></tr></table></figure></p>
 <p>如果看到<code>Hi+你的用户名</code>，就说明成功了。</p>
 <h2 id="6、发布"><a href="#6、发布" class="headerlink" title="6、发布"></a>6、发布</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$git init （第一次推送）</span><br><span class="line">$git remote add origin + YourGithubAddress //github项目具体地址</span><br><span class="line">$git add .                                 //添加项目所有文件到git仓库</span><br><span class="line">$git commit -m &quot;&quot;                          //添加对本次更新的注释</span><br><span class="line">$git push -u origin master                 //提交代码到远程仓库</span><br></pre></td></tr></table></figure>
+<p>note: git 与 svn最大的区别在于，git会保存每个版本的文件快照，便于恢复，svn以及其他版本控制器会保存文件的改动信息。</p>
 <blockquote>
 <p>前两步只在第一次推送时执行，已经建立远程库的不需要重复执行<br>如果需要更换远程仓库地址，先执行<code>git remote rm origin</code>然后重新第二行代码即可</p>
 </blockquote>
@@ -529,7 +529,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Git (/ɡɪt/) is a version control system for tracking changes in computer files and coordinating work on those files among multiple people. It is primarily used for source code management in software development    </p>
+                        <div class="media-content hide-xs font-merryweather"><p>Git (/ɡɪt/) is a version control system for tracking changes in computer files and coordinating work on those files among multiple people. It is primarily used for source code management in software development</p>
 <div align="right">—wikipedia</div></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -710,7 +710,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>人啊，根据重新振作的方法可分为两种：<br>一种是看着比自己卑微的东西，寻找垫底的聊以自慰；<br>另一种则是看着比自己伟大的东西，狠狠踢醒毫无气度的自己。</p>
+                        <div class="media-content hide-xs font-merryweather"><p>人啊，根据重新振作的方法可分为两种：<br>一种是看着比自己卑微的东西，寻找垫底聊以自慰；<br>另一种则是看着比自己伟大的东西，狠狠踢醒毫无气度的自己。</p>
 <div align="right">-note</div></div>
                     </div>
                     <div style="clear:both;"></div>

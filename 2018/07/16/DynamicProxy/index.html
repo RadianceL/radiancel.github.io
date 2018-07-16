@@ -1,0 +1,741 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Blog Bom!!BO!">
+    <title>Dynamic Proxy - Blog Bom!!BO!</title>
+    <meta name="author" content="Eddie Lee">
+    
+    
+    
+    <meta name="description" content="动态代理理论及Mybatis实战动态代理在我们平时编程并不常用，但因为Spring AOP以及大量框架均使用动态代理机制。所以必须要掌握。">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Dynamic Proxy">
+<meta property="og:url" content="http://yoursite.com/2018/07/16/DynamicProxy/index.html">
+<meta property="og:site_name" content="Blog Bom!!BO!">
+<meta property="og:description" content="动态代理理论及Mybatis实战动态代理在我们平时编程并不常用，但因为Spring AOP以及大量框架均使用动态代理机制。所以必须要掌握。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-07-16T08:42:45.205Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dynamic Proxy">
+<meta name="twitter:description" content="动态代理理论及Mybatis实战动态代理在我们平时编程并不常用，但因为Spring AOP以及大量框架均使用动态代理机制。所以必须要掌握。">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/photo.png"/>
+    
+    
+        <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" />
+    
+    
+        <meta property="og:image" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg" />
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
+    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <!--STYLES END-->
+    
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Blog Bom!!BO!</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>As student</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-stack-overflow"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-left
+                    "
+             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title" itemprop="headline">
+            Dynamic Proxy
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time itemprop="datePublished" datetime="2018-07-16T15:24:33+08:00">
+	
+		    Jul 16, 2018
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Java/">Java</a>
+
+
+    
+</div>
+
+    
+</div>
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+    
+    <div class="post-content markdown" itemprop="articleBody">
+        <div class="main-content-wrap">
+            <p>动态代理理论及Mybatis实战<br>动态代理在我们平时编程并不常用，但因为Spring AOP以及大量框架均使用动态代理机制。<br>所以必须要掌握。<br><a id="more"></a></p>
+<p>动态代理其本质是：PrxoyGenerator.generateProxyClass生成字节码文件，然后通defineClass0加载这个类<br>说白了是重生成了一个字节码文件。</p>
+<p>那先看下源码，在来简单实践一下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@CallerSensitive</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">newProxyInstance</span><span class="params">(ClassLoader loader,</span></span></span><br><span class="line"><span class="function"><span class="params">                                      Class&lt;?&gt;[] interfaces,</span></span></span><br><span class="line"><span class="function"><span class="params">                                      InvocationHandler h)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> IllegalArgumentException</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Objects.requireNonNull(h);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//克隆一份</span></span><br><span class="line">    <span class="keyword">final</span> Class&lt;?&gt;[] intfs = interfaces.clone();</span><br><span class="line">    <span class="keyword">final</span> SecurityManager sm = System.getSecurityManager();</span><br><span class="line">    <span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</span><br><span class="line">        checkProxyAccess(Reflection.getCallerClass(), loader, intfs);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通过getProxyClass0方法动态生成Class类</span></span><br><span class="line">    Class&lt;?&gt; cl = getProxyClass0(loader, intfs);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</span><br><span class="line">            checkNewProxyPermission(Reflection.getCallerClass(), cl);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> Constructor&lt;?&gt; cons = cl.getConstructor(constructorParams);</span><br><span class="line">        <span class="keyword">final</span> InvocationHandler ih = h;</span><br><span class="line">        <span class="keyword">if</span> (!Modifier.isPublic(cl.getModifiers())) &#123;</span><br><span class="line">            AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Void&gt;() &#123;</span><br><span class="line">                <span class="function"><span class="keyword">public</span> Void <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    cons.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> cons.newInstance(<span class="keyword">new</span> Object[]&#123;h&#125;);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IllegalAccessException|InstantiationException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(e.toString(), e);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">        Throwable t = e.getCause();</span><br><span class="line">        <span class="keyword">if</span> (t <span class="keyword">instanceof</span> RuntimeException) &#123;</span><br><span class="line">            <span class="keyword">throw</span> (RuntimeException) t;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(t.toString(), t);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(e.toString(), e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该方法首先创建了一个接口的克隆，之后检查权限。<br>最重要的一步是<code>Class&lt;?&gt; cl = getProxyClass0(loader, intfs)</code><br>Java通过该方法中<code>proxyClassCache.get()</code>方法拿到生成的字节码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> Class&lt;?&gt; getProxyClass0(ClassLoader loader,</span><br><span class="line">                                        Class&lt;?&gt;... interfaces) &#123;</span><br><span class="line">     <span class="comment">//首先，限制一个类接口不能多余65535</span></span><br><span class="line">     <span class="keyword">if</span> (interfaces.length &gt; <span class="number">65535</span>) &#123;</span><br><span class="line">         <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"interface limit exceeded"</span>);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">// private static final WeakCache&lt;ClassLoader, Class&lt;?&gt;[], Class&lt;?&gt;&gt;</span></span><br><span class="line">     <span class="comment">//  proxyClassCache = new WeakCache&lt;&gt;(new KeyFactory(), new ProxyClassFactory());</span></span><br><span class="line">     <span class="keyword">return</span> proxyClassCache.get(loader, interfaces);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>proxyClassCache.get()方法的部分实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//最终通过 supplier.get()返回对象</span></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (supplier != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">// supplier might be a Factory or a CacheValue&lt;V&gt; instance</span></span><br><span class="line">    V value = supplier.get();</span><br><span class="line">    <span class="keyword">if</span> (value != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (factory == <span class="keyword">null</span>) &#123;</span><br><span class="line">    factory = <span class="keyword">new</span> Factory(key, parameter, subKey, valuesMap);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (supplier == <span class="keyword">null</span>) &#123;</span><br><span class="line">    supplier = valuesMap.putIfAbsent(subKey, factory);</span><br><span class="line">    <span class="keyword">if</span> (supplier == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// successfully installed Factory</span></span><br><span class="line">        supplier = factory;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// else retry with winning supplier</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (valuesMap.replace(subKey, supplier, factory)) &#123;</span><br><span class="line">        <span class="comment">// successfully replaced</span></span><br><span class="line">        <span class="comment">// cleared CacheEntry / unsuccessful Factory</span></span><br><span class="line">        <span class="comment">// with our Factory</span></span><br><span class="line">        supplier = factory;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// retry with current supplier</span></span><br><span class="line">        supplier = valuesMap.get(subKey);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//supplier.get()的实现</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> V <span class="title">get</span><span class="params">()</span> </span>&#123; <span class="comment">// serialize access</span></span><br><span class="line">    Supplier&lt;V&gt; supplier = valuesMap.get(subKey);</span><br><span class="line">    <span class="keyword">if</span> (supplier != <span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// else still us (supplier == this)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// create new value</span></span><br><span class="line">    V value = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        value = Objects.requireNonNull(valueFactory.apply(key, parameter));</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (value == <span class="keyword">null</span>) &#123; <span class="comment">// remove us on failure</span></span><br><span class="line">            valuesMap.remove(subKey, <span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// the only path to reach here is with non-null value</span></span><br><span class="line">    <span class="keyword">assert</span> value != <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// wrap value with CacheValue (WeakReference)</span></span><br><span class="line">    CacheValue&lt;V&gt; cacheValue = <span class="keyword">new</span> CacheValue&lt;&gt;(value);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// put into reverseMap</span></span><br><span class="line">    reverseMap.put(cacheValue, Boolean.TRUE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// try replacing us with CacheValue (this should always succeed)</span></span><br><span class="line">    <span class="keyword">if</span> (!valuesMap.replace(subKey, <span class="keyword">this</span>, cacheValue)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">"Should not reach here"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// successfully replaced us with new CacheValue -&gt; return the value</span></span><br><span class="line">    <span class="comment">// wrapped by it</span></span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之后回过头看apply方法（<code>value = Objects.requireNonNull(valueFactory.apply(key, parameter));</code>）<br>找到类：<code>ProxyClassFactory</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//·········省略部分验证代码</span></span><br><span class="line"><span class="keyword">if</span> (proxyPkg == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">// if no non-public proxy interfaces, use com.sun.proxy package</span></span><br><span class="line">    proxyPkg = ReflectUtil.PROXY_PACKAGE + <span class="string">"."</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * Choose a name for the proxy class to generate.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">long</span> num = nextUniqueNumber.getAndIncrement();</span><br><span class="line">    String proxyName = proxyPkg + proxyClassNamePrefix + num;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Generate the specified proxy class.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">byte</span>[] proxyClassFile = ProxyGenerator.generateProxyClass(proxyName, interfaces, accessFlags);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> defineClass0(loader, proxyName,proxyClassFile, <span class="number">0</span>, proxyClassFile.length);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (ClassFormatError e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(e.toString());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>其关键部分位于PrxoyGenerator.generateProxyClass生成代理类字节码文件。</p>
+<p>之后返回<code>newProxyInstance</code>方法，看这个类如何被实例化，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Class&lt;?&gt;[] constructorParams = &#123; InvocationHandler.class &#125;;</span><br><span class="line">····</span><br><span class="line"><span class="keyword">final</span> Constructor&lt;?&gt; cons = cl.getConstructor(constructorParams);</span><br><span class="line"><span class="keyword">return</span> cons.newInstance(<span class="keyword">new</span> Object[]&#123;h&#125;);</span><br></pre></td></tr></table></figure>
+<p>首先，获取了带参数InvocationHandler类的构造器，然后通过构造器，往里看最后通过调用NativeConstructorAccessorImpl的本地方法实例化了这个类,这样就完成了整个代理过程</p>
+<p>接下来看下一个实践，知道原理还是要用一下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Subject</span> </span>&#123;</span><br><span class="line">  <span class="comment">//先做一个接口，里面只有一个方法</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">sayHello</span><span class="params">(String str)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationHandler;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="comment">//实现InvocationHandler接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Invoke</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line">	<span class="comment">//这个就是我们要代理的真实对象</span></span><br><span class="line">	<span class="keyword">private</span> Object subject;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//构造方法，给我们要代理的真实对象赋初值</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Invoke</span><span class="params">(Object subject)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.subject = subject;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">    <span class="comment">//doSomeThing</span></span><br><span class="line">		System.out.println(<span class="string">"即将被代理的方法"</span>);</span><br><span class="line">		method.invoke(subject, args);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上就完成了代理类的构建，接下倆我们去调用一下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.Proxy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">doMain</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">		Subject subjectImpl = str -&gt; System.out.println(<span class="string">"Hello:"</span> + str);</span><br><span class="line"></span><br><span class="line">		Invoke invoke = <span class="keyword">new</span> Invoke(subjectImpl);</span><br><span class="line"></span><br><span class="line">		Subject subject = (Subject) Proxy.newProxyInstance(subjectImpl.getClass().getClassLoader(),         subjectImpl.getClass().getInterfaces(), invoke);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//并未直接调用subjectImpl，而是调用生成的代理类</span></span><br><span class="line">		subject.sayHello(<span class="string">"test"</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="comment">/* 控制台输出：</span></span><br><span class="line"><span class="comment">    * 即将被代理的方法</span></span><br><span class="line"><span class="comment">    * Hello:test</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+            
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Java/">Java</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/06/07/bld-interface/" data-tooltip="bld-interface">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/07/16/DynamicProxy/&amp;title=Dynamic Proxy">
+                    <i class="fa fa-qq"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 Eddie Lee. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/06/07/bld-interface/" data-tooltip="bld-interface">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/07/16/DynamicProxy/&amp;title=Dynamic Proxy">
+                    <i class="fa fa-qq"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/07/16/DynamicProxy/&amp;title=Dynamic Proxy">
+                    <i class="fa fa-qq"></i><span>Share on QQ</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Eddie Lee</h4>
+        
+            <div id="about-card-bio"><p>As student</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p> Assistant Teacher</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                LN
+            </div>
+        
+    </div>
+</div>
+
+        <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-close"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/13/JavaCommonType/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/13/JavaCommonType/">
+                            <h3 class="media-heading">Java Common Type</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Oct 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>This is java common type.All type like String come from this.The variable is to apply memory to store values. in other words,when you create variables. you need to apply space in memory</p>
+<div align="right">-note</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/git/">
+                            <img class="media-image" src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1697833489,2364702298&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/git/">
+                            <h3 class="media-heading">Config Git</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Oct 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Git (/ɡɪt/) is a version control system for tracking changes in computer files and coordinating work on those files among multiple people. It is primarily used for source code management in software development</p>
+<div align="right">—wikipedia</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
+                            <img class="media-image" src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
+                            <h3 class="media-heading">Docker</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Oct 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.</p>
+<p><div align="right">—wikipedia</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
+                            <img class="media-image" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
+                            <h3 class="media-heading">Android-ViewPagerFramgent</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Nov 29, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”</p>
+<p><div align="right">-Rollen Holt</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
+                            <h3 class="media-heading">Java Reference Object</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Nov 29, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>References and Referents<br>A reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and the referent cannot be changed.</p>
+<p><div align="right">—Keith D Gregory</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
+                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
+                            <h3 class="media-heading">C-static-Library</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>UNIX is very simple, it just needs a genius to understand its simplicity.</p>
+<p><div align="right">-Dennis MacAlistair Ritchie</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
+                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
+                            <h3 class="media-heading">C-Pointer</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Today learn pointer form enthusiastic netizen,really appreciate.</p>
+<p><div align="right">-土杜土杜</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
+                            <h3 class="media-heading">Redis</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Mar 20, 2018
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as strings, lists, maps, sets, sorted sets, hyperloglogs, bitmaps and spatial indexes. The project is mainly developed by Salvatore Sanfilippo and is currently sponsored by Redis Labs.[4]</p>
+<p><div align="right">—Wikipedia</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
+                            <h3 class="media-heading">jenkins</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Apr 5, 2018
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Auto-build tool from git to k8s</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
+                            <h3 class="media-heading">Maven error list</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    May 2, 2018
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>人啊，根据重新振作的方法可分为两种：<br>一种是看着比自己卑微的东西，寻找垫底聊以自慰；<br>另一种则是看着比自己伟大的东西，狠狠踢醒毫无气度的自己。</p>
+<div align="right">-note</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="no post found"
+                data-message-one="1 post found"
+                data-message-other="{n} posts found">
+                14 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/jquery.js"></script>
+<script src="/assets/js/jquery.fancybox.js"></script>
+<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
+<script src="/assets/js/tranquilpeak.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+    </body>
+</html>

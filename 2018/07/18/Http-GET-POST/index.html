@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="Blog Bom!!BO!">
 <meta property="og:description" content="关于Http一定光而熟知，那么到底Http是什么？？Http是一种通讯协议，在OSI七层协议中，位于【】，包装了TCP协议">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-07-21T08:12:39.807Z">
+<meta property="og:updated_time" content="2018-07-21T08:14:42.239Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Http GET&#x2F;POST">
 <meta name="twitter:description" content="关于Http一定光而熟知，那么到底Http是什么？？Http是一种通讯协议，在OSI七层协议中，位于【】，包装了TCP协议">
@@ -247,11 +247,11 @@
 <li>GET参数通过URL传递，POST放在Request body中。</li>
 </ul>
 <p>以上几乎可以算是“教科书式标准答案”了。但还是现象级别，没看到本质<br>我们再往下探究，HTTP到底是什么？HTTP是基于TCP/IP的关于数据如何在万维网中如何通信的协议。</p>
-<p>HTTP的底层是TCP/IP。所以GET和POST的底层也是TCP/IP，也就是说，GET/POST都是TCP链接。GET和POST能做的事情是一样一样的。你要给GET加上request body，给POST带上url参数，技术上是完全行的通的。</p>
+<p>HTTP的底层是TCP/IP。所以GET和POST的底层也是TCP/IP，也就是说，GET/POST都是TCP链接。GET和POST能做的事情是一样一样的。你要给GET加上Request Body，给POST带上url参数，技术上是完全行的通的。</p>
 <p>我们把网络理解为一条大马路，在这条马路上，各种各样的数据奔流不息。<br>但他们怎么知道要到哪里去？是不是需要一个规则来限定数据的行为。</p>
-<p>TCP就像一辆辆大卡车，装载着不同的数据到不同的地方。<br>虽然理论上，你可以在车顶上无限的堆货物（url中无限加参数）。但是运输公司可不傻，装货和卸货也是有很大成本的，他们会限制单次运输量来控制风险，数据量太大对浏览器和服务器都是很大负担。业界不成文的规定是，（大多数）浏览器通常都会限制url长度在2K个字节，而（大多数）服务器最多处理64K大小的url。超过的部分，恕不处理。如果你用GET服务，在request body偷偷藏了数据，不同服务器的处理方式也是不同的，有些服务器会帮你卸货，读出数据，有些服务器直接忽略，所以，虽然GET可以带request body，也不能保证一定能被接收到。</p>
+<p>TCP就像一辆辆大卡车，装载着不同的数据到不同的地方。<br>虽然理论上，你可以在车顶上无限的堆货物（url中无限加参数）。但是运输公司可不傻，装货和卸货也是有很大成本的，他们会限制单次运输量来控制风险，数据量太大对浏览器和服务器都是很大负担。业界不成文的规定是，（大多数）浏览器通常都会限制url长度在2K个字节，而（大多数）服务器最多处理64K大小的url。超过的部分，恕不处理。如果你用GET服务，在request body偷偷藏了数据，不同服务器的处理方式也是不同的，有些服务器会读出数据，有些服务器直接忽略，所以，虽然GET可以带Request Body，也不能保证一定能被接收到。</p>
 <p>GET和POST还有一个重大区别，简单的说：<br>GET产生一个TCP数据包；POST产生两个TCP数据包。</p>
-<p>对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200（返回数据）<br>而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok（返回数据）。<br>也就是说，GET只需要汽车跑一趟就把货送到了，而POST得跑两趟，第一趟，先去和服务器打个招呼“嗨，我等下要送一批货来，你们打开门迎接我”，然后再回头把货送过去。</p>
+<p>对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200（返回数据）<br>而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok（返回数据）。</p>
 <p>因为POST需要两步，时间上消耗的要多一点，看起来GET比POST更有效。因此Yahoo团队有推荐用GET替换POST来优化网站性能。但这是一个坑！跳入需谨慎。为什么？</p>
 <ol>
 <li>GET与POST都有自己的语义，不能随便混用。</li>

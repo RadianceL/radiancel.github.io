@@ -6,23 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Blog Bom!!BO!">
-    <title>Docker - Blog Bom!!BO!</title>
+    <title>Http GET/POST - Blog Bom!!BO!</title>
     <meta name="author" content="Eddie Lee">
     
     
     
-    <meta name="description" content="Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of o">
-<meta name="keywords" content="CentOS">
+    <meta name="description" content="关于Http一定光而熟知，那么到底Http是什么？？Http是一种通讯协议，在OSI七层协议中，位于【】，包装了TCP协议">
+<meta name="keywords" content="Http">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Docker">
-<meta property="og:url" content="http://yoursite.com/2017/10/14/Docker/index.html">
+<meta property="og:title" content="Http GET&#x2F;POST">
+<meta property="og:url" content="http://yoursite.com/2018/07/18/Http-GET-POST/index.html">
 <meta property="og:site_name" content="Blog Bom!!BO!">
-<meta property="og:description" content="Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on">
+<meta property="og:description" content="关于Http一定光而熟知，那么到底Http是什么？？Http是一种通讯协议，在OSI七层协议中，位于【】，包装了TCP协议">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2017-11-29T02:20:44.974Z">
+<meta property="og:updated_time" content="2018-07-21T08:12:39.807Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Docker">
-<meta name="twitter:description" content="Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on">
+<meta name="twitter:title" content="Http GET&#x2F;POST">
+<meta name="twitter:description" content="关于Http一定光而熟知，那么到底Http是什么？？Http是一种通讯协议，在OSI七层协议中，位于【】，包装了TCP协议">
     
     
         
@@ -198,14 +198,14 @@
                 <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
-            Docker
+            Http GET/POST
         </h1>
     
     
         <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-10-14T14:35:27+08:00">
+    <time itemprop="datePublished" datetime="2018-07-18T14:33:01+08:00">
 	
-		    Oct 14, 2017
+		    Jul 18, 2018
     	
     </time>
     
@@ -232,16 +232,32 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <p>Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.</p>
-<p><div align="right">—wikipedia</div><br><a id="more"></a></p>
-<h2 id="本教程主要针对服务器配置，windows，mac不在范围之内"><a href="#本教程主要针对服务器配置，windows，mac不在范围之内" class="headerlink" title="本教程主要针对服务器配置，windows，mac不在范围之内"></a>本教程主要针对服务器配置，windows，mac不在范围之内</h2><p>centos 安装方法：</p>
-<p>使用<code>uname -r</code>检查kernel版本，如果低于3.10.0，则需要升级内核版本<br>yum 方式安装</p>
-<h3 id="1-使用sudo或root权限的用户登入系统-更新yum"><a href="#1-使用sudo或root权限的用户登入系统-更新yum" class="headerlink" title="1.使用sudo或root权限的用户登入系统,更新yum"></a>1.使用sudo或root权限的用户登入系统,更新yum</h3><p><code>sudo yum update</code></p>
-<h3 id="2-添加-yum-仓库"><a href="#2-添加-yum-仓库" class="headerlink" title="2.添加 yum 仓库"></a>2.添加 yum 仓库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ sudo tee /etc/yum.repos.d/docker.repo &lt;&lt;-‘EOF’</span><br><span class="line">[dockerrepo]</span><br><span class="line">name=Docker Repository</span><br><span class="line">baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=https://yum.dockerproject.org/gpg</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-<h3 id="3-安装-Docker-包"><a href="#3-安装-Docker-包" class="headerlink" title="3.安装 Docker 包"></a>3.安装 Docker 包</h3><p><code>$ sudo yum install docker-engine</code></p>
-<h3 id="4-启动-docker-守护进程"><a href="#4-启动-docker-守护进程" class="headerlink" title="4.启动 docker 守护进程"></a>4.启动 docker 守护进程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl start docker.service</span><br><span class="line">配置让 docker 服务随系统自动启动</span><br><span class="line"></span><br><span class="line">$ sudo chkconfig docker on</span><br><span class="line">验证 docker 是否安装成功</span><br><span class="line"></span><br><span class="line">$ sudo systemctl enable docker.service</span><br><span class="line">安装一个hello-world镜像</span><br><span class="line">[xxxx@xxxxx ~]$ sudo docker run hello-world</span><br><span class="line">Hello from Docker.</span><br><span class="line">This message shows that your installation appears to be working correctly.</span><br><span class="line">To generate this message, Docker took the following steps:</span><br><span class="line">The Docker client contacted the Docker daemon.</span><br><span class="line">The Docker daemon pulled the &quot;hello-world&quot; image from the Docker Hub.</span><br><span class="line">The Docker daemon created a new container from that image which runs the</span><br><span class="line">executable that produces the output you are currently reading.</span><br><span class="line">The Docker daemon streamed that output to the Docker client, which sent it</span><br><span class="line">to your terminal.</span><br><span class="line">To try something more ambitious, you can run an Ubuntu container with:</span><br><span class="line">$ docker run -it ubuntu bash</span><br><span class="line">Share images, automate workflows, and more with a free Docker Hub account:</span><br><span class="line">https://hub.docker.com</span><br><span class="line">For more examples and ideas, visit:</span><br><span class="line">https://docs.docker.com/userguide/</span><br></pre></td></tr></table></figure>
-<p>整个过程是这样的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Docker 客户端连接到 Docker 守护进程；</span><br><span class="line">Docker 守护进程从 Docker Hub 中拉取名为 “hello-world” 的 image（镜像）；</span><br><span class="line">Docker 守护程序从该 image 中创建新的容器，该容器执行输出动作，输出的内容就是上面所看到的；</span><br><span class="line">Docker 守护程序将输出流到 Docker 客户端并发送你的终端显示。</span><br><span class="line">Docker Daemon是Docker架构中运行在后台的守护进程，大致可以分为Docker Server、Engine和Job三部分。Docker Daemon可以认为是通过Docker Server模块接受Docker Client的请求，并在Engine中处理请求，然后根据请求类型，创建出指定的Job并运行，运行过程的作用有以下几种可能：向Docker Registry获取镜像，通过graphdriver执行容器镜像的本地化操作，通过networkdriver执行容器网络环境的配置，通过execdriver执行容器内部运行的执行工作等。</span><br></pre></td></tr></table></figure></p>
-<p>常用命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker ps //查看所有运行中的docker</span><br><span class="line">docker images //查看所有镜像</span><br><span class="line">docker -d -p [this.port]:[docker.port] dockerName;</span><br><span class="line">docker -it run -it [Docker.Name] bash</span><br><span class="line">docker tag [docker.Name] [userAccount]/[new Create Repository]</span><br><span class="line">docker push [userAccount]/[new Create Repository]</span><br><span class="line">Mysql 中文乱码问题: –character-set-server=utf8mb4 –collation-server=utf8mb4_unicode_ci</span><br></pre></td></tr></table></figure></p>
+            <p>关于Http一定光而熟知，那么到底Http是什么？？<br>Http是一种通讯协议，在OSI七层协议中，位于【】，包装了TCP协议<br><a id="more"></a></p>
+<h1 id="HTTP-GET-POST"><a href="#HTTP-GET-POST" class="headerlink" title="HTTP GET/POST"></a>HTTP GET/POST</h1><p>首先两种协议最大的区别就是，get请求参数在URL中，属于明文传递<br>post请求参数在请求体中。有一点需要强调的是，Get请求也可以放请求体<br>但根据服务器的实现规则，并不一定可以被服务器拿到。</p>
+<p>以上就是GET请求和POST请求最大的区别，但如果仅仅到此，你的面试也就结束了。<br>经常阅读书的朋友可能会提到一下点</p>
+<ul>
+<li>GET在浏览器回退时是无害的，而POST会再次提交请求（两次请求）。</li>
+<li>GET产生的URL地址可以被浏览器记录为标签，而POST不可以。</li>
+<li>GET请求会被浏览器主动cache，而POST不会，除非手动设置。</li>
+<li>GET请求只能进行url编码，而POST支持多种编码方式。</li>
+<li>GET请求参数会被完整保留在浏览器历史记录里，而POST中的参数不会被保留。</li>
+<li>GET请求在URL中传送的参数是有长度限制的，而POST没有。</li>
+<li>对参数的数据类型，GET只接受ASCII字符，而POST没有限制。</li>
+<li>GET比POST更不安全，因为参数直接暴露在URL上，所以不能用来传递敏感信息。</li>
+<li>GET参数通过URL传递，POST放在Request body中。</li>
+</ul>
+<p>以上几乎可以算是“教科书式标准答案”了。但还是现象级别，没看到本质<br>我们再往下探究，HTTP到底是什么？HTTP是基于TCP/IP的关于数据如何在万维网中如何通信的协议。</p>
+<p>HTTP的底层是TCP/IP。所以GET和POST的底层也是TCP/IP，也就是说，GET/POST都是TCP链接。GET和POST能做的事情是一样一样的。你要给GET加上request body，给POST带上url参数，技术上是完全行的通的。</p>
+<p>我们把网络理解为一条大马路，在这条马路上，各种各样的数据奔流不息。<br>但他们怎么知道要到哪里去？是不是需要一个规则来限定数据的行为。</p>
+<p>TCP就像一辆辆大卡车，装载着不同的数据到不同的地方。<br>虽然理论上，你可以在车顶上无限的堆货物（url中无限加参数）。但是运输公司可不傻，装货和卸货也是有很大成本的，他们会限制单次运输量来控制风险，数据量太大对浏览器和服务器都是很大负担。业界不成文的规定是，（大多数）浏览器通常都会限制url长度在2K个字节，而（大多数）服务器最多处理64K大小的url。超过的部分，恕不处理。如果你用GET服务，在request body偷偷藏了数据，不同服务器的处理方式也是不同的，有些服务器会帮你卸货，读出数据，有些服务器直接忽略，所以，虽然GET可以带request body，也不能保证一定能被接收到。</p>
+<p>GET和POST还有一个重大区别，简单的说：<br>GET产生一个TCP数据包；POST产生两个TCP数据包。</p>
+<p>对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200（返回数据）<br>而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok（返回数据）。<br>也就是说，GET只需要汽车跑一趟就把货送到了，而POST得跑两趟，第一趟，先去和服务器打个招呼“嗨，我等下要送一批货来，你们打开门迎接我”，然后再回头把货送过去。</p>
+<p>因为POST需要两步，时间上消耗的要多一点，看起来GET比POST更有效。因此Yahoo团队有推荐用GET替换POST来优化网站性能。但这是一个坑！跳入需谨慎。为什么？</p>
+<ol>
+<li>GET与POST都有自己的语义，不能随便混用。</li>
+<li>据研究，在网络环境好的情况下，发一次包的时间和发两次包的时间差别基本可以无视。而在网络环境差的情况下，两次包的TCP在验证数据包完整性上，有非常大的优点。</li>
+<li>并不是所有浏览器都会在POST中发送两次包，Firefox就只发送一次。</li>
+</ol>
 
             
         </div>
@@ -251,7 +267,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/CentOS/">CentOS</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/Http/">Http</a>
 
             </div>
         
@@ -261,7 +277,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/29/Android-ViewPagerFramgent/"  data-tooltip="Android-ViewPagerFramgent">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -269,7 +285,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/07/16/DynamicProxy/" data-tooltip="Dynamic Proxy">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -287,7 +303,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2017/10/14/Docker/&amp;title=Docker">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/07/18/Http-GET-POST/&amp;title=Http GET/POST">
                     <i class="fa fa-qq"></i>
                 </a>
             </li>
@@ -327,7 +343,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/29/Android-ViewPagerFramgent/"  data-tooltip="Android-ViewPagerFramgent">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -335,7 +351,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/07/16/DynamicProxy/" data-tooltip="Dynamic Proxy">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -353,7 +369,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2017/10/14/Docker/&amp;title=Docker">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/07/18/Http-GET-POST/&amp;title=Http GET/POST">
                     <i class="fa fa-qq"></i>
                 </a>
             </li>
@@ -378,7 +394,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2017/10/14/Docker/&amp;title=Docker">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/07/18/Http-GET-POST/&amp;title=Http GET/POST">
                     <i class="fa fa-qq"></i><span>Share on QQ</span>
                 </a>
             </li>

@@ -11,14 +11,18 @@
     
     
     
-    <meta property="og:type" content="blog">
+    <meta name="description" content="你真的了解Git嘛，还是只是会用git clone,git push?曾经我以为，git只是个简单的硬盘，并不会对实际工作产生什么帮助不过最近与大佬一同工作，受到很大启发 This is Git!">
+<meta name="keywords" content="AutoTool">
+<meta property="og:type" content="blog">
 <meta property="og:title" content="Real-know-Git">
 <meta property="og:url" content="http://yoursite.com/2018/08/01/Real-know-Git/index.html">
 <meta property="og:site_name" content="Blog Bom!!BO!">
+<meta property="og:description" content="你真的了解Git嘛，还是只是会用git clone,git push?曾经我以为，git只是个简单的硬盘，并不会对实际工作产生什么帮助不过最近与大佬一同工作，受到很大启发 This is Git!">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-08-01T05:24:43.576Z">
+<meta property="og:updated_time" content="2018-08-01T06:46:41.265Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Real-know-Git">
+<meta name="twitter:description" content="你真的了解Git嘛，还是只是会用git clone,git push?曾经我以为，git只是个简单的硬盘，并不会对实际工作产生什么帮助不过最近与大佬一同工作，受到很大启发 This is Git!">
     
     
         
@@ -27,6 +31,12 @@
         <meta property="og:image" content="http://yoursite.com/assets/images/photo.png"/>
     
     
+        <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" />
+    
+    
+        <meta property="og:image" content="http://pic.paopaoche.net/up/2015-11/201511101726368467375.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://pic.paopaoche.net/up/2015-11/201511101726368467375.jpg" />
     
     
     <!--STYLES-->
@@ -179,15 +189,13 @@
 </nav>
 
             
-            <div id="main" data-behavior="4"
-                 class="
-                        hasCoverMetaIn
-                        ">
-                
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
-    
-    
-        <div class="post-header main-content-wrap text-left">
+        <div class="post-header-cover
+                    text-left
+                    "
+             style="background-image:url('http://pic.paopaoche.net/up/2015-11/201511101726368467375.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
             Real-know-Git
@@ -201,18 +209,57 @@
     	
     </time>
     
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Java/">Java</a>
+
+
+    
 </div>
 
     
 </div>
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            
+            <p>你真的了解Git嘛，还是只是会用git clone,git push?<br>曾经我以为，git只是个简单的硬盘，并不会对实际工作产生什么帮助<br>不过最近与大佬一同工作，受到很大启发 This is Git!<br><a id="more"></a></p>
+<h1 id="GitFlow"><a href="#GitFlow" class="headerlink" title="GitFlow"></a>GitFlow</h1><p>首先按照Git的标准工作流程，必须要有两个分支，master/dev<br>开发人员是不去碰master，只有当测试工作完成，由项目负责人审核通过，项目负责人把dev分支合并到master分支。</p>
+<p>按照git flow的工作流程，项目总共分三种迭代方式。</p>
+<ul>
+<li>新功能</li>
+<li>bug修改</li>
+<li>发行版更新</li>
+</ul>
+<p>当你来了一个业务需求，比如cv功能，就要从dev分支新建一个新功能<code>feature</code>分支，所有更改在feature分支完成，push到远程<code>feature</code>分支，测试完成后，与dev分支合并，供测试人员测试。测试完成后，由负责人合并到master分支，申请发布时间，发布上线。</p>
+<p>如果你的线上版本出现问题，需要紧急修复，就从<code>master</code>分支新建一个bugfix分支，进行修复，完成后同时同步到<code>master</code>和<code>dev</code>分支。保证<code>dev</code>分支要至少与master同步，通常的情况，尽量保证dev分支版本高于<code>master</code>分支，</p>
+<p>但是我们在开发过程中，有一种情况比较棘手，这种情况是，比如一个实验性的改动，或者重构，可能改动了大量的代码，这个工作并不是短期的工作，可能需要2个月时间，但这个期间接到了其他任务，比如你的项目有个bug需要修改，那这种情况，你很可能忘记更改分支，因为写新东西和富有挑战的任务总是会让人兴奋。这时候你只是提交了一次，并没有更改分支，继续在测试分支更改老版本的bug。<br>当你写到一般反应过来了，oh, shit!</p>
+<p>当然有个笨方法，查看版本历史，哪个文件改动了，一个一个把你改动的复制到bugfix分支。但是很傻，程序员不干体力劳动。</p>
+<p>所以当然有更好的方案，git设计之初考虑到了这部分<code>马虎</code>的开发者。</p>
+<p>stash<br>stash就是专门为马虎的开发者提供的功能，<br>大白话解释下什么事stash，stash可以把你当前版本的所有更改提取出来，放到储存区中，放心，这个时候你更改的代码不是消失了，只是换个地方保存起来。<br>切换回bugfix分支，再应用你的存储，这时候你在测试分支的修改bug的代码，就被带到bugfix分支了。<br>但需要注意的是，一定要记得每次新任务或临时做其他工作前提交一次代码，不一定非得提交到远程，本地一样可以。</p>
+<p>顺便一提，远程分支的备注，一定要很标准，这样对大型项目的管理很有帮助<br>可以看下Vue项目yyx990803大神的提交备注。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">Commits on Apr 5, 2018</span><br><span class="line">fix(ssr): remove trailing hash in webpack module identifier when  …</span><br><span class="line">@yyx990803</span><br><span class="line">yyx990803 committed on Apr 5</span><br><span class="line"></span><br><span class="line">ae6dcd6  </span><br><span class="line">Commits on Apr 3, 2018</span><br><span class="line">chore: new sponsor</span><br><span class="line">@yyx990803</span><br><span class="line">yyx990803 committed on Apr 3</span><br><span class="line"></span><br><span class="line">805a4fd  </span><br><span class="line">Commits on Apr 2, 2018</span><br><span class="line">chore: update sponsor</span><br><span class="line">@yyx990803</span><br><span class="line">yyx990803 committed on Apr 2</span><br><span class="line"></span><br><span class="line">ee1a368  </span><br><span class="line">Commits on Mar 24, 2018</span><br><span class="line">build: release 2.5.17-beta.0</span><br><span class="line">@yyx990803</span><br><span class="line">yyx990803 committed on Mar 24</span><br><span class="line"></span><br><span class="line">19552a8  </span><br><span class="line">build: build 2.5.17-beta.0</span><br><span class="line">@yyx990803</span><br><span class="line">yyx990803 committed on Mar 24</span><br><span class="line">dbf1510  </span><br><span class="line">types: make flow happy</span><br><span class="line">@yyx990803</span><br><span class="line">yyx990803 committed on Mar 24</span><br></pre></td></tr></table></figure></p>
+<h1 id="xxx-xxxxxxxx"><a href="#xxx-xxxxxxxx" class="headerlink" title="xxx:xxxxxxxx"></a>xxx:xxxxxxxx</h1><p>首先要有个大的前缀，标记你本地提交做的是哪方面的事，比如新加功能，修改bug，零碎的工作（无聊的工作）等等，接下来，描述本次更改具体完成的工作。如果只更改了一个文件，甚至可以把这个文件名放到：后面。</p>
+
             
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/AutoTool/">AutoTool</a>
+
+            </div>
         
         
             <div class="post-actions-wrap">

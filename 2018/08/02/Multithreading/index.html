@@ -1,0 +1,757 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Blog Bom!!BO!">
+    <title>Multithreading - Blog Bom!!BO!</title>
+    <meta name="author" content="Eddie Lee">
+    
+    
+    
+    <meta name="description" content="来总结一下多线程开发，加深学习。">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Multithreading">
+<meta property="og:url" content="http://yoursite.com/2018/08/02/Multithreading/index.html">
+<meta property="og:site_name" content="Blog Bom!!BO!">
+<meta property="og:description" content="来总结一下多线程开发，加深学习。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-08-02T09:17:23.513Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Multithreading">
+<meta name="twitter:description" content="来总结一下多线程开发，加深学习。">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/photo.png"/>
+    
+    
+        <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" />
+    
+    
+        <meta property="og:image" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg" />
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
+    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <!--STYLES END-->
+    
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Blog Bom!!BO!</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-stack-overflow"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-left
+                    "
+             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title" itemprop="headline">
+            Multithreading
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time itemprop="datePublished" datetime="2018-08-02T15:28:06+08:00">
+	
+		    Aug 02, 2018
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Java/">Java</a>
+
+
+    
+</div>
+
+    
+</div>
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+    
+    <div class="post-content markdown" itemprop="articleBody">
+        <div class="main-content-wrap">
+            <p>来总结一下多线程开发，加深学习。<br><a id="more"></a></p>
+<p>首先何为线程（进程/线程）？<br>进程操作系统动态执行基本单元，系统为每个进程分配内存，包括一般情况下，包括文本区域（text region/指令）、数据区域（data region/变量）和堆栈（stack region/对象）。</p>
+<p>我们的程序虽然可以做到多进程，但是，多进程需要切换上下文，什么是上下文？<br>当程序执行到多进程的指令，那么会把当前的上下文复制一份，到另一块内存区域，而又因为cpu是轮寻机制，不是顺序执行，关于CPU运行原理，百度上有篇文章写的很好，我这边引用一下。<br>所以频繁切换上下文（大概一次20微秒），属于没必要的昂贵消耗。另外就是进程间通信需要通过管道机制，比较复杂。</p>
+<p>那么多线程就出现了。<br>线程的定义是，一个线程有且至少有一个线程，线程利用进程的资源，且本身不拥有系统资源，所以对线程的调度的开销就会小很多。</p>
+<p>因为这篇文章我定一到Java的分类下面，所以还是要通过Java来描述<br>其实我认为要真的好好深入学习线程进程，cpu调度这块，还是要通过C来学<br>日后有时间，我会用C语言来模拟实现一遍</p>
+<p>既然了解了什么是线程，看下Java怎么实现多线程：<br><code>Thread</code>,<code>Runnable</code>,<code>Future</code><br>至于网上有些说4种的，其实就是用ExecutorService来管理了一下。<br>那么从头聊一聊。</p>
+<p><code>Thread</code> 其实是Runnable的实现类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Thread</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span></span><br></pre></td></tr></table></figure>
+<p>那Ok，既然继承了Runnbale，那就一定会有<code>Run</code>方法吧。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* What will be run. */</span></span><br><span class="line"><span class="keyword">private</span> Runnable target;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Thread</span><span class="params">(Runnable target)</span> </span>&#123;</span><br><span class="line">     init(<span class="keyword">null</span>, target, <span class="string">"Thread-"</span> + nextThreadNum(), <span class="number">0</span>);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (target != <span class="keyword">null</span>) &#123;</span><br><span class="line">        target.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之后再来看很关键的一个方法<br>首先判定现成的状态，0就是状态是新的，一切非新的状态都视为违法抛出异常<br>添加到线程组，线程组初始长度为4，如果满了就阔为2倍。<br>之后可以看到，调用了一个本地方法<code>start0</code>，如果成功，则更改<code>started</code>标签量<br>最后一个判定，启动失败，从线程组中移除当前线程。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * This method is not invoked for the main method thread or "system"</span></span><br><span class="line"><span class="comment">     * group threads created/set up by the VM. Any new functionality added</span></span><br><span class="line"><span class="comment">     * to this method in the future may have to also be added to the VM.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * A zero status value corresponds to state "NEW".</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">if</span> (threadStatus != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalThreadStateException();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Notify the group that this thread is about to be started</span></span><br><span class="line"><span class="comment">     * so that it can be added to the group's list of threads</span></span><br><span class="line"><span class="comment">     * and the group's unstarted count can be decremented. */</span></span><br><span class="line">    group.add(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">boolean</span> started = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        start0();</span><br><span class="line">        started = <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (!started) &#123;</span><br><span class="line">                group.threadStartFailed(<span class="keyword">this</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable ignore) &#123;</span><br><span class="line">            <span class="comment">/* do nothing. If start0 threw a Throwable then</span></span><br><span class="line"><span class="comment">              it will be passed up the call stack */</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>Thread</code>中出现的Runnable，作为一个接口，只有一个方法，就是<code>run</code>。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * When an object implementing interface &lt;code&gt;Runnable&lt;/code&gt; is used</span></span><br><span class="line"><span class="comment">     * to create a thread, starting the thread causes the object's</span></span><br><span class="line"><span class="comment">     * &lt;code&gt;run&lt;/code&gt; method to be called in that separately executing</span></span><br><span class="line"><span class="comment">     * thread.</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;</span></span><br><span class="line"><span class="comment">     * The general contract of the method &lt;code&gt;run&lt;/code&gt; is that it may</span></span><br><span class="line"><span class="comment">     * take any action whatsoever.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@see</span>     java.lang.Thread#run()</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>之后来看Future,<br><code>Future</code>其实提供了和<code>Runnable</code>能力并列的接口，简单解释一下为什么这么说，<code>Runnable</code>接口提供了<code>run</code>，也就是可以放在线程中执行的能力，<code>Future</code>其实是赋予了线程执行后可以返回的能力，<code>run</code>的声明是<code>void</code>，所以没有返回值。</p>
+<p>两者结合，简单易懂的一个类<code>RunnableFuture</code>的接口就出来了。<br>那么相当于<code>Thread</code>的实现类，<code>FutureTask</code>就出现了，它就是集大成者。</p>
+<p>为什么说相当于<code>Thread</code>,因为想要使用这个类，同样需要一个类似具有<code>Runnable</code>能力的接口。<br>就是<code>Callable</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Computes a result, or throws an exception if unable to do so.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> computed result</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception if unable to compute a result</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看下<code>Callable</code>的声明，是有返回值的，并且可以抛出异常的。<br>简单看下如何使用一个有返回值的多线程操作<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CallableTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">		Callable&lt;Integer&gt; callable = <span class="keyword">new</span> Task();</span><br><span class="line">		FutureTask task = <span class="keyword">new</span> FutureTask(callable);</span><br><span class="line"></span><br><span class="line">		Thread oneThread = <span class="keyword">new</span> Thread(task);</span><br><span class="line">		oneThread.start();</span><br><span class="line"></span><br><span class="line">		System.out.println(<span class="string">"&gt;&gt;&gt;  工作结果 "</span> + task.get().toString());</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Task</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Integer <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"&gt;&gt;&gt;  线程开始工作"</span>);</span><br><span class="line">		Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">		System.out.println(<span class="string">"&gt;&gt;&gt;  结束工作开始返回"</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">10</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到<code>FutureTask</code>依然调用的是<code>Thread</code>，走的是本地方法<code>start0</code>。<br>最后看下<code>ExecutorService</code>这个类，<code>ExecutorService</code>级别很高，他的爸爸直接就是Executor。</p>
+<p>他的儿子，是<code>AbstractExecutorService</code>，这里实现了<code>submit</code>,<code>doInvokeAny</code>等方法。<br>而我们调用<code>Executors.newFixedThreadPool(poolSize);</code>返回的是<code>ThreadPoolExecutor</code></p>
+<p>那这个类，又是<code>AbstractExecutorService</code>的儿子，所以这个关系就很明显了<br><code>ThreadPoolExecutor</code> -&gt; <code>AbstractExecutorService</code> -&gt; <code>ExecutorService</code> -&gt; <code>Executor</code></p>
+<p>看到一堆<code>submit</code>方法，然而没什么用，真正关键的方法，是execute方法,在<code>ThreadPoolExecutor</code>中实现。</p>
+<p>这个类有点意思，一上来就给我一个下马威<br><code>private final AtomicInteger ctl = new AtlmicInteger(ctlOf(RUNNING, 0));</code></p>
+<p>这个ctl到底是什么？<br>差了很久，在cnblogs里找到一个大神的描述 – Okevin</p>
+<p>这个变量使用来干嘛的呢？它的作用有点类似我们在《7.ReadWriteLock接口及其实现ReentrantReadWriteLock》中提到的读写锁有读、写两个同步状态，而AQS则只提供了state一个int型变量，此时将state高16位表示为读状态，低16位表示为写状态。这里的clt同样也是，它表示了两个概念：</p>
+<p>workerCount：当前有效的线程数<br>runState：当前线程池的五种状态，Running、Shutdown、Stop、Tidying、Terminate。<br>　　int型变量一共有32位，线程池的五种状态runState至少需要3位来表示，故workCount只能有29位，所以代码中规定线程池的有效线程数最多为2^29-1。</p>
+<p>看到这先来聊一下线程提交任务的规则，–《java并发编程艺术》</p>
+<ol>
+<li>首先会判断核心线程池里是否有线程可执行，有空闲线程则创建一个线程来执行任务。</li>
+<li>当核心线程池里已经没有线程可执行的时候，此时将任务丢到任务队列中去。</li>
+<li>如果任务队列（有界）也已经满了的话，但运行的线程数小于最大线程池的数量的时候，此时将会新建一个线程用于执行任务，但如果运行的线程数已经达到最大线程池的数量的时候，此时将无法创建线程执行任务。<br>　　所以实际上对于线程池不仅是单纯地将任务丢到线程池，线程池中有线程就执行任务，没线程就等待。</li>
+</ol>
+<p>最后附上大神对execute的注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * corePoolSize：核心线程池的线程数量</span></span><br><span class="line"><span class="comment">  *　</span></span><br><span class="line"><span class="comment">  *　maximumPoolSize：最大的线程池线程数量</span></span><br><span class="line"><span class="comment">  *　</span></span><br><span class="line"><span class="comment">  *　keepAliveTime：线程活动保持时间，线程池的工作线程空闲后，保持存活的时间。</span></span><br><span class="line"><span class="comment">  *　</span></span><br><span class="line"><span class="comment">  *　unit：线程活动保持时间的单位。</span></span><br><span class="line"><span class="comment">  *　</span></span><br><span class="line"><span class="comment">  *　workQueue：指定任务队列所使用的阻塞队列</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="comment">//ThreadPoolExecutor#execute</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (command == <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">　　 <span class="comment">//由它可以获取到当前有效的线程数和线程池的状态</span></span><br><span class="line">　　 <span class="comment">/*1.获取当前正在运行线程数是否小于核心线程池，是则新创建一个线程执行任务，否则将任务放到任务队列中*/</span></span><br><span class="line">　　 <span class="keyword">int</span> c = ctl.get();</span><br><span class="line">    <span class="keyword">if</span> (workerCountOf(c) &lt; corePoolSize)&#123;</span><br><span class="line">        <span class="keyword">if</span> (addWorker(command, tre))     <span class="comment">//在addWorker中创建工作线程执行任务</span></span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        c = ctl.get();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*2.当前核心线程池中全部线程都在运行workerCountOf(c) &gt;= corePoolSize，所以此时将线程放到任务队列中*/</span></span><br><span class="line">    <span class="comment">//线程池是否处于运行状态，且是否任务插入任务队列成功</span></span><br><span class="line">    <span class="keyword">if</span> (isRunning(c) &amp;&amp; workQueue.offer(command))    &#123;</span><br><span class="line">        <span class="keyword">int</span> recheck = ctl.get();</span><br><span class="line">　　　　 <span class="keyword">if</span> (!isRunning(recheck) &amp;&amp; remove(command))<span class="comment">//线程池是否处于运行状态，如果不是则使刚刚的任务出队</span></span><br><span class="line">　　　　　　 reject(command);<span class="comment">//抛出RejectedExceptionException异常</span></span><br><span class="line">　　　　 <span class="keyword">else</span> <span class="keyword">if</span> (workerCountOf(recheck) == <span class="number">0</span>)</span><br><span class="line">　　　　　　 addWorker(<span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">　　&#125;</span><br><span class="line"><span class="comment">/*3.插入队列不成功，且当前线程数数量小于最大线程池数量，此时则创建新线程执行任务，创建失败抛出异常*/</span></span><br><span class="line">　　<span class="keyword">else</span> <span class="keyword">if</span> (!addWorker(command, <span class="keyword">false</span>))&#123;</span><br><span class="line">　　　　reject(command);    <span class="comment">//抛出RejectedExceptionException异常</span></span><br><span class="line">　　&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ThreadPoolExecutor#addWorker</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">addWorker</span><span class="params">(Runnable firstTask, <span class="keyword">boolean</span> core)</span> </span>&#123;</span><br><span class="line"><span class="comment">/*首先会再次检查线程池是否处于运行状态，核心线程池中是否还有空闲线程，都满足条件过后则会调用compareAndIncrementWorkerCount先将正在运行的线程数+1，数量自增成功则跳出循环，自增失败则继续从头继续循环*/</span></span><br><span class="line">　　...</span><br><span class="line">　　<span class="keyword">if</span> (compareAndIncrementWorkerCount(c))</span><br><span class="line">　　　　<span class="keyword">break</span> retry;</span><br><span class="line">　　...</span><br><span class="line">　　<span class="comment">/*正在运行的线程数自增成功后则将线程封装成工作线程Worker*/</span></span><br><span class="line">　　<span class="keyword">boolean</span> workerStarted = <span class="keyword">false</span>;</span><br><span class="line">　　<span class="keyword">boolean</span> workerAdded = <span class="keyword">false</span>;</span><br><span class="line">　　Worker w = <span class="keyword">null</span>;</span><br><span class="line">　　<span class="keyword">try</span> &#123;</span><br><span class="line">　　　　<span class="keyword">final</span> ReentrantLock mainLock = <span class="keyword">this</span>.mainLock;<span class="comment">//全局锁</span></span><br><span class="line">　　　　w = <span class="keyword">new</span> Woker(firstTask);<span class="comment">//将线程封装为Worker工作线程</span></span><br><span class="line">　　　　<span class="keyword">final</span> Thread t = w.thread;</span><br><span class="line">　　　　<span class="keyword">if</span> (t != <span class="keyword">null</span>) &#123;</span><br><span class="line">　　　　　　<span class="comment">//获取全局锁</span></span><br><span class="line">　　　　　　mainLock.lock();</span><br><span class="line">　　　　　　<span class="comment">/*当持有了全局锁的时候，还需要再次检查线程池的运行状态等*/</span></span><br><span class="line">　　　　　　<span class="keyword">try</span> &#123;</span><br><span class="line">　　　　　　　　<span class="keyword">int</span> c = clt.get();</span><br><span class="line">　　　　　　　　<span class="keyword">int</span> rs = runStateOf(c);        <span class="comment">//线程池运行状态</span></span><br><span class="line">　　　　　　　　<span class="keyword">if</span> (rs &lt; SHUTDOWN || (rs == SHUTDOWN &amp;&amp; firstTask == <span class="keyword">null</span>))&#123;　　　　　　　　　　<span class="comment">//线程池处于运行状态，或者线程池关闭且任务线程为空</span></span><br><span class="line">　　　　　　　　　　<span class="keyword">if</span> (t.isAlive())    <span class="comment">//线程处于活跃状态，即线程已经开始执行或者还未死亡，正确的应线程在这里应该是还未开始执行的</span></span><br><span class="line">　　　　　　　　　　　　<span class="keyword">throw</span> <span class="keyword">new</span> IllegalThreadStateException();</span><br><span class="line">　　　　　　　　　　<span class="comment">//private final HashSet&lt;Worker&gt; wokers = new HashSet&lt;Worker&gt;();</span></span><br><span class="line">　　　　　　　　　　<span class="comment">//包含线程池中所有的工作线程，只有在获取了全局的时候才能访问它。将新构造的工作线程加入到工作线程集合中</span></span><br><span class="line">　　　　　　　　　　workers.add(w);</span><br><span class="line">　　　　　　　　　　<span class="keyword">int</span> s = worker.size();    <span class="comment">//工作线程数量</span></span><br><span class="line">　　　　　　　　　　<span class="keyword">if</span> (s &gt; largestPoolSize)</span><br><span class="line">　　　　　　　　　　　　largestPoolSize = s;</span><br><span class="line">　　　　　　　　　　workerAdded = <span class="keyword">true</span>;    <span class="comment">//新构造的工作线程加入成功</span></span><br><span class="line">　　　　　　　　&#125;</span><br><span class="line">　　　　　　&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">　　　　　　　　mainLock.unlock();</span><br><span class="line">　　　　　　&#125;</span><br><span class="line">　 　　　　<span class="keyword">if</span> (workerAdded) &#123;</span><br><span class="line">　　　　　　　　<span class="comment">//在被构造为Worker工作线程，且被加入到工作线程集合中后，执行线程任务</span></span><br><span class="line">　　　　　　　　<span class="comment">//注意这里的start实际上执行Worker中run方法，所以接下来分析Worker的run方法</span></span><br><span class="line">　　　　　　　　t.start();</span><br><span class="line">　　　　　　　　workerStarted = <span class="keyword">true</span>;</span><br><span class="line">　　　　　　&#125;</span><br><span class="line">　　　　&#125;</span><br><span class="line">　　&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">　　　　<span class="keyword">if</span> (!workerStarted)　　　<span class="comment">//未能成功创建执行工作线程</span></span><br><span class="line">　　　　　　<span class="comment">//在启动工作线程失败后，将工作线程从集合中移除</span></span><br><span class="line">　　　　　　addWorkerFailed(w);    </span><br><span class="line">　　&#125;</span><br><span class="line">　　<span class="keyword">return</span> workerStarted;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ThreadPoolExecutor$Worker，它继承了AQS，同时实现了Runnable，所以它具备了这两者的所有特性</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Worker</span> <span class="keyword">extends</span> <span class="title">AbstractQueuedSynchronizer</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">　　<span class="keyword">final</span> Thread thread;</span><br><span class="line">　　Runnable firstTask;</span><br><span class="line">　　<span class="function"><span class="keyword">public</span> <span class="title">Worker</span><span class="params">(Runnable firstTask)</span> </span>&#123;</span><br><span class="line">　　　　<span class="comment">//设置AQS的同步状态为-1，禁止中断，直到调用runWorker</span></span><br><span class="line">　　　　setState(-<span class="number">1</span>);    </span><br><span class="line">　　　　<span class="keyword">this</span>.firstTask = firstTask;</span><br><span class="line">　　　　<span class="comment">//通过线程工厂来创建一个线程，将自身作为Runnable传递传递</span></span><br><span class="line">　　　　<span class="keyword">this</span>.thread = getThreadFactory().newThread(<span class="keyword">this</span>);    </span><br><span class="line">　　&#125;</span><br><span class="line">　　<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">　　　　runWorker(<span class="keyword">this</span>);    <span class="comment">//运行工作线程</span></span><br><span class="line">　　&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Okevin<a href="http://www.cnblogs.com/yulinfeng/" target="_blank" rel="noopener">博客</a></p>
+
+            
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Java/">Java</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/08/01/Real-know-Git/" data-tooltip="Real-know-Git">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/08/02/Multithreading/&amp;title=Multithreading">
+                    <i class="fa fa-qq"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 Eddie Lee. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/08/01/Real-know-Git/" data-tooltip="Real-know-Git">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/08/02/Multithreading/&amp;title=Multithreading">
+                    <i class="fa fa-qq"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/08/02/Multithreading/&amp;title=Multithreading">
+                    <i class="fa fa-qq"></i><span>Share on QQ</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Eddie Lee</h4>
+        
+            <div id="about-card-bio"><p>Once work as assistant teacher</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                LN
+            </div>
+        
+    </div>
+</div>
+
+        <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-close"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
+                            <img class="media-image" src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
+                            <h3 class="media-heading">Docker</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Oct 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.</p>
+<p><div align="right">—wikipedia</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
+                            <img class="media-image" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
+                            <h3 class="media-heading">Android-ViewPagerFramgent</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Nov 29, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”</p>
+<p><div align="right">-Rollen Holt</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
+                            <h3 class="media-heading">Java Reference Object</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Nov 29, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>References and Referents<br>A reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and the referent cannot be changed.</p>
+<p><div align="right">—Keith D Gregory</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
+                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
+                            <h3 class="media-heading">C-Pointer</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Today learn pointer form enthusiastic netizen,really appreciate.</p>
+<p><div align="right">-土杜土杜</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
+                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
+                            <h3 class="media-heading">C-static-Library</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>UNIX is very simple, it just needs a genius to understand its simplicity.</p>
+<p><div align="right">-Dennis MacAlistair Ritchie</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
+                            <h3 class="media-heading">Redis</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Mar 20, 2018
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as strings, lists, maps, sets, sorted sets, hyperloglogs, bitmaps and spatial indexes. The project is mainly developed by Salvatore Sanfilippo and is currently sponsored by Redis Labs.[4]</p>
+<p><div align="right">—Wikipedia</div><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
+                            <h3 class="media-heading">jenkins</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Apr 5, 2018
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Auto-build tool from git to k8s</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
+                            <h3 class="media-heading">Maven error list</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    May 2, 2018
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>人啊，根据重新振作的方法可分为两种：<br>一种是看着比自己卑微的东西，寻找垫底聊以自慰；<br>另一种则是看着比自己伟大的东西，狠狠踢醒毫无气度的自己。</p>
+<div align="right">-note</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
+                            <h3 class="media-heading">Java-Annotation</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jun 3, 2018
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Annotation<br>I want to learn is by Spring <code>@bean</code>,Want to know how it work.<br>But toke a long time in busy.<br>Until today,There is my notes about Annotation.<br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
+                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
+                            <h3 class="media-heading">Software Suggest</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jun 7, 2018
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>When I design a interface platform system.<br>I find my system is not elegant realization.<br>Detrimental to maintenance.<br>So this my summary.<br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="no post found"
+                data-message-one="1 post found"
+                data-message-other="{n} posts found">
+                15 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/jquery.js"></script>
+<script src="/assets/js/jquery.fancybox.js"></script>
+<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
+<script src="/assets/js/tranquilpeak.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+    </body>
+</html>

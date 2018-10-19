@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg"},"articleBody":"Auto-build tool from git to k8s\n\n简介与Git无缝贴合，通过githook获取项目更新通知，完成编译-发布动作。\n安装环境：centos\n首先需要给yum引入源。\n1sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo\n之后安装两个命令：12sudo rpm --importhttps://jenkins-ci.org/redhat/jenkins-ci.org.keysudo yum -y install jenkins\n这里使用git作为更新管道，所以需要安装配置全局git账户git，安装java。测试git，clone一下。再安装maven允许开机启动12sudo chkconfig jenkins onsudo service jenkins start\n开启端口，访问服务器8080端口.\n配置首先进入界面，回要求输入密码，密码在服务器上，网页上标注了地址，cat一下就好。\n然后就可以创建项目了，选择一个自由的项目就可以，我们用git项目，所以勾选GitHub project，并把项目地址录入。\nSource Code Management选择git，url还是刚的项目地址，Credentials这里的类型选择用户名和密码，输入的就是你github的账号密码。\nBuild使用xecute shell，执行maven构建命令，比如mvn clean package\nBuild Triggers选择GitHub hook trigger for GITScm polling。githook的配置稍后再说。\nBuild Environment里选择一个Add timestamps to the Console Output，可以看到命令行输出。\nPost-build Actions需要插件deploy to container这个插件，这个可以稍后配置，安装插件要重启。\n这样我们的项目就配置好了\n关于git的配置，先要弄一个Personal Access Token,在Settings/Developer settings/Personal access tokens里，生成一个新的token，对应项目的地址。\n到项目的setting里配置webhook。url就是jenkins的服务器地址：8080+/github-webhook/ 结尾要有/，否则可能出问题\n回到jenkins，到系统设置的GitHub /Github Servers配置服务，配置用户时使用Secret text权限。测试一下连接。\n以上就配置好了当git接受新push的时候，自动构建，测试项目。\n下一步就是发布\n发布通常我们都使用Tomcat服务器，就使用deploy to container这个插件，再运行Tomcat的主机上，配置tomcat管理账户。\n\nWAR/EAR files：是相对于你前面配置的工作空间的。\nContext path：是你容器部署的目录，如果是tomcat，那么在webapps下，如果你不想要项目名称的话选”\\”,填写”ROOT”是不可以的。\nContainers： tomcat8。当然你要有manager用户信息。在tomcat目录下的conf目录，tomcat-users.xml修改如下：12345&lt;role rolename=\"manager-gui\"/&gt;&lt;role rolename=\"manager-script\"/&gt;&lt;role rolename=\"manager-jmx\"/&gt;&lt;role rolename=\"manager-status\"/&gt;&lt;user password=\"tomcat\" roles=\"manager-gui,manager-script,manager-jmx,manager-status\" username=\"tomcat\"/&gt;\n\n\n这样Tomcat就发布了。\n","dateCreated":"2018-04-05T19:31:13+08:00","dateModified":"2018-04-05T20:29:22+08:00","datePublished":"2018-04-05T19:31:13+08:00","description":"Auto-build tool from git to k8s","headline":"jenkins","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://pic.paopaoche.net/up/2015-11/201511101726368467375.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/04/05/jenkins/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg","logo":{"@type":"ImageObject","url":"my.jpg"}},"url":"http://yoursite.com/2018/04/05/jenkins/","keywords":"AutoTool","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"my.jpg"},"articleBody":"Auto-build tool from git to k8s\n\n简介与Git无缝贴合，通过githook获取项目更新通知，完成编译-发布动作。\n安装环境：centos\n首先需要给yum引入源。\n1sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo\n之后安装两个命令：12sudo rpm --importhttps://jenkins-ci.org/redhat/jenkins-ci.org.keysudo yum -y install jenkins\n这里使用git作为更新管道，所以需要安装配置全局git账户git，安装java。测试git，clone一下。再安装maven允许开机启动12sudo chkconfig jenkins onsudo service jenkins start\n开启端口，访问服务器8080端口.\n配置首先进入界面，回要求输入密码，密码在服务器上，网页上标注了地址，cat一下就好。\n然后就可以创建项目了，选择一个自由的项目就可以，我们用git项目，所以勾选GitHub project，并把项目地址录入。\nSource Code Management选择git，url还是刚的项目地址，Credentials这里的类型选择用户名和密码，输入的就是你github的账号密码。\nBuild使用xecute shell，执行maven构建命令，比如mvn clean package\nBuild Triggers选择GitHub hook trigger for GITScm polling。githook的配置稍后再说。\nBuild Environment里选择一个Add timestamps to the Console Output，可以看到命令行输出。\nPost-build Actions需要插件deploy to container这个插件，这个可以稍后配置，安装插件要重启。\n这样我们的项目就配置好了\n关于git的配置，先要弄一个Personal Access Token,在Settings/Developer settings/Personal access tokens里，生成一个新的token，对应项目的地址。\n到项目的setting里配置webhook。url就是jenkins的服务器地址：8080+/github-webhook/ 结尾要有/，否则可能出问题\n回到jenkins，到系统设置的GitHub /Github Servers配置服务，配置用户时使用Secret text权限。测试一下连接。\n以上就配置好了当git接受新push的时候，自动构建，测试项目。\n下一步就是发布\n发布通常我们都使用Tomcat服务器，就使用deploy to container这个插件，再运行Tomcat的主机上，配置tomcat管理账户。\n\nWAR/EAR files：是相对于你前面配置的工作空间的。\nContext path：是你容器部署的目录，如果是tomcat，那么在webapps下，如果你不想要项目名称的话选”\\”,填写”ROOT”是不可以的。\nContainers： tomcat8。当然你要有manager用户信息。在tomcat目录下的conf目录，tomcat-users.xml修改如下：12345&lt;role rolename=\"manager-gui\"/&gt;&lt;role rolename=\"manager-script\"/&gt;&lt;role rolename=\"manager-jmx\"/&gt;&lt;role rolename=\"manager-status\"/&gt;&lt;user password=\"tomcat\" roles=\"manager-gui,manager-script,manager-jmx,manager-status\" username=\"tomcat\"/&gt;\n\n\n这样Tomcat就发布了。\n","dateCreated":"2018-04-05T19:31:13+08:00","dateModified":"2018-04-05T20:29:22+08:00","datePublished":"2018-04-05T19:31:13+08:00","description":"Auto-build tool from git to k8s","headline":"jenkins","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://pic.paopaoche.net/up/2015-11/201511101726368467375.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/04/05/jenkins/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"my.jpg","logo":{"@type":"ImageObject","url":"my.jpg"}},"url":"http://yoursite.com/2018/04/05/jenkins/","keywords":"AutoTool","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="Auto-build tool from git to k8s">
 <meta name="keywords" content="AutoTool">
 <meta property="og:type" content="blog">
@@ -92,7 +92,7 @@
                 </a>
                 <h4 class="sidebar-profile-name">Eddie Lee</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
 </h5>
                 
             </div>
@@ -171,7 +171,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -406,7 +406,7 @@
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
-            <div id="about-card-bio"><p>Once work as assistant teacher</p>
+            <div id="about-card-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
 </div>
         
         

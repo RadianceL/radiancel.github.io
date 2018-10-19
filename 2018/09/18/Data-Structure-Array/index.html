@@ -11,6 +11,7 @@
     
     
     
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!\n何为数据结构数据结构是数据在计算机中存储的形态，比如一个班的学生，是站成一排，还是站成两排，还是正方形等等。\n那没有数据结构可不可以，如果没有数据结构，我们想想一下，还是这一个班的学生，我如果要找某个同学，假设我知道他叫什么，也知道他在哪，但我该怎么描述他的位置呢？\n如果是有结构的，我们可以说，第一排第六个，或者[3,4]这个位置，又或者[1,4,7]这样的三维位置可以描述他的准确位置，可如果它们没有结构，每个人都随意在任意一个位置，假设我们知道位置，但怎么告诉程序该去哪找他？\n所以，描述数据位置及组成的结构叫做数据结构。而选择合适的数据结构密切影响着我们程序运行的效率。\n数据结构在内存中大家都知道，计算机中的数据都在内存里，那么，数据结构在内存中是怎么样的？\n在内存中数据结构有四种方式\n\n顺序存储方法\n逻辑上相连的节点也存储在物理位置上也相邻的单元里，只存住节点的值，不存储节点的之间的关系\n遍历速度快\n不利于查找某个具体数据\n\n\n链表存储方法\n不要求物理上单元相邻，节点之间的关系由附加的指针来描述\n更改方便\n\n\n索引存储方法\n索引存储是在存储数据的同时，再建立一个附加的索引表，然后利用索引表中索引项的值来确定实际存储单元地址\n查找方便\n\n\n散列存储方法\n根据存储的关键字直接计算出节点的存储地址\n\n\n\n在Java中，数据结构的基本呈现首先我们第一站，肯定要描述最基本的单元，利用最基本的结构，来向上做出适应更复杂场景的结构。\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116117118119120121122123124125126127128129130131132133134135136137138139140141142143144145146public final class Array&lt;E&gt; &#123;  //泛型类保存数据\tprivate E[] data;  //一组数据中实际数据的下一个位置\tprivate int size;  //扩容参数\tprivate final float limit;\tpublic Array() &#123;\t\tthis(10, 0.4f);\t&#125;\tpublic Array(int capacity) &#123;\t\tthis(capacity, 0.4f);\t&#125;\tpublic Array(int capacity, float limit) &#123;\t\tdata = (E[]) new Object[capacity];\t\tthis.size = 0;\t\tthis.limit = limit;\t&#125;\t//O(1) 获取里面包含了多少数据\tpublic int getSize() &#123;\t\treturn size;\t&#125;\t//O(1) 获取数组当前的容量\tpublic int getCapacity() &#123;\t\treturn data.length;\t&#125;\t//O(1) 是否为空\tpublic boolean isEmpty() &#123;\t\treturn size == 0;\t&#125;\t//O(1) 存入一个数据\tpublic void put(E e) &#123;\t\tput(size, e);\t&#125;\t//O(n) 在第一个位置添加数据\tpublic void addFirst(E e) &#123;\t\tput(0, e);\t&#125;\t//O(1) 获取最后一个位置的数据\tpublic E getLast() &#123;\t\treturn data[size - 1];\t&#125;\t//O(1) 获取某个位置的数据\tpublic E get(int pos) &#123;\t\tif (pos &lt; 0 || pos &gt;= size)\t\t\tthrow new IllegalArgumentException(\"out of array, pos = \" + pos + \", size= \" + size);\t\treturn data[pos];\t&#125;\t//O(1) 设置某个位置上的数据\tpublic synchronized void set(int pos, E e) &#123;\t\tif (pos &lt; 0 || pos &gt;= size)\t\t\tthrow new IllegalArgumentException(\"set out of array, pos = \" + pos + \", size= \" + size);\t\tdata[pos] = e;\t&#125;\t//O(n) 放入一个数据，判断是否需要扩容，\tpublic synchronized void put(int pos, E e) &#123;\t\tif (pos &gt;= data.length)\t\t\tresize(data.length * 2);\t\tif (size == data.length || pos &lt; 0)\t\t\tthrow new IllegalArgumentException(\"add failed, array is already full pos = \" + pos + \" ,Size = \" + size + \" ,Capacity = \" + data.length);\t\tfor (int i = size - 1; i &gt;= pos; i--)\t\t\tdata[i + 1] = data[i];\t\tdata[pos] = e;\t\tsize++;\t&#125;\tpublic synchronized E deleteLast() &#123;\t\treturn delete(size - 1);\t&#125;\t//O(n)  删除某个位置元素，判断是否需要缩容\tpublic synchronized E delete(int pos) &#123;\t\tif (pos &lt; 0 || pos &gt;= size)\t\t\tthrow new IllegalArgumentException(\"delete failed, pos = \" + pos + \" ,Size = \" + size + \" ,Capacity = \" + data.length);\t\tE e = data[pos];\t\tif (pos != size - 1) &#123;\t\t\tfor (int i = pos; i &lt; size - 1; i++) &#123;\t\t\t\tdata[i] = data[i + 1];\t\t\t&#125;\t\t&#125;\t\tsize--;\t\tdata[size] = null;\t\tif (size &lt; data.length * limit)\t\t\tresize(data.length / 2);\t\treturn e;\t&#125;\t//O(n) 重制容器的容积\tprivate synchronized void resize(int capacity) &#123;\t\tif (capacity &lt; 5) &#123;\t\t\treturn;\t\t&#125;\t\tE[] newData = (E[]) new Object[capacity];\t\tfor (int i = 0; i &lt; size; i++) &#123;\t\t\tnewData[i] = data[i];\t\t&#125;\t\tdata = newData;\t&#125;\t@Override\tpublic String toString() &#123;\t\tStringBuilder res = new StringBuilder();\t\tres.append(String.format(\"Array: size = %d , capacity = %d\\n\", size, data.length));\t\tres.append('[');\t\tfor (int i = 0; i &lt; size; i++) &#123;\t\t\tres.append(data[i]);\t\t\tif (i != size - 1)\t\t\t\tres.append(\", \");\t\t&#125;\t\tres.append(']');\t\tSystem.out.println(\"内存中的数据&#123;\" + Arrays.toString(data) + \"&#125;\");\t\treturn res.toString();\t&#125;\tpublic static void main(String[] args) &#123;\t\tArray&lt;Integer&gt; array = new Array&lt;&gt;();\t\tfor (int i = 0; i &lt;= 20; i++)\t\t\tarray.put(i);\t\tfor (int i = 0; i &lt; 15; i++) &#123;\t\t\tarray.delete(0);\t\t\tSystem.out.println(array + \"\\n&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;\");\t\t&#125;\t&#125;&#125;\n以上就是一个可以装任意数据的组数结构的Java版本，那么有了这个结构，自然就衍生出来，堆结构和栈结构。\n第二篇数据结构就是堆栈结构的实战代码。\n","dateCreated":"2018-09-18T17:31:10+08:00","dateModified":"2018-09-19T09:18:58+08:00","datePublished":"2018-09-18T17:31:10+08:00","description":"Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!","headline":"Data Structure Array","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1537273413651&di=8b4639f3204c941e6ef026c910184646&imgtype=0&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/09/18/Data-Structure-Array/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2018/09/18/Data-Structure-Array/","keywords":"Data-Structure","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!">
 <meta name="keywords" content="Data-Structure">
 <meta property="og:type" content="blog">
@@ -19,7 +20,7 @@
 <meta property="og:site_name" content="Blog Bom!!BO!">
 <meta property="og:description" content="Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-09-19T01:18:57.554Z">
+<meta property="og:updated_time" content="2018-09-19T01:18:58.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Data Structure Array">
 <meta name="twitter:description" content="Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!">
@@ -27,8 +28,6 @@
     
         
     
-    
-        <meta property="og:image" content="http://yoursite.com/assets/images/photo.png"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -40,12 +39,10 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
     <!--STYLES END-->
     
+
     
 </head>
 
@@ -54,10 +51,6 @@
             <!-- Define author's picture -->
 
 
-    
-        
-            
-        
     
 
 <header id="header" data-behavior="4">
@@ -71,8 +64,6 @@
                 href="#about">
         
         
-            <img class="header-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
-        
         </a>
     
 </header>
@@ -80,23 +71,8 @@
             <!-- Define author's picture -->
 
 
-
-        
-    
-
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
-        
-            <div class="sidebar-profile">
-                <a href="/#about">
-                    <img class="sidebar-profile-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
-                </a>
-                <h4 class="sidebar-profile-name">Eddie Lee</h4>
-                
-                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
-</h5>
-                
-            </div>
         
         
             <ul class="sidebar-buttons">
@@ -106,9 +82,10 @@
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -118,9 +95,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -130,9 +108,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -142,10 +121,24 @@
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link open-algolia-search"
+                             href="#search"
+                            
+                            title="Search"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
             
@@ -154,9 +147,10 @@
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -167,19 +161,84 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener">
+                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener">
+                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-stack-overflow"></i>
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
+                    
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
+                    
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
+                    
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google +</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/mailto"
+                            title="Mail"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/atom.xml"
+                            
+                            title="RSS"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -197,13 +256,13 @@
             
                 <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             Data Structure Array
         </h1>
     
     
         <div class="post-meta">
-    <time itemprop="datePublished" datetime="2018-09-18T17:31:10+08:00">
+    <time datetime="2018-09-18T17:31:10+08:00">
 	
 		    Sep 18, 2018
     	
@@ -219,6 +278,7 @@
 
     
 </div>
+
             
         </div>
 
@@ -227,10 +287,10 @@
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
-    <div class="post-content markdown" itemprop="articleBody">
+    <div class="post-content markdown">
         <div class="main-content-wrap">
             <p>Program = Data Structure + Algorithm<br>所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构<br>Let’s start it!<br><a id="more"></a></p>
 <h1 id="何为数据结构"><a href="#何为数据结构" class="headerlink" title="何为数据结构"></a>何为数据结构</h1><p>数据结构是数据在计算机中存储的形态，比如一个班的学生，是站成一排，还是站成两排，还是正方形等等。</p>
@@ -267,6 +327,7 @@
 <p>第二篇数据结构就是堆栈结构的实战代码。</p>
 
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -284,43 +345,63 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/09/18/Data-Structure-Stack&Queue/"  data-tooltip="Data Structure Stack&amp;Queue">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/09/18/Data-Structure-Stack&Queue/" data-tooltip="Data Structure Stack&amp;Queue" aria-label="PREVIOUS: Data Structure Stack&amp;Queue">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/09/14/Spring-Boot-Operational-Principle/" data-tooltip="Spring Boot Operational Principle">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/09/14/Spring-Boot-Operational-Principle/" data-tooltip="Spring Boot Operational Principle" aria-label="NEXT: Spring Boot Operational Principle">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/09/18/Data-Structure-Array/&amp;title=Data Structure Array">
-                    <i class="fa fa-qq"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/09/18/Data-Structure-Array/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/09/18/Data-Structure-Array/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/09/18/Data-Structure-Array/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
         
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -350,43 +431,63 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/09/18/Data-Structure-Stack&Queue/"  data-tooltip="Data Structure Stack&amp;Queue">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/09/18/Data-Structure-Stack&Queue/" data-tooltip="Data Structure Stack&amp;Queue" aria-label="PREVIOUS: Data Structure Stack&amp;Queue">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/09/14/Spring-Boot-Operational-Principle/" data-tooltip="Spring Boot Operational Principle">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/09/14/Spring-Boot-Operational-Principle/" data-tooltip="Spring Boot Operational Principle" aria-label="NEXT: Spring Boot Operational Principle">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/09/18/Data-Structure-Array/&amp;title=Data Structure Array">
-                    <i class="fa fa-qq"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/09/18/Data-Structure-Array/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/09/18/Data-Structure-Array/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/09/18/Data-Structure-Array/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
         
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -395,14 +496,30 @@
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <i id="btn-close-shareoptions" class="fa fa-close"></i>
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/09/18/Data-Structure-Array/&amp;title=Data Structure Array">
-                    <i class="fa fa-qq"></i><span>Share on QQ</span>
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/09/18/Data-Structure-Array/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/09/18/Data-Structure-Array/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/09/18/Data-Structure-Array/">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
                 </a>
             </li>
         
@@ -414,17 +531,11 @@
         
 
 
-    
-        
-    
-
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
-            <i class="fa fa-remove"></i>
+            <i class="fa fa-times"></i>
         </div>
-        
-            <img id="about-card-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -440,314 +551,18 @@
             </div>
         
         
-            <div id="about-card-location">
-                <i class="fa fa-map-marker"></i>
-                <br/>
-                LN
-            </div>
+    </div>
+</div>
+
         
-    </div>
-</div>
-
-        <div id="algolia-search-modal" class="modal-container">
-    <div class="modal">
-        <div class="modal-header">
-            <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
-                <span class="searchby-algolia-text text-color-light text-small">by</span>
-                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
-            </a>
-            <i class="search-icon fa fa-search"></i>
-            <form id="algolia-search-form">
-                <input type="text" id="algolia-search-input" name="search"
-                    class="form-control input--large search-input" placeholder="Search "
-                    />
-            </form>
-        </div>
-        <div class="modal-body">
-            <div class="no-result text-color-light text-center">no post found</div>
-            <div class="results">
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
-                            <img class="media-image" src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
-                            <h3 class="media-heading">Docker</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Oct 14, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.</p>
-<p><div align="right">—wikipedia</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                            <img class="media-image" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                            <h3 class="media-heading">Android-ViewPagerFramgent</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Nov 29, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”</p>
-<p><div align="right">-Rollen Holt</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
-                            <h3 class="media-heading">Java Reference Object</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Nov 29, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>References and Referents<br>A reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and the referent cannot be changed.</p>
-<p><div align="right">—Keith D Gregory</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
-                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
-                            <h3 class="media-heading">C-Pointer</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Dec 28, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Today learn pointer form enthusiastic netizen,really appreciate.</p>
-<p><div align="right">-土杜土杜</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
-                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
-                            <h3 class="media-heading">C-static-Library</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Dec 28, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>UNIX is very simple, it just needs a genius to understand its simplicity.</p>
-<p><div align="right">-Dennis MacAlistair Ritchie</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
-                            <h3 class="media-heading">Redis</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Mar 20, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as strings, lists, maps, sets, sorted sets, hyperloglogs, bitmaps and spatial indexes. The project is mainly developed by Salvatore Sanfilippo and is currently sponsored by Redis Labs.[4]</p>
-<p><div align="right">—Wikipedia</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
-                            <h3 class="media-heading">jenkins</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Apr 5, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Auto-build tool from git to k8s</p></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
-                            <h3 class="media-heading">Maven error list</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    May 2, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>人啊，根据重新振作的方法可分为两种：<br>一种是看着比自己卑微的东西，寻找垫底聊以自慰；<br>另一种则是看着比自己伟大的东西，狠狠踢醒毫无气度的自己。</p>
-<div align="right">-note</div></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
-                            <h3 class="media-heading">Java-Annotation</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jun 3, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Annotation<br>I want to learn is by Spring <code>@bean</code>,Want to know how it work.<br>But toke a long time in busy.<br>Until today,There is my notes about Annotation.<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
-                            <h3 class="media-heading">Software Suggest</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jun 7, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>When I design a interface platform system.<br>I find my system is not elegant realization.<br>Detrimental to maintenance.<br>So this my summary.<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-            </div>
-        </div>
-        <div class="modal-footer">
-            <p class="results-count text-medium"
-                data-message-zero="no post found"
-                data-message-one="1 post found"
-                data-message-other="{n} posts found">
-                18 posts found
-            </p>
-        </div>
-    </div>
-</div>
-
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
 <!--SCRIPTS END-->
 
     
+
 
 
     </body>

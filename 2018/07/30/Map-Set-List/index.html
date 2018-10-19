@@ -11,6 +11,7 @@
     
     
     
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"读源码有助于对程序的深入理解，原来一直横向拓宽技术栈，现在开始每天读一点源码。这个Map很早就已经读完了，今天偷得浮生半日闲，来分享下。\n首先Map、Set、List的区别123456789101112131415161718192021222324252627282930313233343536373839404142434445public static void main(String[] args) &#123;        /**         * 线程安全 -- 性能依次提高         */        //同一时间只能有一个线程访问该容器，效率低        Hashtable&lt;String,String&gt; hashTable = new Hashtable&lt;&gt;();        //Hashtable的替代版本，同一时间只能有一个线程访问该容器的方法(方法锁)        Map&lt;String,String&gt; synchronizedMap = Collections.synchronizedMap(new HashMap&lt;&gt;());        //高性能版本，分段锁，线程安全        ConcurrentMap&lt;String,String&gt; concurrentHashMap = new ConcurrentHashMap&lt;&gt;();        /**         * 非线程安全         */        //实现SortMap接口，默认是按键值的升序排序        Map&lt;String,String&gt; treeMap = new TreeMap&lt;&gt;();        //LinkedHashMap保存了记录的插入顺序，在用Iterator遍历LinkedHashMap时，先得到的记录肯定是先插入的。也可以在构造时带参数，按照应用次数排序。        Map&lt;String,String&gt; linkedHashMap = new LinkedHashMap&lt;&gt;();        //HashMap 是一个最常用的Map，它根据键的HashCode 值存储数据，根据键可以直接获取它的值，具有很快的访问速度。遍历时，取得数据的顺序是完全随机的。        //HashMap最多只允许一条记录的键为Null；允许多条记录的值为 Null。        //HashMap不支持线程的同步（即任一时刻可以有多个线程同时写HashMap），可能会导致数据的不一致。如果需要同步，可以用 Collections的synchronizedMap方法使HashMap具有同步的能力，或者使用ConcurrentHashMap。        //HashTable与 HashMap类似，它继承自Dictionary类。不同的是：它不允许记录的键或者值为空；它支持线程的同步（即任一时刻只有一个线程能写HashTable），因此也导致了 HashTable在写入时会比较慢。        Map&lt;String,String&gt; hashMap = new HashMap&lt;&gt;();        /**         * List与Set         * 简要说明         * set --其中的值不允许重复，无序的数据结构。Set具有与Collection完全一样的接口，Set中的值必须唯一         * list --其中的值允许重复，因为其为有序的数据结构         * list和set是实现了collection接口的。         */        //为快速查找设计的Set。存入HashSet的对象必须定义hashCode()。        Set&lt;String&gt; hashSet = new HashSet&lt;&gt;();        //保存次序的Set, 底层为树结构。使用它可以从Set中提取有序的序列。        Set&lt;String&gt; treeSet = new TreeSet&lt;&gt;();        //LinkedHashSet : 具有HashSet的查询速度，且内部使用链表维护元素的顺序(插入的次序)。        //于是在使用迭代器遍历Set时，结果会按元素插入的次序显示。        Set&lt;String&gt; linkedHashSet = new LinkedHashSet&lt;&gt;();        //由数组实现的List。允许对元素进行快速随机访问，但是向List中间插入与移除元素的速度很慢        List&lt;String&gt; arrayList = new ArrayList&lt;&gt;();        //对顺序访问进行了优化，向List中间插入与删除的开销并不大。随机访问则相对较慢。        List&lt;String&gt; linkedList = new LinkedList&lt;&gt;();    &#125;\n那么光这么简单了解一下，肯定是没有深度的，透过现象看本质。这些东西的本质到底是什么List其实是一个Object[],Set其实是包装了Map，HashSet =&gt; HashMap、TreeSet =&gt; TreeMap……Map其实是相当于一个结构体，学过C语言的朋友肯定熟悉这个结构\n1234567static class Node&lt;K,V&gt; implements Map.Entry&lt;K,V&gt; &#123;        final int hash;        final K key;        V value;        Node&lt;K,V&gt; next;        //....&#125;\n那我们都开始读源码了，肯定不能就了解这么一点就完事了。继续读：\n从这里开始就要分两个大概念（读者可以不跟着我的概念走，并不一定适合任何人，仅供参考）两个概念是线程安全和非线程安全。\n提到线程安全，那大家肯定记得有个通用的线程安全的方法Collections.synchronizedxxx();没错，这个方法隶属于java.util包下的方法。功能是返回一个线程安全的容器。具体的实现方案是（以Collections.synchronizedMap为例）：12345678910111213141516171819202122232425262728293031323334implements Map&lt;K,V&gt;, Serializable &#123;        private static final long serialVersionUID = 1978198479659022715L;        private final Map&lt;K,V&gt; m;     // Backing Map        final Object      mutex;        // Object on which to synchronize        SynchronizedMap(Map&lt;K,V&gt; m) &#123;            this.m = Objects.requireNonNull(m);            mutex = this;        &#125;        SynchronizedMap(Map&lt;K,V&gt; m, Object mutex) &#123;            this.m = m;            this.mutex = mutex;        &#125;        public int size() &#123;            synchronized (mutex) &#123;return m.size();&#125;        &#125;        public boolean isEmpty() &#123;            synchronized (mutex) &#123;return m.isEmpty();&#125;        &#125;        public boolean containsKey(Object key) &#123;            synchronized (mutex) &#123;return m.containsKey(key);&#125;        &#125;        public boolean containsValue(Object value) &#123;            synchronized (mutex) &#123;return m.containsValue(value);&#125;        &#125;        public V get(Object key) &#123;            synchronized (mutex) &#123;return m.get(key);&#125;        &#125;        //....省略更多&#125;\n可以看到这个方法，返回都在synchronized块里，提供了方法锁。这样的方法肯定要比table类锁要高效一点。那接下来我们细说非线程安全这一块。继承Collection接口的只介绍一下ArrayList，其他的大同小异。Set内部也是Map，所以我们快速的把目光放到Map上123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960public static void main(String[] args)&#123;        List&lt;String&gt; list = new ArrayList&lt;&gt;();        //添加数据        for (int i =0; i &lt; 10; i++)&#123;            list.add(\"数据:\" + i);        &#125;        boolean isAddSuccess = list.add(\"0\");        String pos = list.get(0);        int size = list.size();        int position = list.indexOf(\"\");        boolean empty = list.isEmpty();        boolean isRemoveSuccess = list.remove(\"\");        String remove = list.remove(0);        //不建议使用，如频繁使用，则选择LinkedList        list.add(10,\"添加数据\");        //是否包含某条数据        boolean contains = list.contains(\"0\");        //迭代器        Iterator&lt;String&gt; iterator = list.iterator();        //for循环其实是一个封装了迭代的语法块,所以我们遍历采用迭代器        while (iterator.hasNext())&#123;            String str = iterator.next();            System.out.println(str);        &#125;        //带有操作功能的迭代器，add(),set(),remove...        ListIterator&lt;String&gt; listIterator = list.listIterator();        listIterator.previousIndex();        //Spliterator是一个可分割迭代器(splitable iterator)        Spliterator&lt;String&gt; spliterator1 = list.spliterator();        //将要迭代的元素数量        System.out.println(\"将要迭代的元素的数量\" + spliterator1.estimateSize());        //尝试分割一个List，返回靠前的数据段的迭代器，原迭代器从中间位置到最后位置。        Spliterator&lt;String&gt; spliterator2 = spliterator1.trySplit();        // 使用action消费下一个元素，指针向后移动一位        spliterator1.tryAdvance(s -&gt; System.out.println(s));        System.out.println(\"切分迭代器遍历数据1\");        System.out.println(\"获取ExactSizeIfKnown\" + spliterator1.getExactSizeIfKnown());        spliterator1.forEachRemaining(str -&gt; System.out.println(str));        System.out.println(\"切分迭代器遍历数据2\");        System.out.println(\"获取ExactSizeIfKnown\" + spliterator1.getExactSizeIfKnown());        spliterator2.forEachRemaining(str -&gt; System.out.println(str));        //显示的调用这个函数，如果参数大于底层数组长度的1.5倍        //那么这个数组的容量就会被扩容到这个参数值，如果参数小于低层数组长度的1.5倍        //那么这个容量就会被扩容到低层数组长度的1.5倍（至少底层数组的1.5倍)        ((ArrayList&lt;String&gt;) list).ensureCapacity(10);        list.clear();    &#125;\n那么本文的重头戏来了，我需要给这个重头戏加个粗\nMap没错，就是Map。那么为什么说Map是重头戏呢，因为从实际生产中来看，Map确实用的很多，从源码角度看，Map有太多值得我们学习的地方。\n前文已经简单介绍过Map了，我们先来回顾一下1234//HashMap 是一个最常用的Map，它根据键的HashCode 值存储数据，根据键可以直接获取它的值，具有很快的访问速度。遍历时，取得数据的顺序是完全随机的。//HashMap最多只允许一条记录的键为Null；允许多条记录的值为 Null。//HashMap不支持线程的同步（即任一时刻可以有多个线程同时写HashMap），可能会导致数据的不一致。如果需要同步，可以用 Collections的synchronizedMap方法使HashMap具有同步的能力，或者使用ConcurrentHashMap。//HashTable与 HashMap类似，它继承自Dictionary类。不同的是：它不允许记录的键或者值为空；它支持线程的同步（即任一时刻只有一个线程能写HashTable），因此也导致了 HashTable在写入时会比较慢。\nHashMap的底层采用类似C语言结构体一样的结构，定义了一个Node。而一个HashMap里包含很多个Node数组，我们称之为桶，那么HashMap既然是Hash，肯定会有Hash冲突的情况，我们看下HashMap怎么解决的冲突问题12345678910111213/**     * HashMap 内部有     *  final int hash;     V value;     *  final K key;        Node&lt;K,V&gt; next;     *     *  可以看到 HashMap 内部存储使用了一个 Node 数组(默认大小是16)，相当于一个链表     *  所有根据hash值计算的 bucket 一样的key会存储到同一个链表里（冲突）     *  当数据庞大时会影响效率，所以HashMap有自动扩容机制     *  计算方法为（默认情况下数组大小为16，loadFactor为0.75）     *  当size &gt; 16 * 0.75 时，size = 16 * 2     *  扩容会重新计算元素的位置，目的是让每个node链表降低深度，以达到高效     *     */\n那么我上面说过分为线程安全与线程不安全，为什么说Map线程不安全呢？\n1234567891011/**     *  原因有二：     *  - 假设两个线程同时put的key发生碰撞，那么根据HashMap实现，两个key会被添加到同一位置，其中一个线程的数据会被覆盖     *  - 多线程同时监测到需要扩容，都在重新计算元素位置以及复制数据，但是最终只有一个线程扩容后的数组会赋给 table     *  也就是说其他线程的都会丢失，并且各自线程 put 的数据也丢失。     *     *  《Java并发编程艺术》中说     *  &gt; HashMap 在并发执行 put 操作时会引起死循环，导致 CPU 利用率接近100%。因为多线程会导致 HashMap 的 Node 链表形成环形数据结构，     *  &gt; 一旦形成环形数据结构，Node 的 next 节点永远不为空，就会在获取 Node 时产生死循环。     *  put并不会导致以上问题，死循环发生在扩容阶段     */\n线程安全的部分：List没什么好说的，两个方案，一个是使用synchronized关键字，另一个是Collections.synchronizedList()。\n那么set底层同样采用Map来实现，我们知道ConcurrentHashMap是线程安全中最快的方案（后续详解），但那需要我们重写一个ConcurrentHashSet类，比较麻烦。通过百度一下，知道Google家的Guava已经帮我们实现了一个ConcurrentHashSet使用方法大概是这样的：Set&lt;String&gt; s = Sets.newConcurrentHashSet();\nMap的线程安全方案有三种，Hashtable,Collections.synchronizedMap,ConcurrentHashMap。\n可以说很丰富了，但究竟我们该用哪个？首先Hashtable可以说是完全可以不用看。速度很慢Collections.synchronizedMap可以接受所有种类的Map，还有Collections.synchronizedMap是方法锁，ConcurrentHashMap分段锁机制，Java6吧提供这个类，而java8目前使用CAS算法更高效了。从效率上讲，肯定是ConcurrentHashMap要更高效，但如果你对Map有特殊要求，比如TreeMap，那就要使用Collections.synchronizedMap了。\n什么？不信？？好吧，我这边有个测试类，运行一下看看～12345678910111213141516171819202122232425/** * Test started for: class java.util.Hashtable * 2500K entried added/retrieved in 1632 ms * 2500K entried added/retrieved in 1722 ms * 2500K entried added/retrieved in 2129 ms * 2500K entried added/retrieved in 2061 ms * 2500K entried added/retrieved in 2058 ms * For class java.util.Hashtable the average time is 1920 ms * * Test started for: class java.util.Collections$SynchronizedMap * 2500K entried added/retrieved in 2677 ms * 2500K entried added/retrieved in 1944 ms * 2500K entried added/retrieved in 2019 ms * 2500K entried added/retrieved in 1964 ms * 2500K entried added/retrieved in 1972 ms * For class java.util.Collections$SynchronizedMap the average time is 2115 ms * * Test started for: class java.util.concurrent.ConcurrentHashMap * 2500K entried added/retrieved in 752 ms * 2500K entried added/retrieved in 454 ms * 2500K entried added/retrieved in 1190 ms * 2500K entried added/retrieved in 484 ms * 2500K entried added/retrieved in 473 ms * For class java.util.concurrent.ConcurrentHashMap the average time is 670 ms */\n可以看到的确是ConcurrentHashMap的平均时间仅为670，另外两个结果都远超ConcurrentHashMap不只一倍。大家可以自己运行下看看，结果根据电脑配置上下有波动，但ConcurrentHashMap肯定是最快的（测试案例在本文结尾的GitHub链接里有）。\n简单来看目前大概就是这么多了，水平有限，更深层次的东西我怕说不明白。\n\nGitHub\n","dateCreated":"2018-07-30T15:02:44+08:00","dateModified":"2018-08-01T14:48:34+08:00","datePublished":"2018-07-30T15:02:44+08:00","description":"读源码有助于对程序的深入理解，原来一直横向拓宽技术栈，现在开始每天读一点源码。这个Map很早就已经读完了，今天偷得浮生半日闲，来分享下。","headline":"Map-Set-List","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/07/30/Map-Set-List/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2018/07/30/Map-Set-List/","keywords":"Java","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="读源码有助于对程序的深入理解，原来一直横向拓宽技术栈，现在开始每天读一点源码。这个Map很早就已经读完了，今天偷得浮生半日闲，来分享下。">
 <meta name="keywords" content="Java">
 <meta property="og:type" content="blog">
@@ -19,7 +20,7 @@
 <meta property="og:site_name" content="Blog Bom!!BO!">
 <meta property="og:description" content="读源码有助于对程序的深入理解，原来一直横向拓宽技术栈，现在开始每天读一点源码。这个Map很早就已经读完了，今天偷得浮生半日闲，来分享下。">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-08-01T06:48:34.221Z">
+<meta property="og:updated_time" content="2018-08-01T06:48:34.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Map-Set-List">
 <meta name="twitter:description" content="读源码有助于对程序的深入理解，原来一直横向拓宽技术栈，现在开始每天读一点源码。这个Map很早就已经读完了，今天偷得浮生半日闲，来分享下。">
@@ -27,8 +28,6 @@
     
         
     
-    
-        <meta property="og:image" content="http://yoursite.com/assets/images/photo.png"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -40,12 +39,10 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
     <!--STYLES END-->
     
+
     
 </head>
 
@@ -54,10 +51,6 @@
             <!-- Define author's picture -->
 
 
-    
-        
-            
-        
     
 
 <header id="header" data-behavior="4">
@@ -71,8 +64,6 @@
                 href="#about">
         
         
-            <img class="header-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
-        
         </a>
     
 </header>
@@ -80,23 +71,8 @@
             <!-- Define author's picture -->
 
 
-
-        
-    
-
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
-        
-            <div class="sidebar-profile">
-                <a href="/#about">
-                    <img class="sidebar-profile-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
-                </a>
-                <h4 class="sidebar-profile-name">Eddie Lee</h4>
-                
-                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
-</h5>
-                
-            </div>
         
         
             <ul class="sidebar-buttons">
@@ -106,9 +82,10 @@
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -118,9 +95,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -130,9 +108,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -142,10 +121,24 @@
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link open-algolia-search"
+                             href="#search"
+                            
+                            title="Search"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
             
@@ -154,9 +147,10 @@
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -167,19 +161,84 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener">
+                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener">
+                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-stack-overflow"></i>
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
+                    
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
+                    
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
+                    
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google +</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/mailto"
+                            title="Mail"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/atom.xml"
+                            
+                            title="RSS"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -197,13 +256,13 @@
             
                 <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             Map-Set-List
         </h1>
     
     
         <div class="post-meta">
-    <time itemprop="datePublished" datetime="2018-07-30T15:02:44+08:00">
+    <time datetime="2018-07-30T15:02:44+08:00">
 	
 		    Jul 30, 2018
     	
@@ -219,6 +278,7 @@
 
     
 </div>
+
             
         </div>
 
@@ -227,10 +287,10 @@
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
-    <div class="post-content markdown" itemprop="articleBody">
+    <div class="post-content markdown">
         <div class="main-content-wrap">
             <p>读源码有助于对程序的深入理解，原来一直横向拓宽技术栈，现在开始每天读一点源码。<br>这个Map很早就已经读完了，今天偷得浮生半日闲，来分享下。<br><a id="more"></a></p>
 <p>首先Map、Set、List的区别<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 线程安全 -- 性能依次提高</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="comment">//同一时间只能有一个线程访问该容器，效率低</span></span><br><span class="line">        Hashtable&lt;String,String&gt; hashTable = <span class="keyword">new</span> Hashtable&lt;&gt;();</span><br><span class="line">        <span class="comment">//Hashtable的替代版本，同一时间只能有一个线程访问该容器的方法(方法锁)</span></span><br><span class="line">        Map&lt;String,String&gt; synchronizedMap = Collections.synchronizedMap(<span class="keyword">new</span> HashMap&lt;&gt;());</span><br><span class="line">        <span class="comment">//高性能版本，分段锁，线程安全</span></span><br><span class="line">        ConcurrentMap&lt;String,String&gt; concurrentHashMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 非线程安全</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="comment">//实现SortMap接口，默认是按键值的升序排序</span></span><br><span class="line">        Map&lt;String,String&gt; treeMap = <span class="keyword">new</span> TreeMap&lt;&gt;();</span><br><span class="line">        <span class="comment">//LinkedHashMap保存了记录的插入顺序，在用Iterator遍历LinkedHashMap时，先得到的记录肯定是先插入的。也可以在构造时带参数，按照应用次数排序。</span></span><br><span class="line">        Map&lt;String,String&gt; linkedHashMap = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line">        <span class="comment">//HashMap 是一个最常用的Map，它根据键的HashCode 值存储数据，根据键可以直接获取它的值，具有很快的访问速度。遍历时，取得数据的顺序是完全随机的。</span></span><br><span class="line">        <span class="comment">//HashMap最多只允许一条记录的键为Null；允许多条记录的值为 Null。</span></span><br><span class="line">        <span class="comment">//HashMap不支持线程的同步（即任一时刻可以有多个线程同时写HashMap），可能会导致数据的不一致。如果需要同步，可以用 Collections的synchronizedMap方法使HashMap具有同步的能力，或者使用ConcurrentHashMap。</span></span><br><span class="line">        <span class="comment">//HashTable与 HashMap类似，它继承自Dictionary类。不同的是：它不允许记录的键或者值为空；它支持线程的同步（即任一时刻只有一个线程能写HashTable），因此也导致了 HashTable在写入时会比较慢。</span></span><br><span class="line">        Map&lt;String,String&gt; hashMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * List与Set</span></span><br><span class="line"><span class="comment">         * 简要说明</span></span><br><span class="line"><span class="comment">         * set --其中的值不允许重复，无序的数据结构。Set具有与Collection完全一样的接口，Set中的值必须唯一</span></span><br><span class="line"><span class="comment">         * list --其中的值允许重复，因为其为有序的数据结构</span></span><br><span class="line"><span class="comment">         * list和set是实现了collection接口的。</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="comment">//为快速查找设计的Set。存入HashSet的对象必须定义hashCode()。</span></span><br><span class="line">        Set&lt;String&gt; hashSet = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        <span class="comment">//保存次序的Set, 底层为树结构。使用它可以从Set中提取有序的序列。</span></span><br><span class="line">        Set&lt;String&gt; treeSet = <span class="keyword">new</span> TreeSet&lt;&gt;();</span><br><span class="line">        <span class="comment">//LinkedHashSet : 具有HashSet的查询速度，且内部使用链表维护元素的顺序(插入的次序)。</span></span><br><span class="line">        <span class="comment">//于是在使用迭代器遍历Set时，结果会按元素插入的次序显示。</span></span><br><span class="line">        Set&lt;String&gt; linkedHashSet = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//由数组实现的List。允许对元素进行快速随机访问，但是向List中间插入与移除元素的速度很慢</span></span><br><span class="line">        List&lt;String&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="comment">//对顺序访问进行了优化，向List中间插入与删除的开销并不大。随机访问则相对较慢。</span></span><br><span class="line">        List&lt;String&gt; linkedList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
@@ -257,6 +317,7 @@
 <p><a href="https://github.com/RadianceL/Baseknowledge" target="_blank" rel="noopener">GitHub</a></p>
 
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -274,43 +335,63 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/08/01/Real-know-Git/"  data-tooltip="Real-know-Git">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/08/01/Real-know-Git/" data-tooltip="Real-know-Git" aria-label="PREVIOUS: Real-know-Git">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/07/18/Http-GET-POST/" data-tooltip="Http GET/POST">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/07/18/Http-GET-POST/" data-tooltip="Http GET/POST" aria-label="NEXT: Http GET/POST">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/07/30/Map-Set-List/&amp;title=Map-Set-List">
-                    <i class="fa fa-qq"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/07/30/Map-Set-List/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/07/30/Map-Set-List/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/07/30/Map-Set-List/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
         
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -340,43 +421,63 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/08/01/Real-know-Git/"  data-tooltip="Real-know-Git">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/08/01/Real-know-Git/" data-tooltip="Real-know-Git" aria-label="PREVIOUS: Real-know-Git">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/07/18/Http-GET-POST/" data-tooltip="Http GET/POST">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/07/18/Http-GET-POST/" data-tooltip="Http GET/POST" aria-label="NEXT: Http GET/POST">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/07/30/Map-Set-List/&amp;title=Map-Set-List">
-                    <i class="fa fa-qq"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/07/30/Map-Set-List/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/07/30/Map-Set-List/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/07/30/Map-Set-List/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
         
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -385,14 +486,30 @@
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <i id="btn-close-shareoptions" class="fa fa-close"></i>
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/07/30/Map-Set-List/&amp;title=Map-Set-List">
-                    <i class="fa fa-qq"></i><span>Share on QQ</span>
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/07/30/Map-Set-List/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/07/30/Map-Set-List/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/07/30/Map-Set-List/">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
                 </a>
             </li>
         
@@ -404,17 +521,11 @@
         
 
 
-    
-        
-    
-
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
-            <i class="fa fa-remove"></i>
+            <i class="fa fa-times"></i>
         </div>
-        
-            <img id="about-card-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -430,314 +541,18 @@
             </div>
         
         
-            <div id="about-card-location">
-                <i class="fa fa-map-marker"></i>
-                <br/>
-                LN
-            </div>
+    </div>
+</div>
+
         
-    </div>
-</div>
-
-        <div id="algolia-search-modal" class="modal-container">
-    <div class="modal">
-        <div class="modal-header">
-            <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
-                <span class="searchby-algolia-text text-color-light text-small">by</span>
-                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
-            </a>
-            <i class="search-icon fa fa-search"></i>
-            <form id="algolia-search-form">
-                <input type="text" id="algolia-search-input" name="search"
-                    class="form-control input--large search-input" placeholder="Search "
-                    />
-            </form>
-        </div>
-        <div class="modal-body">
-            <div class="no-result text-color-light text-center">no post found</div>
-            <div class="results">
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
-                            <img class="media-image" src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
-                            <h3 class="media-heading">Docker</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Oct 14, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.</p>
-<p><div align="right">—wikipedia</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                            <img class="media-image" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                            <h3 class="media-heading">Android-ViewPagerFramgent</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Nov 29, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”</p>
-<p><div align="right">-Rollen Holt</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
-                            <h3 class="media-heading">Java Reference Object</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Nov 29, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>References and Referents<br>A reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and the referent cannot be changed.</p>
-<p><div align="right">—Keith D Gregory</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
-                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
-                            <h3 class="media-heading">C-Pointer</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Dec 28, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Today learn pointer form enthusiastic netizen,really appreciate.</p>
-<p><div align="right">-土杜土杜</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
-                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
-                            <h3 class="media-heading">C-static-Library</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Dec 28, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>UNIX is very simple, it just needs a genius to understand its simplicity.</p>
-<p><div align="right">-Dennis MacAlistair Ritchie</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
-                            <h3 class="media-heading">Redis</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Mar 20, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as strings, lists, maps, sets, sorted sets, hyperloglogs, bitmaps and spatial indexes. The project is mainly developed by Salvatore Sanfilippo and is currently sponsored by Redis Labs.[4]</p>
-<p><div align="right">—Wikipedia</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
-                            <h3 class="media-heading">jenkins</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Apr 5, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Auto-build tool from git to k8s</p></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
-                            <h3 class="media-heading">Maven error list</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    May 2, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>人啊，根据重新振作的方法可分为两种：<br>一种是看着比自己卑微的东西，寻找垫底聊以自慰；<br>另一种则是看着比自己伟大的东西，狠狠踢醒毫无气度的自己。</p>
-<div align="right">-note</div></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
-                            <h3 class="media-heading">Java-Annotation</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jun 3, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Annotation<br>I want to learn is by Spring <code>@bean</code>,Want to know how it work.<br>But toke a long time in busy.<br>Until today,There is my notes about Annotation.<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
-                            <h3 class="media-heading">Software Suggest</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jun 7, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>When I design a interface platform system.<br>I find my system is not elegant realization.<br>Detrimental to maintenance.<br>So this my summary.<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-            </div>
-        </div>
-        <div class="modal-footer">
-            <p class="results-count text-medium"
-                data-message-zero="no post found"
-                data-message-one="1 post found"
-                data-message-other="{n} posts found">
-                18 posts found
-            </p>
-        </div>
-    </div>
-</div>
-
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
 <!--SCRIPTS END-->
 
     
+
 
 
     </body>

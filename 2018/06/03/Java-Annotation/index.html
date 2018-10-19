@@ -11,6 +11,7 @@
     
     
     
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.\nFirst you need create class and replace class to @interfaceAll Annotation implicit inheritance from java.lang.annotation.AnnotationAnd all your annotation can use meta-annotationThere have four meta-annotation\n\n@Target mark where your annotation can use, without @Target, your annotation can use everywhere\n\nElementType.ANNOTATION_TYPE —mark annotation type\nElementType.PACKAGE —above package\nElementType.TYPE —above class and interface\nElementType.METHOD — above method\nElementType.CONSTRUCT —above construct\nElementType.FIELD —member domain\nElementType.PARAMETER —above method or whit parameter\nElementType.LOCAL_VARIABLE —local variable\nTElementType.YPE_PARAMETER —type parameter\nElementType.TYPE_USE —type use\n\n\n@Retention be used to mark a annotation keep time, without @Retention, default is RetentionPolicy.CLASS\n\nRetentionPolicy.SOURCE —not include class file\nRetentionPolicy.CLASS —include class file but JVM not load\nRetentionPolicy.RUNTIME —include class file and JVM will load, you can get them by reflex\n\n\n@Document create note for archive like JavaDoc\n\n@Inherited only be used to class, if a has extend annotation, then it all child class auto have the same annotation\n\n\n\nok, there is a demo.first need create a annotation by yourself.The meta-annotation above public @interface Foo {}you can chose which is necessary12345678import java.lang.annotation.*;@Documented@Retention(RetentionPolicy.RUNTIME)public @interface Foo &#123;    String name() default \"\";    int count() default 0;&#125;\nthis annotation Foo has two value, name and count.that value type can be\n\nBase-Type (int, short, long, byte, char, double, float or boolean)\nString\nClass (such as Class&lt;? extend Bar&gt;)\nEnum\nAnnotation\nArray (create from above type)\n\nso this Foo can be use now\n12345678910@Foo(value = \"这是类注解\",count = 1)public class Bar &#123;    @Foo(value = \"这是属性注解\",count = 2)    private String name;    @Foo(value = \"这是方法注解\",count = 3)    private void test()&#123;        System.out.println(\"\");    &#125;&#125;\nas you can see @Foo can use above class, property and method.because of when i create it whit @Target, so Foo can use whit them.\nbut only annotation can not do anything.must be have a “process” to handle.\nso there is my “process”:\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748public class FooProcess&#123;    public static void analyze(Class clazz) throws NoSuchMethodException &#123;        //get all class annotation information        Annotation[] classAnnotation = clazz.getAnnotations();        for(Annotation annotation : classAnnotation)&#123;            Class annotationType =  annotation.annotationType();            boolean equals = annotationType.equals(Foo.class);            if (equals)&#123;                System.out.println(\"Bar class has Foo annotation\");                System.out.println(\"info: \" + ((Foo)annotation).value() + \",\" + ((Foo)annotation).count());            &#125;            //get all annotation type            System.out.println(\"Bar class annotation is:\" + annotationType);        &#125;        System.out.println();        //get all property annotation information        Field[] fields = clazz.getDeclaredFields();        for (Field field :fields)&#123;            String filedName = field.getName();            Annotation[] allAnnotations = field.getAnnotations();            for(Annotation an : allAnnotations)&#123;                Class annotationType = an.annotationType();                System.out.println(\"FiledName[\"+filedName+\"]property annotation: \" + annotationType);            &#125;            if (field.isAnnotationPresent(Foo.class))&#123;                Foo foo = field.getAnnotation(Foo.class);                System.out.println(\"FiledName[\"+filedName+\"]property info: \"+ foo.value() + \",\" + foo.count());            &#125;        &#125;        System.out.println();        //get all method annotation information        Method method = clazz.getDeclaredMethod(\"test\", null);//get private and public method        Annotation[] annotations = method.getAnnotations();        for (Annotation annotation : annotations)&#123;            Class annotationType = annotation.annotationType();            System.out.println(\"test method has annotation type: \" + annotationType);            if (annotationType.equals(Foo.class)) &#123;                Foo mode = (Foo) annotation;                System.out.println(\"info: \" + mode.value() + \",\" + mode.count());            &#125;        &#125;    &#125;&#125;\nand run with :1234567public static void main(String args[])&#123;        try &#123;            FooProcess.analyze(Bar.class);        &#125; catch (NoSuchMethodException e) &#123;            e.printStackTrace();        &#125;    &#125;\nsee console123456789Bar class has Foo annotationinfo: this is class annotation,1Bar class annotation is:interface com.eddie.annotation.FooFiledName[name]property annotation: interface com.eddie.annotation.FooFiledName[name]property info: this is property annotation,2test method has annotation type: interface com.eddie.annotation.Fooinfo: this is method annotation,3\nyou can do everything in process, but first you need use if to know target locationreal have your annotation, if not, you will get a NullPointerException or maybeClassCastException. we don’t want to see them, right?then you can get value and do what you want.\n","dateCreated":"2018-06-03T11:37:17+08:00","dateModified":"2018-06-03T14:05:48+08:00","datePublished":"2018-06-03T11:37:17+08:00","description":"AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.","headline":"Java-Annotation","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/06/03/Java-Annotation/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2018/06/03/Java-Annotation/","keywords":"Java","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.">
 <meta name="keywords" content="Java">
 <meta property="og:type" content="blog">
@@ -19,7 +20,7 @@
 <meta property="og:site_name" content="Blog Bom!!BO!">
 <meta property="og:description" content="AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-06-03T06:05:48.790Z">
+<meta property="og:updated_time" content="2018-06-03T06:05:48.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java-Annotation">
 <meta name="twitter:description" content="AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.">
@@ -27,8 +28,6 @@
     
         
     
-    
-        <meta property="og:image" content="http://yoursite.com/assets/images/photo.png"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -40,12 +39,10 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
     <!--STYLES END-->
     
+
     
 </head>
 
@@ -54,10 +51,6 @@
             <!-- Define author's picture -->
 
 
-    
-        
-            
-        
     
 
 <header id="header" data-behavior="4">
@@ -71,8 +64,6 @@
                 href="#about">
         
         
-            <img class="header-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
-        
         </a>
     
 </header>
@@ -80,23 +71,8 @@
             <!-- Define author's picture -->
 
 
-
-        
-    
-
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
-        
-            <div class="sidebar-profile">
-                <a href="/#about">
-                    <img class="sidebar-profile-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
-                </a>
-                <h4 class="sidebar-profile-name">Eddie Lee</h4>
-                
-                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
-</h5>
-                
-            </div>
         
         
             <ul class="sidebar-buttons">
@@ -106,9 +82,10 @@
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -118,9 +95,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -130,9 +108,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -142,10 +121,24 @@
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link open-algolia-search"
+                             href="#search"
+                            
+                            title="Search"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
             
@@ -154,9 +147,10 @@
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -167,19 +161,84 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener">
+                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener">
+                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-stack-overflow"></i>
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
+                    
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
+                    
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
+                    
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google +</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/mailto"
+                            title="Mail"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/atom.xml"
+                            
+                            title="RSS"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -197,13 +256,13 @@
             
                 <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             Java-Annotation
         </h1>
     
     
         <div class="post-meta">
-    <time itemprop="datePublished" datetime="2018-06-03T11:37:17+08:00">
+    <time datetime="2018-06-03T11:37:17+08:00">
 	
 		    Jun 03, 2018
     	
@@ -219,6 +278,7 @@
 
     
 </div>
+
             
         </div>
 
@@ -227,10 +287,10 @@
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
-    <div class="post-content markdown" itemprop="articleBody">
+    <div class="post-content markdown">
         <div class="main-content-wrap">
             <p>Annotation<br>I want to learn is by Spring <code>@bean</code>,Want to know how it work.<br>But toke a long time in busy.<br>Until today,There is my notes about Annotation.<br><a id="more"></a></p>
 <p>First you need create class and replace <code>class</code> to <code>@interface</code><br>All Annotation implicit inheritance from java.lang.annotation.Annotation<br>And all your annotation can use meta-annotation<br>There have four meta-annotation</p>
@@ -283,6 +343,7 @@
 <p>you can do everything in process, but first you need use if to know target location<br>real have your annotation, if not, you will get a NullPointerException or maybe<br>ClassCastException. we don’t want to see them, right?<br>then you can get value and do what you want.</p>
 
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -300,43 +361,63 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/06/07/Software-Suggest/"  data-tooltip="Software Suggest">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/06/07/Software-Suggest/" data-tooltip="Software Suggest" aria-label="PREVIOUS: Software Suggest">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/05/02/Maven-error-list/" data-tooltip="Maven error list">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/05/02/Maven-error-list/" data-tooltip="Maven error list" aria-label="NEXT: Maven error list">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/06/03/Java-Annotation/&amp;title=Java-Annotation">
-                    <i class="fa fa-qq"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
         
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -366,43 +447,63 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/06/07/Software-Suggest/"  data-tooltip="Software Suggest">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/06/07/Software-Suggest/" data-tooltip="Software Suggest" aria-label="PREVIOUS: Software Suggest">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/05/02/Maven-error-list/" data-tooltip="Maven error list">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/05/02/Maven-error-list/" data-tooltip="Maven error list" aria-label="NEXT: Maven error list">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/06/03/Java-Annotation/&amp;title=Java-Annotation">
-                    <i class="fa fa-qq"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
         
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -411,14 +512,30 @@
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <i id="btn-close-shareoptions" class="fa fa-close"></i>
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/06/03/Java-Annotation/&amp;title=Java-Annotation">
-                    <i class="fa fa-qq"></i><span>Share on QQ</span>
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/06/03/Java-Annotation/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/06/03/Java-Annotation/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/06/03/Java-Annotation/">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
                 </a>
             </li>
         
@@ -430,17 +547,11 @@
         
 
 
-    
-        
-    
-
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
-            <i class="fa fa-remove"></i>
+            <i class="fa fa-times"></i>
         </div>
-        
-            <img id="about-card-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -456,314 +567,18 @@
             </div>
         
         
-            <div id="about-card-location">
-                <i class="fa fa-map-marker"></i>
-                <br/>
-                LN
-            </div>
+    </div>
+</div>
+
         
-    </div>
-</div>
-
-        <div id="algolia-search-modal" class="modal-container">
-    <div class="modal">
-        <div class="modal-header">
-            <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
-                <span class="searchby-algolia-text text-color-light text-small">by</span>
-                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
-            </a>
-            <i class="search-icon fa fa-search"></i>
-            <form id="algolia-search-form">
-                <input type="text" id="algolia-search-input" name="search"
-                    class="form-control input--large search-input" placeholder="Search "
-                    />
-            </form>
-        </div>
-        <div class="modal-body">
-            <div class="no-result text-color-light text-center">no post found</div>
-            <div class="results">
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
-                            <img class="media-image" src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
-                            <h3 class="media-heading">Docker</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Oct 14, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.</p>
-<p><div align="right">—wikipedia</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                            <img class="media-image" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                            <h3 class="media-heading">Android-ViewPagerFramgent</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Nov 29, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”</p>
-<p><div align="right">-Rollen Holt</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
-                            <h3 class="media-heading">Java Reference Object</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Nov 29, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>References and Referents<br>A reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and the referent cannot be changed.</p>
-<p><div align="right">—Keith D Gregory</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
-                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
-                            <h3 class="media-heading">C-Pointer</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Dec 28, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Today learn pointer form enthusiastic netizen,really appreciate.</p>
-<p><div align="right">-土杜土杜</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
-                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
-                            <h3 class="media-heading">C-static-Library</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Dec 28, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>UNIX is very simple, it just needs a genius to understand its simplicity.</p>
-<p><div align="right">-Dennis MacAlistair Ritchie</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
-                            <h3 class="media-heading">Redis</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Mar 20, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as strings, lists, maps, sets, sorted sets, hyperloglogs, bitmaps and spatial indexes. The project is mainly developed by Salvatore Sanfilippo and is currently sponsored by Redis Labs.[4]</p>
-<p><div align="right">—Wikipedia</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
-                            <h3 class="media-heading">jenkins</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Apr 5, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Auto-build tool from git to k8s</p></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
-                            <h3 class="media-heading">Maven error list</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    May 2, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>人啊，根据重新振作的方法可分为两种：<br>一种是看着比自己卑微的东西，寻找垫底聊以自慰；<br>另一种则是看着比自己伟大的东西，狠狠踢醒毫无气度的自己。</p>
-<div align="right">-note</div></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
-                            <h3 class="media-heading">Java-Annotation</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jun 3, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Annotation<br>I want to learn is by Spring <code>@bean</code>,Want to know how it work.<br>But toke a long time in busy.<br>Until today,There is my notes about Annotation.<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
-                            <h3 class="media-heading">Software Suggest</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jun 7, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>When I design a interface platform system.<br>I find my system is not elegant realization.<br>Detrimental to maintenance.<br>So this my summary.<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-            </div>
-        </div>
-        <div class="modal-footer">
-            <p class="results-count text-medium"
-                data-message-zero="no post found"
-                data-message-one="1 post found"
-                data-message-other="{n} posts found">
-                18 posts found
-            </p>
-        </div>
-    </div>
-</div>
-
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
 <!--SCRIPTS END-->
 
     
+
 
 
     </body>

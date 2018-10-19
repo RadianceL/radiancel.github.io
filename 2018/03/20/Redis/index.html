@@ -11,6 +11,7 @@
     
     
     
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as strings, lists, maps, sets, sorted sets, hyperloglogs, bitmaps and spatial indexes. The project is mainly developed by Salvatore Sanfilippo and is currently sponsored by Redis Labs.[4]\n—Wikipedia\nRedis 简介高并发系统瓶颈点一部分在于数据库访问，网络延迟。Redis的作用是缓存数据库内容，使其不必每次都访问数据库。\nJava使用Redis首先Maven添加项目依赖：12345&lt;dependency&gt;    &lt;groupId&gt;redis.clients&lt;/groupId&gt;    &lt;artifactId&gt;jedis&lt;/artifactId&gt;    &lt;version&gt;&#123;jedis.version&#125;&lt;/version&gt;&lt;/dependency&gt;\n其次，Redis接收的是序列化后的二进制数据，如果使用java自带的序列化工具效率是不够好的，这里我选择使用protostuff,说白了就是第三方序列化工具12345678910&lt;dependency&gt;  &lt;groupId&gt;com.dyuproject.protostuff&lt;/groupId&gt;  &lt;artifactId&gt;protostuff-core&lt;/artifactId&gt;  &lt;version&gt;&#123;protostuff.version&#125;&lt;/version&gt;&lt;/dependency&gt;&lt;dependency&gt;  &lt;groupId&gt;com.dyuproject.protostuff&lt;/groupId&gt;  &lt;artifactId&gt;protostuff-runtime&lt;/artifactId&gt;  &lt;version&gt;&#123;protostuff.version&#125;&lt;/version&gt;&lt;/dependency&gt;\n这就是Redis需要添加的所有依赖了.\n接下来就是Java代码的部分，通常都会放在dao层下，新建一个cache包，用来存放所有reids的代码。\n12345678910public class RedisCache &#123;    //所需的全局变量    private final JedisPool jedisPool;//连接池    private final Logger logger = LoggerFactory.getLogger(this.getClass());//日志我这里使用的是slf4j配合logback    //这个变量用于protostuff解析你的entity    private RuntimeSchema&lt;User&gt; schema = RuntimeSchema.createFrom(User.class);  &#125;\n连接池是用来通过ip,port实例化的，这个东西就相当于数据库的dataSource。RuntimeSchema用来解析entity，通过反射机制，获取对象的属性和方法名称。\n需要的方法大概有两种，一种put一种get，存到reids和取出。12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152public String putUser(User user)&#123;    try&#123;        //获取连接        Jedis jedis = jedisPool.getResource();        try &#123;            //设置一个id，相当于map的&lt;key,value&gt;            String key = \"seckill:\"+user.getId();            //通过ProtobufIOUtil序列化user对象，需要传入一个对象，对象对应的schema（解析）,最后是一个默认大小的缓存            byte[] bytes = ProtobufIOUtil.toByteArray(user,schema,                    LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE));            //这一步将序列化的数据set到redis，中间的参数是有效时间，单位应该是分钟            String result = jedis.setex(key.getBytes(), 60 * 60, bytes);            return result;        &#125;finally &#123;            jedis.close();        &#125;    &#125;catch (Exception e)&#123;        logger.error(e.getMessage(),e);    &#125;    return null;&#125;public User getUser(long id)&#123;    try&#123;        //同样需要获取连接资源        Jedis jedis = jedisPool.getResource();        try &#123;            //根据存数据key的规则获取一个key            String key = \"produce:\"+id;            //通过key获取二进制数据            byte[] bytes = jedis.get(key.getBytes());            //如果返回值不为null，说明成功拿到数据，如果没有，返回null            if (bytes!=null)&#123;                //如果拿到了就需要反序列化，变成一个user对象，通过schema生成一个空对象                User user = schema.newMessage();                //通过ProtobufIOUtil将之前的空对象填充                ProtobufIOUtil.mergeFrom(bytes,user,schema);                return user;            &#125;        &#125;finally &#123;            jedis.close();        &#125;    &#125;catch (Exception e)&#123;        logger.error(e.getMessage(),e);    &#125;    return null;&#125;\n以上就是java使用redis的基础用法，我不是运维，具体redis配置，集群暂不考虑。\n更新 - 2018-07-30\n很久之前就借鉴了网上的代码做了一个Redis库，但后期没时间完成更复杂的部分，在这边分享一下。\n首先入口是这个类，很简单的构建了一个工厂，生成RedisClient对象。1234567891011121314151617181920212223public class RedisFactory &#123;    private static RedisClient redisClient;    public static final synchronized RedisClient singletonBuild(String ip,int port)&#123;        if (redisClient == null) &#123;            redisClient = new RedisClient(ip, port);        &#125;        return redisClient;    &#125;\tpublic static final RedisClient build(String ip,int port)&#123;    \treturn new RedisClient(ip, port);\t&#125;    public static final RedisSentinelClient build(String masterName,Set&lt;String&gt; sentinels)&#123;        return new RedisSentinelClient(masterName,sentinels,new JedisPoolConfig());    &#125;    public static final void setSerializeClass(Class cls)&#123;        ProtostuffUtils.registerWrapperClass(cls);    &#125;&#125;\n其实RedisClient就是封装了一些Jedis的方法，但在这里，做了一个优化，原Jedis的方法需要自己实现序列化，RedisClient这个类包装的方法会有个万能Reids序列化的工具。\n这个类大概是这个样子的。1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192939495public class RedisClient &#123;    private final JedisPool jedisPool;    private static int maxTotal;    private static int maxIdle;    private static int maxWaitMillis;    private static boolean testOnBorrow;    static&#123;        final Properties properties = new Properties();        try (final InputStream stream = RedisClient.class.getClassLoader().getResourceAsStream(\"cache.properties\")) &#123;            properties.load(stream);            maxTotal = Integer.parseInt(properties.getProperty(\"common.redis.maxTotal\",\"1000\"));            maxIdle = Integer.parseInt(properties.getProperty(\"common.redis.maxIdle\",\"100\"));            maxWaitMillis = Integer.parseInt(properties.getProperty(\"common.redis.maxWaitMillis\",\"10000\"));            testOnBorrow = Boolean.parseBoolean(properties.getProperty(\"common.redis.testOnBorrow\",\"true\"));        &#125; catch (IOException e) &#123;            e.printStackTrace();        &#125;        JedisPoolConfig config = new JedisPoolConfig();        //配置最大jedis实例数        config.setMaxTotal(maxTotal);        //配置资源池最大闲置数        config.setMaxIdle(maxIdle);        //等待可用连接的最大时间        config.setMaxWaitMillis(maxWaitMillis);        //在borrow一个jedis实例时，是否提前进行validate操作；如果为true，则得到的jedis实例均是可用的        config.setTestOnBorrow(testOnBorrow);    &#125;    public RedisClient(String ip,int port)&#123;        jedisPool = new JedisPool(ip,port);    &#125;    public String putData(String redisKey,Object param)&#123;        Jedis jedis = jedisPool.getResource();        try &#123;            byte[] serialize = ProtostuffUtils.serialize(param);            String result = jedis.setex(redisKey.getBytes(), 60 * 60 * 60, serialize);            if (result!= null)                return result;            throw new CacheException(\"Put object exception\");        &#125;finally &#123;            if (jedis != null) &#123;                jedisPool.returnResource(jedis);            &#125;        &#125;    &#125;    public &lt;T&gt; T getData(String redisKey,Class cla)&#123;        Jedis jedis = jedisPool.getResource();        try &#123;            byte[] bytes = jedis.get(redisKey.getBytes());            Object deserialize = ProtostuffUtils.deserialize(bytes, cla);            if (deserialize!= null)                return (T) deserialize;            throw new CacheException(\"Get object exception\");        &#125;finally &#123;            if (jedis != null) &#123;                jedisPool.returnResource(jedis);            &#125;        &#125;    &#125;    public boolean publishMessage(String channel,String msg)&#123;       Jedis jedis = jedisPool.getResource();       try&#123;           Long publishCount = jedis.publish(channel, msg);           System.out.println(\"发送成功，该频道有\" +publishCount + \"个订阅者\");       &#125;finally &#123;           if (jedis != null) &#123;               jedisPool.returnResource(jedis);           &#125;       &#125;       return true;   &#125;   public void subscribeMessage(JedisPubSub pubSub, String channel)&#123;       Jedis jedis = jedisPool.getResource();       try &#123;           jedis.subscribe(pubSub, channel);       &#125;finally &#123;           if (jedis != null) &#123;               jedisPool.returnResource(jedis);           &#125;       &#125;   &#125;    //省略更多方法&#125;\n这里面有两个方法要说明一下，[publishMessage]、[subscribeMessage]。Redis可以作为Mq做广播和接收，但这种方法并非安全分布式队列的应用场景和缓存的应用场景是不一样的。如果有没来得及持久化的数据怎么办？从业务系统的角度，已经成功发送给消息队列了。消息队列也以为Redis妥妥地收好了。可Redis还没写到日记里，更没有及时通知小伙伴，挂了。可能是断电了，可能是进程被kill了。后果会怎样？已经执行过的任务会再次执行一遍。已经放到队列中的任务，消失了。标记为已经完成的任务，状态变为“进行中”了，然后又被执行了一遍。后果不可接受。\n所以如果使用这两个方法，一定要做好相应的措施，例如：采用 Master－Slave 数据复制模式，配置bgsave，追加存储到aof。在从服务器上配置bgsave，不影响master性能。\n之后一个很重要的类就是序列化工具类，使用Protostuff众所周知吧，Protostuff是一个很厉害的序列化工具，这里对Protostuff做一个包装。123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109public class ProtostuffUtils &#123;    /**     * 需要使用包装类进行序列化/反序列化的class集合     */    private static final Set&lt;Class&lt;?&gt;&gt; WRAPPER_SET = new HashSet&lt;&gt;();    /**     * 序列化/反序列化包装类 Class 对象     */    private static final Class&lt;SerializeDeserializeWrapper&gt; WRAPPER_CLASS = SerializeDeserializeWrapper.class;    /**     * 序列化/反序列化包装类 Schema 对象     */    private static final Schema&lt;SerializeDeserializeWrapper&gt; WRAPPER_SCHEMA = RuntimeSchema.createFrom(WRAPPER_CLASS);    /**     * 缓存对象及对象schema信息集合     */    private static final Map&lt;Class&lt;?&gt;, Schema&lt;?&gt;&gt; CACHE_SCHEMA = new HashMap&lt;Class&lt;?&gt;, Schema&lt;?&gt;&gt;();    /**     * 预定义一些Protostuff无法直接序列化/反序列化的对象     */    static &#123;        WRAPPER_SET.add(List.class);        WRAPPER_SET.add(ArrayList.class);        WRAPPER_SET.add(Map.class);\t    WRAPPER_SET.add(HashMap.class);        WRAPPER_SET.add(Object.class);    &#125;    /**     * 注册需要使用包装类进行序列化/反序列化的 Class 对象     *     * @param cls 需要包装的类型 Class 对象     */    public static void registerWrapperClass(Class cls) &#123;        WRAPPER_SET.add(cls);    &#125;    /**     * 获取序列化对象类型的schema     *     * @param cls 序列化对象的class     * @param &lt;T&gt; 序列化对象的类型     * @return 序列化对象类型的schema     */    private static &lt;T&gt; Schema&lt;T&gt; getSchema(Class&lt;T&gt; cls) &#123;        Schema&lt;T&gt; schema = (Schema&lt;T&gt;) CACHE_SCHEMA.get(cls);        if (schema == null) &#123;            schema = RuntimeSchema.createFrom(cls);            CACHE_SCHEMA.put(cls, schema);        &#125;        return schema;    &#125;    /**     * 序列化对象     *     * @param obj 需要序列化的对象     * @param &lt;T&gt; 序列化对象的类型     * @return 序列化后的二进制数组     */    public static &lt;T&gt; byte[] serialize(T obj) &#123;        Class&lt;T&gt; clazz = (Class&lt;T&gt;) obj.getClass();        LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);        try &#123;            Object serializeObject = obj;            Schema schema = WRAPPER_SCHEMA;            if (!WRAPPER_SET.contains(clazz)) &#123;                schema = getSchema(clazz);            &#125; else &#123;                serializeObject = SerializeDeserializeWrapper.builder(obj);            &#125;            return ProtostuffIOUtil.toByteArray(serializeObject, schema, buffer);        &#125; catch (Exception e) &#123;            throw new IllegalStateException(e.getMessage(), e);        &#125; finally &#123;            buffer.clear();        &#125;    &#125;    /**     * 反序列化对象     *     * @param data  需要反序列化的二进制数组     * @param clazz 反序列化后的对象class     * @param &lt;T&gt;   反序列化后的对象类型     * @return 反序列化后的对象集合     */    public static &lt;T&gt; T deserialize(byte[] data, Class&lt;T&gt; clazz) &#123;        try &#123;            if (!WRAPPER_SET.contains(clazz)) &#123;                T message = clazz.newInstance();                Schema&lt;T&gt; schema = getSchema(clazz);                ProtostuffIOUtil.mergeFrom(data, message, schema);                return message;            &#125; else &#123;                SerializeDeserializeWrapper&lt;T&gt; wrapper = new SerializeDeserializeWrapper&lt;&gt;();                ProtostuffIOUtil.mergeFrom(data, wrapper, WRAPPER_SCHEMA);                return wrapper.getData();            &#125;        &#125; catch (Exception e) &#123;            throw new IllegalStateException(e.getMessage(), e);        &#125;    &#125;&#125;\n这个项目我已经放到GitHUb上了 地址\n","dateCreated":"2018-03-20T12:55:33+08:00","dateModified":"2018-09-14T12:10:54+08:00","datePublished":"2018-03-20T12:55:33+08:00","description":"Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as strings, lists, maps, sets, sorted sets, hyperloglogs, bitmaps and spatial indexes. The project is mainly developed by Salvatore Sanfilippo and is currently sponsored by Redis Labs.[4]\n—Wikipedia","headline":"Redis","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/03/20/Redis/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2018/03/20/Redis/","keywords":"Redis","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kind">
 <meta name="keywords" content="Redis">
 <meta property="og:type" content="blog">
@@ -19,7 +20,7 @@
 <meta property="og:site_name" content="Blog Bom!!BO!">
 <meta property="og:description" content="Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as s">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-09-14T04:10:54.576Z">
+<meta property="og:updated_time" content="2018-09-14T04:10:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis">
 <meta name="twitter:description" content="Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as s">
@@ -27,8 +28,6 @@
     
         
     
-    
-        <meta property="og:image" content="http://yoursite.com/assets/images/photo.png"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -40,12 +39,10 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
     <!--STYLES END-->
     
+
     
 </head>
 
@@ -54,10 +51,6 @@
             <!-- Define author's picture -->
 
 
-    
-        
-            
-        
     
 
 <header id="header" data-behavior="4">
@@ -71,8 +64,6 @@
                 href="#about">
         
         
-            <img class="header-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
-        
         </a>
     
 </header>
@@ -80,23 +71,8 @@
             <!-- Define author's picture -->
 
 
-
-        
-    
-
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
-        
-            <div class="sidebar-profile">
-                <a href="/#about">
-                    <img class="sidebar-profile-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
-                </a>
-                <h4 class="sidebar-profile-name">Eddie Lee</h4>
-                
-                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
-</h5>
-                
-            </div>
         
         
             <ul class="sidebar-buttons">
@@ -106,9 +82,10 @@
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -118,9 +95,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -130,9 +108,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -142,10 +121,24 @@
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link open-algolia-search"
+                             href="#search"
+                            
+                            title="Search"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
             
@@ -154,9 +147,10 @@
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -167,19 +161,84 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener">
+                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener">
+                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-stack-overflow"></i>
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
+                    
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
+                    
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
+                    
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google +</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/mailto"
+                            title="Mail"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/atom.xml"
+                            
+                            title="RSS"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -197,13 +256,13 @@
             
                 <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             Redis
         </h1>
     
     
         <div class="post-meta">
-    <time itemprop="datePublished" datetime="2018-03-20T12:55:33+08:00">
+    <time datetime="2018-03-20T12:55:33+08:00">
 	
 		    Mar 20, 2018
     	
@@ -219,6 +278,7 @@
 
     
 </div>
+
             
         </div>
 
@@ -227,10 +287,10 @@
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
-    <div class="post-content markdown" itemprop="articleBody">
+    <div class="post-content markdown">
         <div class="main-content-wrap">
             <p>Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as strings, lists, maps, sets, sorted sets, hyperloglogs, bitmaps and spatial indexes. The project is mainly developed by Salvatore Sanfilippo and is currently sponsored by Redis Labs.[4]</p>
 <p><div align="right">—Wikipedia</div><br><a id="more"></a></p>
@@ -254,6 +314,7 @@
 <p>这个项目我已经放到GitHUb上了 <a href="https://github.com/RadianceL/RedisPlugin" target="_blank" rel="noopener">地址</a></p>
 
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -271,43 +332,63 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/04/05/jenkins/"  data-tooltip="jenkins">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/04/05/jenkins/" data-tooltip="jenkins" aria-label="PREVIOUS: jenkins">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/12/28/C-static-Library/" data-tooltip="C-static-Library">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/12/28/C-static-Library/" data-tooltip="C-static-Library" aria-label="NEXT: C-static-Library">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/03/20/Redis/&amp;title=Redis">
-                    <i class="fa fa-qq"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/03/20/Redis/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/03/20/Redis/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/03/20/Redis/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
         
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -337,43 +418,63 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/04/05/jenkins/"  data-tooltip="jenkins">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/04/05/jenkins/" data-tooltip="jenkins" aria-label="PREVIOUS: jenkins">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/12/28/C-static-Library/" data-tooltip="C-static-Library">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/12/28/C-static-Library/" data-tooltip="C-static-Library" aria-label="NEXT: C-static-Library">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/03/20/Redis/&amp;title=Redis">
-                    <i class="fa fa-qq"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/03/20/Redis/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/03/20/Redis/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/03/20/Redis/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
         
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -382,14 +483,30 @@
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <i id="btn-close-shareoptions" class="fa fa-close"></i>
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=http://yoursite.com/2018/03/20/Redis/&amp;title=Redis">
-                    <i class="fa fa-qq"></i><span>Share on QQ</span>
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/03/20/Redis/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/03/20/Redis/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/03/20/Redis/">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
                 </a>
             </li>
         
@@ -401,17 +518,11 @@
         
 
 
-    
-        
-    
-
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
-            <i class="fa fa-remove"></i>
+            <i class="fa fa-times"></i>
         </div>
-        
-            <img id="about-card-picture" src="/assets/images/photo.png" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -427,314 +538,18 @@
             </div>
         
         
-            <div id="about-card-location">
-                <i class="fa fa-map-marker"></i>
-                <br/>
-                LN
-            </div>
+    </div>
+</div>
+
         
-    </div>
-</div>
-
-        <div id="algolia-search-modal" class="modal-container">
-    <div class="modal">
-        <div class="modal-header">
-            <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
-                <span class="searchby-algolia-text text-color-light text-small">by</span>
-                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
-            </a>
-            <i class="search-icon fa fa-search"></i>
-            <form id="algolia-search-form">
-                <input type="text" id="algolia-search-input" name="search"
-                    class="form-control input--large search-input" placeholder="Search "
-                    />
-            </form>
-        </div>
-        <div class="modal-body">
-            <div class="no-result text-color-light text-center">no post found</div>
-            <div class="results">
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
-                            <img class="media-image" src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/10/14/Docker/">
-                            <h3 class="media-heading">Docker</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Oct 14, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.</p>
-<p><div align="right">—wikipedia</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                            <img class="media-image" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                            <h3 class="media-heading">Android-ViewPagerFramgent</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Nov 29, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”</p>
-<p><div align="right">-Rollen Holt</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/11/29/Java-Reference-Object/">
-                            <h3 class="media-heading">Java Reference Object</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Nov 29, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>References and Referents<br>A reference object is a layer of indirection between your program code and some other object, called a referent. Each reference object is constructed around its referent, and the referent cannot be changed.</p>
-<p><div align="right">—Keith D Gregory</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
-                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-Pointer/">
-                            <h3 class="media-heading">C-Pointer</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Dec 28, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Today learn pointer form enthusiastic netizen,really appreciate.</p>
-<p><div align="right">-土杜土杜</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
-                            <img class="media-image" src="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2017/12/28/C-static-Library/">
-                            <h3 class="media-heading">C-static-Library</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Dec 28, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>UNIX is very simple, it just needs a genius to understand its simplicity.</p>
-<p><div align="right">-Dennis MacAlistair Ritchie</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/03/20/Redis/">
-                            <h3 class="media-heading">Redis</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Mar 20, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Redis is an open-source in-memory database project implementing a distributed, in-memory key-value store with optional durability. Redis supports different kinds of abstract data structures, such as strings, lists, maps, sets, sorted sets, hyperloglogs, bitmaps and spatial indexes. The project is mainly developed by Salvatore Sanfilippo and is currently sponsored by Redis Labs.[4]</p>
-<p><div align="right">—Wikipedia</div><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/04/05/jenkins/">
-                            <h3 class="media-heading">jenkins</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Apr 5, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Auto-build tool from git to k8s</p></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/05/02/Maven-error-list/">
-                            <h3 class="media-heading">Maven error list</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    May 2, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>人啊，根据重新振作的方法可分为两种：<br>一种是看着比自己卑微的东西，寻找垫底聊以自慰；<br>另一种则是看着比自己伟大的东西，狠狠踢醒毫无气度的自己。</p>
-<div align="right">-note</div></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/03/Java-Annotation/">
-                            <h3 class="media-heading">Java-Annotation</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jun 3, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>Annotation<br>I want to learn is by Spring <code>@bean</code>,Want to know how it work.<br>But toke a long time in busy.<br>Until today,There is my notes about Annotation.<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
-                            <img class="media-image" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="http://yoursite.com/2018/06/07/Software-Suggest/">
-                            <h3 class="media-heading">Software Suggest</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jun 7, 2018
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>When I design a interface platform system.<br>I find my system is not elegant realization.<br>Detrimental to maintenance.<br>So this my summary.<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-            </div>
-        </div>
-        <div class="modal-footer">
-            <p class="results-count text-medium"
-                data-message-zero="no post found"
-                data-message-one="1 post found"
-                data-message-other="{n} posts found">
-                18 posts found
-            </p>
-        </div>
-    </div>
-</div>
-
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
 <!--SCRIPTS END-->
 
     
+
 
 
     </body>

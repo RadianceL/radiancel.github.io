@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.\nThree Layer ArchitectureData access layer + Business logic layer + Presentation layer\nWhen I design interface platform system, I made a DTO to result.But it go through business logic layer straight up controller.\nand all data assemble at business logic layer,When I finish this system.Oh, shit!A lot kind of log, exception, DAO at here.\nAlthough all service implements method result the same type.but it also not good for read.\nso i reflect,\n\ndata assemble should in another class with static method. this method will cache all possible throws exception.\ndata parsing should in another class with static method. also ache all possible throws exception.\nthe system should has itself exception, like FooException as root Exception, all other exception extends the root exception.\nthe system should has itself error code. and some solution for those code.\nbusiness logic layer should clear. just communicate with database.\nall controller result should have a agreement. structural consistency.\n\nAbout Design patternJust make a good way to coding, if unnecessary, do not use Design patternif you coding experience is not enough, at last 5 years maybe.It well let you can’t coding.\n","dateCreated":"2018-06-07T10:06:34+08:00","dateModified":"2018-07-16T16:55:40+08:00","datePublished":"2018-06-07T10:06:34+08:00","description":"When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.","headline":"Software Suggest","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/06/07/Software-Suggest/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2018/06/07/Software-Suggest/","keywords":"Design","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg"},"articleBody":"When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.\nThree Layer ArchitectureData access layer + Business logic layer + Presentation layer\nWhen I design interface platform system, I made a DTO to result.But it go through business logic layer straight up controller.\nand all data assemble at business logic layer,When I finish this system.Oh, shit!A lot kind of log, exception, DAO at here.\nAlthough all service implements method result the same type.but it also not good for read.\nso i reflect,\n\ndata assemble should in another class with static method. this method will cache all possible throws exception.\ndata parsing should in another class with static method. also ache all possible throws exception.\nthe system should has itself exception, like FooException as root Exception, all other exception extends the root exception.\nthe system should has itself error code. and some solution for those code.\nbusiness logic layer should clear. just communicate with database.\nall controller result should have a agreement. structural consistency.\n\nAbout Design patternJust make a good way to coding, if unnecessary, do not use Design patternif you coding experience is not enough, at last 5 years maybe.It well let you can’t coding.\n","dateCreated":"2018-06-07T10:06:34+08:00","dateModified":"2018-07-16T16:55:40+08:00","datePublished":"2018-06-07T10:06:34+08:00","description":"When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.","headline":"Software Suggest","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/06/07/Software-Suggest/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg","logo":{"@type":"ImageObject","url":"my.jpg"}},"url":"http://yoursite.com/2018/06/07/Software-Suggest/","keywords":"Design","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.">
 <meta name="keywords" content="Design">
 <meta property="og:type" content="blog">
@@ -28,6 +28,8 @@
     
         
     
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/my.jpg"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -52,6 +54,10 @@
 
 
     
+        
+            
+        
+    
 
 <header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
@@ -64,6 +70,8 @@
                 href="#about">
         
         
+            <img class="header-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+        
         </a>
     
 </header>
@@ -71,8 +79,23 @@
             <!-- Define author's picture -->
 
 
+
+        
+    
+
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
+</h5>
+                
+            </div>
         
         
             <ul class="sidebar-buttons">
@@ -131,19 +154,6 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Search"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Search</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
                         <a  class="sidebar-button-link "
                              href="#about"
                             
@@ -165,80 +175,6 @@
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google +</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -352,30 +288,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/06/07/Software-Suggest/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/06/07/Software-Suggest/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/06/07/Software-Suggest/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -438,30 +350,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/06/07/Software-Suggest/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/06/07/Software-Suggest/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/06/07/Software-Suggest/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -481,30 +369,6 @@
     <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/06/07/Software-Suggest/">
-                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/06/07/Software-Suggest/">
-                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/06/07/Software-Suggest/">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
-                </a>
-            </li>
-        
     </ul>
 </div>
 
@@ -513,11 +377,17 @@
         
 
 
+    
+        
+    
+
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
             <i class="fa fa-times"></i>
         </div>
+        
+            <img id="about-card-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -532,6 +402,12 @@
 
             </div>
         
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
         
     </div>
 </div>

@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.\nFirst you need create class and replace class to @interfaceAll Annotation implicit inheritance from java.lang.annotation.AnnotationAnd all your annotation can use meta-annotationThere have four meta-annotation\n\n@Target mark where your annotation can use, without @Target, your annotation can use everywhere\n\nElementType.ANNOTATION_TYPE —mark annotation type\nElementType.PACKAGE —above package\nElementType.TYPE —above class and interface\nElementType.METHOD — above method\nElementType.CONSTRUCT —above construct\nElementType.FIELD —member domain\nElementType.PARAMETER —above method or whit parameter\nElementType.LOCAL_VARIABLE —local variable\nTElementType.YPE_PARAMETER —type parameter\nElementType.TYPE_USE —type use\n\n\n@Retention be used to mark a annotation keep time, without @Retention, default is RetentionPolicy.CLASS\n\nRetentionPolicy.SOURCE —not include class file\nRetentionPolicy.CLASS —include class file but JVM not load\nRetentionPolicy.RUNTIME —include class file and JVM will load, you can get them by reflex\n\n\n@Document create note for archive like JavaDoc\n\n@Inherited only be used to class, if a has extend annotation, then it all child class auto have the same annotation\n\n\n\nok, there is a demo.first need create a annotation by yourself.The meta-annotation above public @interface Foo {}you can chose which is necessary12345678import java.lang.annotation.*;@Documented@Retention(RetentionPolicy.RUNTIME)public @interface Foo &#123;    String name() default \"\";    int count() default 0;&#125;\nthis annotation Foo has two value, name and count.that value type can be\n\nBase-Type (int, short, long, byte, char, double, float or boolean)\nString\nClass (such as Class&lt;? extend Bar&gt;)\nEnum\nAnnotation\nArray (create from above type)\n\nso this Foo can be use now\n12345678910@Foo(value = \"这是类注解\",count = 1)public class Bar &#123;    @Foo(value = \"这是属性注解\",count = 2)    private String name;    @Foo(value = \"这是方法注解\",count = 3)    private void test()&#123;        System.out.println(\"\");    &#125;&#125;\nas you can see @Foo can use above class, property and method.because of when i create it whit @Target, so Foo can use whit them.\nbut only annotation can not do anything.must be have a “process” to handle.\nso there is my “process”:\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748public class FooProcess&#123;    public static void analyze(Class clazz) throws NoSuchMethodException &#123;        //get all class annotation information        Annotation[] classAnnotation = clazz.getAnnotations();        for(Annotation annotation : classAnnotation)&#123;            Class annotationType =  annotation.annotationType();            boolean equals = annotationType.equals(Foo.class);            if (equals)&#123;                System.out.println(\"Bar class has Foo annotation\");                System.out.println(\"info: \" + ((Foo)annotation).value() + \",\" + ((Foo)annotation).count());            &#125;            //get all annotation type            System.out.println(\"Bar class annotation is:\" + annotationType);        &#125;        System.out.println();        //get all property annotation information        Field[] fields = clazz.getDeclaredFields();        for (Field field :fields)&#123;            String filedName = field.getName();            Annotation[] allAnnotations = field.getAnnotations();            for(Annotation an : allAnnotations)&#123;                Class annotationType = an.annotationType();                System.out.println(\"FiledName[\"+filedName+\"]property annotation: \" + annotationType);            &#125;            if (field.isAnnotationPresent(Foo.class))&#123;                Foo foo = field.getAnnotation(Foo.class);                System.out.println(\"FiledName[\"+filedName+\"]property info: \"+ foo.value() + \",\" + foo.count());            &#125;        &#125;        System.out.println();        //get all method annotation information        Method method = clazz.getDeclaredMethod(\"test\", null);//get private and public method        Annotation[] annotations = method.getAnnotations();        for (Annotation annotation : annotations)&#123;            Class annotationType = annotation.annotationType();            System.out.println(\"test method has annotation type: \" + annotationType);            if (annotationType.equals(Foo.class)) &#123;                Foo mode = (Foo) annotation;                System.out.println(\"info: \" + mode.value() + \",\" + mode.count());            &#125;        &#125;    &#125;&#125;\nand run with :1234567public static void main(String args[])&#123;        try &#123;            FooProcess.analyze(Bar.class);        &#125; catch (NoSuchMethodException e) &#123;            e.printStackTrace();        &#125;    &#125;\nsee console123456789Bar class has Foo annotationinfo: this is class annotation,1Bar class annotation is:interface com.eddie.annotation.FooFiledName[name]property annotation: interface com.eddie.annotation.FooFiledName[name]property info: this is property annotation,2test method has annotation type: interface com.eddie.annotation.Fooinfo: this is method annotation,3\nyou can do everything in process, but first you need use if to know target locationreal have your annotation, if not, you will get a NullPointerException or maybeClassCastException. we don’t want to see them, right?then you can get value and do what you want.\n","dateCreated":"2018-06-03T11:37:17+08:00","dateModified":"2018-06-03T14:05:48+08:00","datePublished":"2018-06-03T11:37:17+08:00","description":"AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.","headline":"Java-Annotation","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/06/03/Java-Annotation/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2018/06/03/Java-Annotation/","keywords":"Java","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg"},"articleBody":"AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.\nFirst you need create class and replace class to @interfaceAll Annotation implicit inheritance from java.lang.annotation.AnnotationAnd all your annotation can use meta-annotationThere have four meta-annotation\n\n@Target mark where your annotation can use, without @Target, your annotation can use everywhere\n\nElementType.ANNOTATION_TYPE —mark annotation type\nElementType.PACKAGE —above package\nElementType.TYPE —above class and interface\nElementType.METHOD — above method\nElementType.CONSTRUCT —above construct\nElementType.FIELD —member domain\nElementType.PARAMETER —above method or whit parameter\nElementType.LOCAL_VARIABLE —local variable\nTElementType.YPE_PARAMETER —type parameter\nElementType.TYPE_USE —type use\n\n\n@Retention be used to mark a annotation keep time, without @Retention, default is RetentionPolicy.CLASS\n\nRetentionPolicy.SOURCE —not include class file\nRetentionPolicy.CLASS —include class file but JVM not load\nRetentionPolicy.RUNTIME —include class file and JVM will load, you can get them by reflex\n\n\n@Document create note for archive like JavaDoc\n\n@Inherited only be used to class, if a has extend annotation, then it all child class auto have the same annotation\n\n\n\nok, there is a demo.first need create a annotation by yourself.The meta-annotation above public @interface Foo {}you can chose which is necessary12345678import java.lang.annotation.*;@Documented@Retention(RetentionPolicy.RUNTIME)public @interface Foo &#123;    String name() default \"\";    int count() default 0;&#125;\nthis annotation Foo has two value, name and count.that value type can be\n\nBase-Type (int, short, long, byte, char, double, float or boolean)\nString\nClass (such as Class&lt;? extend Bar&gt;)\nEnum\nAnnotation\nArray (create from above type)\n\nso this Foo can be use now\n12345678910@Foo(value = \"这是类注解\",count = 1)public class Bar &#123;    @Foo(value = \"这是属性注解\",count = 2)    private String name;    @Foo(value = \"这是方法注解\",count = 3)    private void test()&#123;        System.out.println(\"\");    &#125;&#125;\nas you can see @Foo can use above class, property and method.because of when i create it whit @Target, so Foo can use whit them.\nbut only annotation can not do anything.must be have a “process” to handle.\nso there is my “process”:\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748public class FooProcess&#123;    public static void analyze(Class clazz) throws NoSuchMethodException &#123;        //get all class annotation information        Annotation[] classAnnotation = clazz.getAnnotations();        for(Annotation annotation : classAnnotation)&#123;            Class annotationType =  annotation.annotationType();            boolean equals = annotationType.equals(Foo.class);            if (equals)&#123;                System.out.println(\"Bar class has Foo annotation\");                System.out.println(\"info: \" + ((Foo)annotation).value() + \",\" + ((Foo)annotation).count());            &#125;            //get all annotation type            System.out.println(\"Bar class annotation is:\" + annotationType);        &#125;        System.out.println();        //get all property annotation information        Field[] fields = clazz.getDeclaredFields();        for (Field field :fields)&#123;            String filedName = field.getName();            Annotation[] allAnnotations = field.getAnnotations();            for(Annotation an : allAnnotations)&#123;                Class annotationType = an.annotationType();                System.out.println(\"FiledName[\"+filedName+\"]property annotation: \" + annotationType);            &#125;            if (field.isAnnotationPresent(Foo.class))&#123;                Foo foo = field.getAnnotation(Foo.class);                System.out.println(\"FiledName[\"+filedName+\"]property info: \"+ foo.value() + \",\" + foo.count());            &#125;        &#125;        System.out.println();        //get all method annotation information        Method method = clazz.getDeclaredMethod(\"test\", null);//get private and public method        Annotation[] annotations = method.getAnnotations();        for (Annotation annotation : annotations)&#123;            Class annotationType = annotation.annotationType();            System.out.println(\"test method has annotation type: \" + annotationType);            if (annotationType.equals(Foo.class)) &#123;                Foo mode = (Foo) annotation;                System.out.println(\"info: \" + mode.value() + \",\" + mode.count());            &#125;        &#125;    &#125;&#125;\nand run with :1234567public static void main(String args[])&#123;        try &#123;            FooProcess.analyze(Bar.class);        &#125; catch (NoSuchMethodException e) &#123;            e.printStackTrace();        &#125;    &#125;\nsee console123456789Bar class has Foo annotationinfo: this is class annotation,1Bar class annotation is:interface com.eddie.annotation.FooFiledName[name]property annotation: interface com.eddie.annotation.FooFiledName[name]property info: this is property annotation,2test method has annotation type: interface com.eddie.annotation.Fooinfo: this is method annotation,3\nyou can do everything in process, but first you need use if to know target locationreal have your annotation, if not, you will get a NullPointerException or maybeClassCastException. we don’t want to see them, right?then you can get value and do what you want.\n","dateCreated":"2018-06-03T11:37:17+08:00","dateModified":"2018-06-03T14:05:48+08:00","datePublished":"2018-06-03T11:37:17+08:00","description":"AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.","headline":"Java-Annotation","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/06/03/Java-Annotation/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg","logo":{"@type":"ImageObject","url":"my.jpg"}},"url":"http://yoursite.com/2018/06/03/Java-Annotation/","keywords":"Java","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="AnnotationI want to learn is by Spring @bean,Want to know how it work.But toke a long time in busy.Until today,There is my notes about Annotation.">
 <meta name="keywords" content="Java">
 <meta property="og:type" content="blog">
@@ -28,6 +28,8 @@
     
         
     
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/my.jpg"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -52,6 +54,10 @@
 
 
     
+        
+            
+        
+    
 
 <header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
@@ -64,6 +70,8 @@
                 href="#about">
         
         
+            <img class="header-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+        
         </a>
     
 </header>
@@ -71,8 +79,23 @@
             <!-- Define author's picture -->
 
 
+
+        
+    
+
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
+</h5>
+                
+            </div>
         
         
             <ul class="sidebar-buttons">
@@ -131,19 +154,6 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Search"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Search</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
                         <a  class="sidebar-button-link "
                              href="#about"
                             
@@ -165,80 +175,6 @@
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google +</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -386,30 +322,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -472,30 +384,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/06/03/Java-Annotation/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -515,30 +403,6 @@
     <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/06/03/Java-Annotation/">
-                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/06/03/Java-Annotation/">
-                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/06/03/Java-Annotation/">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
-                </a>
-            </li>
-        
     </ul>
 </div>
 
@@ -547,11 +411,17 @@
         
 
 
+    
+        
+    
+
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
             <i class="fa fa-times"></i>
         </div>
+        
+            <img id="about-card-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -566,6 +436,12 @@
 
             </div>
         
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
         
     </div>
 </div>

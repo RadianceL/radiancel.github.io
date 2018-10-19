@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”\n-Rollen Holt\n首先将MainActivity 改成 继承自FragmentActivity(最好这样做)public class MainActivity extends FragmentActivity\n编写menu菜单栏,新建menu文件夹,新建menu.xml文件,对应底部导航的按钮123456789101112131415161718192021222324&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;menu xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;&gt;    &lt;item android:id=&quot;@+id/bottom_nav_ui&quot;        android:enabled=&quot;true&quot;        app:showAsAction=&quot;ifRoom&quot;        android:title=&quot;页面1&quot;        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;    &lt;item android:id=&quot;@+id/bottom_nav_data&quot;        android:enabled=&quot;true&quot;        app:showAsAction=&quot;ifRoom&quot;        android:title=&quot;页面2&quot;        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;    &lt;item android:id=&quot;@+id/bottom_nav_service&quot;        android:enabled=&quot;true&quot;        app:showAsAction=&quot;ifRoom&quot;        android:title=&quot;页面3&quot;        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;    &lt;item android:id=&quot;@+id/bottom_nav_xxx&quot;        android:enabled=&quot;true&quot;        app:showAsAction=&quot;ifRoom&quot;        android:title=&quot;页面4&quot;        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;&lt;/menu&gt;\n编写主界面，底部导航栏采用官方BottomNavigationView的Ex版本1234567891011121314151617181920212223242526272829&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;    xmlns:tools=&quot;http://schemas.android.com/tools&quot;    android:layout_width=&quot;match_parent&quot;    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;    android:layout_height=&quot;match_parent&quot;    android:orientation=&quot;vertical&quot;    tools:context=&quot;com.example.eddie.test.activity.MainActivity&quot;&gt;    &lt;android.support.v7.widget.Toolbar        android:layout_width=&quot;match_parent&quot;        android:layout_height=&quot;?attr/actionBarSize&quot;        android:background=&quot;?attr/colorPrimary&quot;        app:theme=&quot;@style/ToolbarTheme&quot;        android:id=&quot;@+id/toolbar&quot;/&gt;    &lt;android.support.v4.view.ViewPager        android:layout_width=&quot;match_parent&quot;        android:layout_height=&quot;0dp&quot;        android:layout_weight=&quot;1&quot;        android:id=&quot;@+id/view_pager&quot;/&gt;    &lt;com.example.eddie.test.Util.BottomNavigationViewEx        android:id=&quot;@+id/bottom_navigation_bar&quot;        android:layout_width=&quot;match_parent&quot;        android:layout_height=&quot;wrap_content&quot;        android:layout_alignParentBottom=&quot;true&quot;        android:background=&quot;@color/white&quot;        app:menu=&quot;@menu/menu&quot;        app:itemIconTint=&quot;@color/selector&quot;        app:itemTextColor=&quot;@color/selector&quot;/&gt;&lt;/LinearLayout&gt;\n创建与menu对应数量的XML布局文件（非new Activity）1234567891011&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;    android:layout_width=&quot;match_parent&quot;    android:layout_height=&quot;match_parent&quot;    android:orientation=&quot;vertical&quot;&gt;    &lt;TextView        android:layout_width=&quot;wrap_content&quot;        android:layout_height=&quot;wrap_content&quot;        android:textSize=&quot;18dp&quot;        android:text=&quot;这是第一个Fragment&quot;/&gt;&lt;/LinearLayout&gt;\n创建与新建布局文件对应数量的class 继承自Fragment继承自Fargment 重写onCreateView方法 其中View对象作为初始化控件的方法12345678910111213import android.os.Bundle;import android.support.v4.app.Fragment;import android.view.LayoutInflater;import android.view.View;import android.view.ViewGroup;import com.example.eddie.test.R;public class FirFragment extends Fragment &#123;    @Override    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) &#123;        View view= inflater.inflate(R.layout.fragment01, container, false);        return view;    &#125;&#125;\n创建自定义FragmentPagerAdapter只需要写构造方法，并重写getItem() 和 getCount()方法即可12345678910111213141516171819import android.support.v4.app.Fragment;import android.support.v4.app.FragmentManager;import android.support.v4.app.FragmentPagerAdapter;import java.util.List;public class FragAdapter extends FragmentPagerAdapter &#123;    private List mFragments;    public FragAdapter(FragmentManager fm,List fragments) &#123;        super(fm);        mFragments = fragments;    &#125;    @Override    public Fragment getItem(int position) &#123;        return mFragments.get(position);    &#125;    @Override    public int getCount() &#123;        return mFragments.size();    &#125;&#125;\n在MainActivity中构造自定义FragmentPagerAdapter，绑定创建的Fragment1234567891011121314151617181920212223242526272829import android.support.v4.app.Fragment;import android.support.v4.app.FragmentActivity;import android.os.Bundle;import android.support.v4.view.ViewPager;import com.example.eddie.test.MyAdapter.FragAdapter;import com.example.eddie.test.R;import com.example.eddie.test.Util.BottomNavigationViewEx;import java.util.ArrayList;import java.util.List;public class MainActivity extends FragmentActivity&#123;    private ViewPager ViewPager;    private BottomNavigationViewEx bottomNavigationBar;    private List list = new ArrayList&lt;&gt;();    @Override    protected void onCreate(Bundle savedInstanceState) &#123;        super.onCreate(savedInstanceState);        setContentView(R.layout.activity_main);        initView();    &#125;    private void initView() &#123;        ViewPager = findViewById(R.id.view_pager);        list.add(new FirFragment());        list.add(new SecFragment());        list.add(new ThrFragment());        list.add(new FouFragment());        FragAdapter fragAdapter = new FragAdapter(getSupportFragmentManager(), list);        ViewPager.setAdapter(fragAdapter);    &#125;&#125;\n最后对BottomNavigationViewEx做最后的设置，使其符合实际场景的需求123456bottomNavigationBar =findViewById(R.id.bottom_navigation_bar);bottomNavigationBar.enableAnimation(true);bottomNavigationBar.enableShiftingMode(false);bottomNavigationBar.enableItemShiftingMode(false);bottomNavigationBar.enableShiftingMode(false);bottomNavigationBar.setupWithViewPager(ViewPager);//设置与ViewPager绑定\n随笔记附带完整Demo\n","dateCreated":"2017-11-29T09:45:07+08:00","dateModified":"2017-11-29T10:22:24+08:00","datePublished":"2017-11-29T09:45:07+08:00","description":"I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”\n-Rollen Holt","headline":"Android-ViewPagerFramgent","image":["https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/","keywords":"Android","thumbnailUrl":"https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg"},"articleBody":"I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”\n-Rollen Holt\n首先将MainActivity 改成 继承自FragmentActivity(最好这样做)public class MainActivity extends FragmentActivity\n编写menu菜单栏,新建menu文件夹,新建menu.xml文件,对应底部导航的按钮123456789101112131415161718192021222324&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;menu xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;&gt;    &lt;item android:id=&quot;@+id/bottom_nav_ui&quot;        android:enabled=&quot;true&quot;        app:showAsAction=&quot;ifRoom&quot;        android:title=&quot;页面1&quot;        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;    &lt;item android:id=&quot;@+id/bottom_nav_data&quot;        android:enabled=&quot;true&quot;        app:showAsAction=&quot;ifRoom&quot;        android:title=&quot;页面2&quot;        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;    &lt;item android:id=&quot;@+id/bottom_nav_service&quot;        android:enabled=&quot;true&quot;        app:showAsAction=&quot;ifRoom&quot;        android:title=&quot;页面3&quot;        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;    &lt;item android:id=&quot;@+id/bottom_nav_xxx&quot;        android:enabled=&quot;true&quot;        app:showAsAction=&quot;ifRoom&quot;        android:title=&quot;页面4&quot;        android:icon=&quot;@mipmap/ic_launcher&quot;/&gt;&lt;/menu&gt;\n编写主界面，底部导航栏采用官方BottomNavigationView的Ex版本1234567891011121314151617181920212223242526272829&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;    xmlns:tools=&quot;http://schemas.android.com/tools&quot;    android:layout_width=&quot;match_parent&quot;    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;    android:layout_height=&quot;match_parent&quot;    android:orientation=&quot;vertical&quot;    tools:context=&quot;com.example.eddie.test.activity.MainActivity&quot;&gt;    &lt;android.support.v7.widget.Toolbar        android:layout_width=&quot;match_parent&quot;        android:layout_height=&quot;?attr/actionBarSize&quot;        android:background=&quot;?attr/colorPrimary&quot;        app:theme=&quot;@style/ToolbarTheme&quot;        android:id=&quot;@+id/toolbar&quot;/&gt;    &lt;android.support.v4.view.ViewPager        android:layout_width=&quot;match_parent&quot;        android:layout_height=&quot;0dp&quot;        android:layout_weight=&quot;1&quot;        android:id=&quot;@+id/view_pager&quot;/&gt;    &lt;com.example.eddie.test.Util.BottomNavigationViewEx        android:id=&quot;@+id/bottom_navigation_bar&quot;        android:layout_width=&quot;match_parent&quot;        android:layout_height=&quot;wrap_content&quot;        android:layout_alignParentBottom=&quot;true&quot;        android:background=&quot;@color/white&quot;        app:menu=&quot;@menu/menu&quot;        app:itemIconTint=&quot;@color/selector&quot;        app:itemTextColor=&quot;@color/selector&quot;/&gt;&lt;/LinearLayout&gt;\n创建与menu对应数量的XML布局文件（非new Activity）1234567891011&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;    android:layout_width=&quot;match_parent&quot;    android:layout_height=&quot;match_parent&quot;    android:orientation=&quot;vertical&quot;&gt;    &lt;TextView        android:layout_width=&quot;wrap_content&quot;        android:layout_height=&quot;wrap_content&quot;        android:textSize=&quot;18dp&quot;        android:text=&quot;这是第一个Fragment&quot;/&gt;&lt;/LinearLayout&gt;\n创建与新建布局文件对应数量的class 继承自Fragment继承自Fargment 重写onCreateView方法 其中View对象作为初始化控件的方法12345678910111213import android.os.Bundle;import android.support.v4.app.Fragment;import android.view.LayoutInflater;import android.view.View;import android.view.ViewGroup;import com.example.eddie.test.R;public class FirFragment extends Fragment &#123;    @Override    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) &#123;        View view= inflater.inflate(R.layout.fragment01, container, false);        return view;    &#125;&#125;\n创建自定义FragmentPagerAdapter只需要写构造方法，并重写getItem() 和 getCount()方法即可12345678910111213141516171819import android.support.v4.app.Fragment;import android.support.v4.app.FragmentManager;import android.support.v4.app.FragmentPagerAdapter;import java.util.List;public class FragAdapter extends FragmentPagerAdapter &#123;    private List mFragments;    public FragAdapter(FragmentManager fm,List fragments) &#123;        super(fm);        mFragments = fragments;    &#125;    @Override    public Fragment getItem(int position) &#123;        return mFragments.get(position);    &#125;    @Override    public int getCount() &#123;        return mFragments.size();    &#125;&#125;\n在MainActivity中构造自定义FragmentPagerAdapter，绑定创建的Fragment1234567891011121314151617181920212223242526272829import android.support.v4.app.Fragment;import android.support.v4.app.FragmentActivity;import android.os.Bundle;import android.support.v4.view.ViewPager;import com.example.eddie.test.MyAdapter.FragAdapter;import com.example.eddie.test.R;import com.example.eddie.test.Util.BottomNavigationViewEx;import java.util.ArrayList;import java.util.List;public class MainActivity extends FragmentActivity&#123;    private ViewPager ViewPager;    private BottomNavigationViewEx bottomNavigationBar;    private List list = new ArrayList&lt;&gt;();    @Override    protected void onCreate(Bundle savedInstanceState) &#123;        super.onCreate(savedInstanceState);        setContentView(R.layout.activity_main);        initView();    &#125;    private void initView() &#123;        ViewPager = findViewById(R.id.view_pager);        list.add(new FirFragment());        list.add(new SecFragment());        list.add(new ThrFragment());        list.add(new FouFragment());        FragAdapter fragAdapter = new FragAdapter(getSupportFragmentManager(), list);        ViewPager.setAdapter(fragAdapter);    &#125;&#125;\n最后对BottomNavigationViewEx做最后的设置，使其符合实际场景的需求123456bottomNavigationBar =findViewById(R.id.bottom_navigation_bar);bottomNavigationBar.enableAnimation(true);bottomNavigationBar.enableShiftingMode(false);bottomNavigationBar.enableItemShiftingMode(false);bottomNavigationBar.enableShiftingMode(false);bottomNavigationBar.setupWithViewPager(ViewPager);//设置与ViewPager绑定\n随笔记附带完整Demo\n","dateCreated":"2017-11-29T09:45:07+08:00","dateModified":"2017-11-29T10:22:24+08:00","datePublished":"2017-11-29T09:45:07+08:00","description":"I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of difficulties, difficulties and challenges to.They will feel confused and Panghuang, but each programmer’s heart have a Bill Gates or Jobs’s dream “with wisdom to create their own cause”\n-Rollen Holt","headline":"Android-ViewPagerFramgent","image":["https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg","logo":{"@type":"ImageObject","url":"my.jpg"}},"url":"http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/","keywords":"Android","thumbnailUrl":"https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="I love the programmer, they are simple, stubborn, easy to feel a sense of achievement; facing the pressure, to burn the midnight oil sleepless; in the face of d">
 <meta name="keywords" content="Android">
 <meta property="og:type" content="blog">
@@ -28,6 +28,8 @@
     
         
     
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/my.jpg"/>
     
     
         <meta property="og:image" content="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1715935796,2969849554&amp;fm=27&amp;gp=0.jpg"/>
@@ -52,6 +54,10 @@
 
 
     
+        
+            
+        
+    
 
 <header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
@@ -64,6 +70,8 @@
                 href="#about">
         
         
+            <img class="header-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+        
         </a>
     
 </header>
@@ -71,8 +79,23 @@
             <!-- Define author's picture -->
 
 
+
+        
+    
+
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
+</h5>
+                
+            </div>
         
         
             <ul class="sidebar-buttons">
@@ -131,19 +154,6 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Search"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Search</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
                         <a  class="sidebar-button-link "
                              href="#about"
                             
@@ -165,80 +175,6 @@
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google +</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -348,30 +284,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -434,30 +346,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -477,30 +365,6 @@
     <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2017/11/29/Android-ViewPagerFramgent/">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
-                </a>
-            </li>
-        
     </ul>
 </div>
 
@@ -509,11 +373,17 @@
         
 
 
+    
+        
+    
+
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
             <i class="fa fa-times"></i>
         </div>
+        
+            <img id="about-card-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -528,6 +398,12 @@
 
             </div>
         
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
         
     </div>
 </div>

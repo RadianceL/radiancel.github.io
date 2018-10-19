@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"Today learn pointer form enthusiastic netizen,really appreciate.\n-土杜土杜\n指针的应用12char *p;p = \"test\";\n这是可以的，因为“test”已经分配了空间，所以指针指向了“test”内存空间的首地址\n12char *p;strcpy(p,\"test\");\n这时候就会报错，因为并没有给p分配内存空间不可以把“test”复制到指针变量里\n结构体指针的应用首先结构体里存指针\n123typedef struct test&#123;    char *test;&#125;test,*pTest;\nmain中测试：\n123pTest p = malloc(sizeof(test));p-&gt;test = \"test String\";printf(\"%s\\n\",p-&gt;test);\n需要注意的是，如果单纯使用malloc函数分配空间，分配的空间是结构体里指针的空间（指针64位，8byte），与指针代表的数据所占用空间无关\n但在测试程序中，直接=“fff”是可以的，因为这时候就已经为字符串开辟好了栈空间，test1-&gt;test直接指向这个空间的首地址。\n123typedef struct test&#123;    long *a;&#125;test;\n如果是正常情况下\n123456test *b = malloc(sizeof(test));long x = 10;//b中指针指向x的内存地址b-&gt;a = &amp;x;//取值需要用long value = *(b-&gt;a);\n\n指针是指针，如果想给指针赋值，必须要给指针分配对应的内存空间\n\n函数操作结构体指针的指针123456789101112131415161718//样例代码typedef struct &#123;    char *IP;&#125;LOGOUT_INFO;void send_client_logout_info(LOGOUT_INFO *logout_info,char *json) &#123;    cJSON *item;    cJSON *root = cJSON_Parse(json);    logout_info-&gt;IP = malloc(16);    item=cJSON_GetObjectItem(root,\"IP\");    strcpy(logout_info-&gt;IP,item-&gt;valuestring);    if (root)        cJSON_Delete(root);&#125;\n这是一段cJson解析json的代码，我需要这段代码填充LOGOUT_INFO这个对象，所以传入一个结构体指针，直接对内存空间进行操作，首先要先对logout_info-&gt;IP初始化，malloc函数为其分配空间，之后就可以使用strcpy进行copy。\n","dateCreated":"2017-12-28T13:49:07+08:00","dateModified":"2018-07-30T15:01:24+08:00","datePublished":"2017-12-28T13:49:07+08:00","description":"Today learn pointer form enthusiastic netizen,really appreciate.\n-土杜土杜","headline":"C-Pointer","image":["http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2017/12/28/C-Pointer/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2017/12/28/C-Pointer/","keywords":"C","thumbnailUrl":"http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg"},"articleBody":"Today learn pointer form enthusiastic netizen,really appreciate.\n-土杜土杜\n指针的应用12char *p;p = \"test\";\n这是可以的，因为“test”已经分配了空间，所以指针指向了“test”内存空间的首地址\n12char *p;strcpy(p,\"test\");\n这时候就会报错，因为并没有给p分配内存空间不可以把“test”复制到指针变量里\n结构体指针的应用首先结构体里存指针\n123typedef struct test&#123;    char *test;&#125;test,*pTest;\nmain中测试：\n123pTest p = malloc(sizeof(test));p-&gt;test = \"test String\";printf(\"%s\\n\",p-&gt;test);\n需要注意的是，如果单纯使用malloc函数分配空间，分配的空间是结构体里指针的空间（指针64位，8byte），与指针代表的数据所占用空间无关\n但在测试程序中，直接=“fff”是可以的，因为这时候就已经为字符串开辟好了栈空间，test1-&gt;test直接指向这个空间的首地址。\n123typedef struct test&#123;    long *a;&#125;test;\n如果是正常情况下\n123456test *b = malloc(sizeof(test));long x = 10;//b中指针指向x的内存地址b-&gt;a = &amp;x;//取值需要用long value = *(b-&gt;a);\n\n指针是指针，如果想给指针赋值，必须要给指针分配对应的内存空间\n\n函数操作结构体指针的指针123456789101112131415161718//样例代码typedef struct &#123;    char *IP;&#125;LOGOUT_INFO;void send_client_logout_info(LOGOUT_INFO *logout_info,char *json) &#123;    cJSON *item;    cJSON *root = cJSON_Parse(json);    logout_info-&gt;IP = malloc(16);    item=cJSON_GetObjectItem(root,\"IP\");    strcpy(logout_info-&gt;IP,item-&gt;valuestring);    if (root)        cJSON_Delete(root);&#125;\n这是一段cJson解析json的代码，我需要这段代码填充LOGOUT_INFO这个对象，所以传入一个结构体指针，直接对内存空间进行操作，首先要先对logout_info-&gt;IP初始化，malloc函数为其分配空间，之后就可以使用strcpy进行copy。\n","dateCreated":"2017-12-28T13:49:07+08:00","dateModified":"2018-07-30T15:01:24+08:00","datePublished":"2017-12-28T13:49:07+08:00","description":"Today learn pointer form enthusiastic netizen,really appreciate.\n-土杜土杜","headline":"C-Pointer","image":["http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2017/12/28/C-Pointer/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg","logo":{"@type":"ImageObject","url":"my.jpg"}},"url":"http://yoursite.com/2017/12/28/C-Pointer/","keywords":"C","thumbnailUrl":"http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="Today learn pointer form enthusiastic netizen,really appreciate. -土杜土杜">
 <meta name="keywords" content="C">
 <meta property="og:type" content="blog">
@@ -28,6 +28,8 @@
     
         
     
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/my.jpg"/>
     
     
         <meta property="og:image" content="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg"/>
@@ -52,6 +54,10 @@
 
 
     
+        
+            
+        
+    
 
 <header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
@@ -64,6 +70,8 @@
                 href="#about">
         
         
+            <img class="header-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+        
         </a>
     
 </header>
@@ -71,8 +79,23 @@
             <!-- Define author's picture -->
 
 
+
+        
+    
+
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
+</h5>
+                
+            </div>
         
         
             <ul class="sidebar-buttons">
@@ -131,19 +154,6 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Search"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Search</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
                         <a  class="sidebar-button-link "
                              href="#about"
                             
@@ -165,80 +175,6 @@
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google +</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -357,30 +293,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/12/28/C-Pointer/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2017/12/28/C-Pointer/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2017/12/28/C-Pointer/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -443,30 +355,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/12/28/C-Pointer/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2017/12/28/C-Pointer/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2017/12/28/C-Pointer/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -486,30 +374,6 @@
     <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/12/28/C-Pointer/">
-                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2017/12/28/C-Pointer/">
-                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2017/12/28/C-Pointer/">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
-                </a>
-            </li>
-        
     </ul>
 </div>
 
@@ -518,11 +382,17 @@
         
 
 
+    
+        
+    
+
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
             <i class="fa fa-times"></i>
         </div>
+        
+            <img id="about-card-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -537,6 +407,12 @@
 
             </div>
         
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
         
     </div>
 </div>

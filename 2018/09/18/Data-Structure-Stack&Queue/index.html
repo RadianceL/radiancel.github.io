@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"数据结构第二篇, Stack&amp;Queue\n何为栈&amp;队列结构\nStack 堆结构 常用于系统层面进程管理 有着先进后出的原则 例如Android程序View的展示 总是展示栈顶页面 按back键关闭的是栈顶页面\nQueue 队列结构 常用于系统间通信 保证先发先到 有先进先出的原则 例如消息中间件MQ\n\n实现原理分析栈结构和堆结构，底层也是一个泛型的数组，只不过我们定了一些规则，保证其符合先进后出与先进后出的原则即可，并额外提供一些便捷方法。\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566//栈结构public final class EStack&lt;E&gt; implements TStack&lt;E&gt; &#123;    private Array&lt;E&gt; stack;    public EStack(int capacity) &#123;        stack = new Array&lt;&gt;(capacity, 0.4f);    &#125;    public EStack() &#123;        stack = new Array&lt;&gt;();    &#125;    @Override    public int getSize() &#123;        return stack.getSize();    &#125;    @Override    public boolean isEmpty() &#123;        return stack.isEmpty();    &#125;    /**     * O(1) 均摊复杂度     * @param e     */    @Override    public void push(E e) &#123;        stack.put(e);    &#125;    /**     * O(1)     * @return     */    @Override    public E pop() &#123;        return stack.deleteLast();    &#125;    /**     * O(1)     * @return     */    @Override    public E peek() &#123;        return stack.getLast();    &#125;    @Override    public String toString() &#123;        StringBuilder res = new StringBuilder();        res.append(\"Stack: \");        res.append('[');        for (int i = 0; i &lt; stack.getSize(); i++) &#123;            res.append(stack.get(i));            if (i != stack.getSize() - 1) &#123;                res.append(\", \");            &#125;        &#125;        res.append(\"] top\");        return res.toString();    &#125;    &#125;\n123456789101112131415161718192021222324252627282930313233343536373839404142//队列结构public final class EQueue&lt;E&gt; implements TQueue&lt;E&gt; &#123;    private Array&lt;E&gt; data;    public EQueue() &#123;        data = new Array&lt;&gt;();    &#125;    public EQueue(int capacity) &#123;        data = new Array&lt;&gt;(capacity);    &#125;    public EQueue(int capacity, float limit) &#123;        data = new Array&lt;&gt;(capacity, limit);    &#125;    @Override    public void put(E e) &#123;        data.put(e);    &#125;    @Override    public E remove() &#123;        return data.delete(0);    &#125;    @Override    public int count() &#123;        return data.getSize();    &#125;    @Override    public int getSize() &#123;        return data.getCapacity();    &#125;    @Override    public boolean isEmpty() &#123;        return data.isEmpty();    &#125;&#125;\n其中Array这个数据结构,来自于上篇文章’Data Structure Array’，其实就是数组的底层实现，非常简单从代码中可以看到，无论是栈结构还是队列结构均是对Array的封装，对外屏蔽了Array的部分方法，添加了各自独有的方法从而实现了栈和队列。\n其他\n本文源码的com.eddie.structure中\n下篇文章将开始更复杂的数据结构\n\n","dateCreated":"2018-09-18T17:31:10+08:00","dateModified":"2018-10-14T13:35:24+08:00","datePublished":"2018-09-18T17:31:10+08:00","description":"数据结构第二篇, Stack&amp;Queue","headline":"Data Structure Stack&Queue","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1537273413651&di=8b4639f3204c941e6ef026c910184646&imgtype=0&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/09/18/Data-Structure-Stack&Queue/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2018/09/18/Data-Structure-Stack&Queue/","keywords":"Data-Structure","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg"},"articleBody":"数据结构第二篇, Stack&amp;Queue\n何为栈&amp;队列结构\nStack 堆结构 常用于系统层面进程管理 有着先进后出的原则 例如Android程序View的展示 总是展示栈顶页面 按back键关闭的是栈顶页面\nQueue 队列结构 常用于系统间通信 保证先发先到 有先进先出的原则 例如消息中间件MQ\n\n实现原理分析栈结构和堆结构，底层也是一个泛型的数组，只不过我们定了一些规则，保证其符合先进后出与先进后出的原则即可，并额外提供一些便捷方法。\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566//栈结构public final class EStack&lt;E&gt; implements TStack&lt;E&gt; &#123;    private Array&lt;E&gt; stack;    public EStack(int capacity) &#123;        stack = new Array&lt;&gt;(capacity, 0.4f);    &#125;    public EStack() &#123;        stack = new Array&lt;&gt;();    &#125;    @Override    public int getSize() &#123;        return stack.getSize();    &#125;    @Override    public boolean isEmpty() &#123;        return stack.isEmpty();    &#125;    /**     * O(1) 均摊复杂度     * @param e     */    @Override    public void push(E e) &#123;        stack.put(e);    &#125;    /**     * O(1)     * @return     */    @Override    public E pop() &#123;        return stack.deleteLast();    &#125;    /**     * O(1)     * @return     */    @Override    public E peek() &#123;        return stack.getLast();    &#125;    @Override    public String toString() &#123;        StringBuilder res = new StringBuilder();        res.append(\"Stack: \");        res.append('[');        for (int i = 0; i &lt; stack.getSize(); i++) &#123;            res.append(stack.get(i));            if (i != stack.getSize() - 1) &#123;                res.append(\", \");            &#125;        &#125;        res.append(\"] top\");        return res.toString();    &#125;    &#125;\n123456789101112131415161718192021222324252627282930313233343536373839404142//队列结构public final class EQueue&lt;E&gt; implements TQueue&lt;E&gt; &#123;    private Array&lt;E&gt; data;    public EQueue() &#123;        data = new Array&lt;&gt;();    &#125;    public EQueue(int capacity) &#123;        data = new Array&lt;&gt;(capacity);    &#125;    public EQueue(int capacity, float limit) &#123;        data = new Array&lt;&gt;(capacity, limit);    &#125;    @Override    public void put(E e) &#123;        data.put(e);    &#125;    @Override    public E remove() &#123;        return data.delete(0);    &#125;    @Override    public int count() &#123;        return data.getSize();    &#125;    @Override    public int getSize() &#123;        return data.getCapacity();    &#125;    @Override    public boolean isEmpty() &#123;        return data.isEmpty();    &#125;&#125;\n其中Array这个数据结构,来自于上篇文章’Data Structure Array’，其实就是数组的底层实现，非常简单从代码中可以看到，无论是栈结构还是队列结构均是对Array的封装，对外屏蔽了Array的部分方法，添加了各自独有的方法从而实现了栈和队列。\n其他\n本文源码的com.eddie.structure中\n下篇文章将开始更复杂的数据结构\n\n","dateCreated":"2018-09-18T17:31:10+08:00","dateModified":"2018-10-14T13:35:24+08:00","datePublished":"2018-09-18T17:31:10+08:00","description":"数据结构第二篇, Stack&amp;Queue","headline":"Data Structure Stack&Queue","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1537273413651&di=8b4639f3204c941e6ef026c910184646&imgtype=0&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/09/18/Data-Structure-Stack&Queue/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg","logo":{"@type":"ImageObject","url":"my.jpg"}},"url":"http://yoursite.com/2018/09/18/Data-Structure-Stack&Queue/","keywords":"Data-Structure","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="数据结构第二篇, Stack&amp;amp;Queue">
 <meta name="keywords" content="Data-Structure">
 <meta property="og:type" content="blog">
@@ -28,6 +28,8 @@
     
         
     
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/my.jpg"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -52,6 +54,10 @@
 
 
     
+        
+            
+        
+    
 
 <header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
@@ -64,6 +70,8 @@
                 href="#about">
         
         
+            <img class="header-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+        
         </a>
     
 </header>
@@ -71,8 +79,23 @@
             <!-- Define author's picture -->
 
 
+
+        
+    
+
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
+</h5>
+                
+            </div>
         
         
             <ul class="sidebar-buttons">
@@ -131,19 +154,6 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Search"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Search</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
                         <a  class="sidebar-button-link "
                              href="#about"
                             
@@ -165,80 +175,6 @@
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google +</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -349,30 +285,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/09/18/Data-Structure-Stack&amp;Queue/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/09/18/Data-Structure-Stack&amp;Queue/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/09/18/Data-Structure-Stack&amp;Queue/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -434,30 +346,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/09/18/Data-Structure-Stack&amp;Queue/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/09/18/Data-Structure-Stack&amp;Queue/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/09/18/Data-Structure-Stack&amp;Queue/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -477,30 +365,6 @@
     <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/09/18/Data-Structure-Stack&amp;Queue/">
-                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/09/18/Data-Structure-Stack&amp;Queue/">
-                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/09/18/Data-Structure-Stack&amp;Queue/">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
-                </a>
-            </li>
-        
     </ul>
 </div>
 
@@ -509,11 +373,17 @@
         
 
 
+    
+        
+    
+
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
             <i class="fa fa-times"></i>
         </div>
+        
+            <img id="about-card-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -528,6 +398,12 @@
 
             </div>
         
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
         
     </div>
 </div>

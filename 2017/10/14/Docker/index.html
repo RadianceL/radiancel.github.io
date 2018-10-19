@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.\n—wikipedia\n本教程主要针对服务器配置，windows，mac不在范围之内centos 安装方法：\n使用uname -r检查kernel版本，如果低于3.10.0，则需要升级内核版本yum 方式安装\n1.使用sudo或root权限的用户登入系统,更新yumsudo yum update\n2.添加 yum 仓库12345678$ sudo tee /etc/yum.repos.d/docker.repo &lt;&lt;-‘EOF’[dockerrepo]name=Docker Repositorybaseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/enabled=1gpgcheck=1gpgkey=https://yum.dockerproject.org/gpgEOF\n3.安装 Docker 包$ sudo yum install docker-engine\n4.启动 docker 守护进程123456789101112131415161718192021222324$ sudo systemctl start docker.service配置让 docker 服务随系统自动启动$ sudo chkconfig docker on验证 docker 是否安装成功$ sudo systemctl enable docker.service安装一个hello-world镜像[xxxx@xxxxx ~]$ sudo docker run hello-worldHello from Docker.This message shows that your installation appears to be working correctly.To generate this message, Docker took the following steps:The Docker client contacted the Docker daemon.The Docker daemon pulled the &quot;hello-world&quot; image from the Docker Hub.The Docker daemon created a new container from that image which runs theexecutable that produces the output you are currently reading.The Docker daemon streamed that output to the Docker client, which sent itto your terminal.To try something more ambitious, you can run an Ubuntu container with:$ docker run -it ubuntu bashShare images, automate workflows, and more with a free Docker Hub account:https://hub.docker.comFor more examples and ideas, visit:https://docs.docker.com/userguide/\n整个过程是这样的：12345Docker 客户端连接到 Docker 守护进程；Docker 守护进程从 Docker Hub 中拉取名为 “hello-world” 的 image（镜像）；Docker 守护程序从该 image 中创建新的容器，该容器执行输出动作，输出的内容就是上面所看到的；Docker 守护程序将输出流到 Docker 客户端并发送你的终端显示。Docker Daemon是Docker架构中运行在后台的守护进程，大致可以分为Docker Server、Engine和Job三部分。Docker Daemon可以认为是通过Docker Server模块接受Docker Client的请求，并在Engine中处理请求，然后根据请求类型，创建出指定的Job并运行，运行过程的作用有以下几种可能：向Docker Registry获取镜像，通过graphdriver执行容器镜像的本地化操作，通过networkdriver执行容器网络环境的配置，通过execdriver执行容器内部运行的执行工作等。\n常用命令：1234567docker ps //查看所有运行中的dockerdocker images //查看所有镜像docker -d -p [this.port]:[docker.port] dockerName;docker -it run -it [Docker.Name] bashdocker tag [docker.Name] [userAccount]/[new Create Repository]docker push [userAccount]/[new Create Repository]Mysql 中文乱码问题: –character-set-server=utf8mb4 –collation-server=utf8mb4_unicode_ci\n","dateCreated":"2017-10-14T14:35:27+08:00","dateModified":"2017-11-29T10:20:44+08:00","datePublished":"2017-10-14T14:35:27+08:00","description":"Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.\n—wikipedia","headline":"Docker","image":["https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png","http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2017/10/14/Docker/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://yoursite.com/2017/10/14/Docker/","keywords":"CentOS","thumbnailUrl":"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg"},"articleBody":"Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.\n—wikipedia\n本教程主要针对服务器配置，windows，mac不在范围之内centos 安装方法：\n使用uname -r检查kernel版本，如果低于3.10.0，则需要升级内核版本yum 方式安装\n1.使用sudo或root权限的用户登入系统,更新yumsudo yum update\n2.添加 yum 仓库12345678$ sudo tee /etc/yum.repos.d/docker.repo &lt;&lt;-‘EOF’[dockerrepo]name=Docker Repositorybaseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/enabled=1gpgcheck=1gpgkey=https://yum.dockerproject.org/gpgEOF\n3.安装 Docker 包$ sudo yum install docker-engine\n4.启动 docker 守护进程123456789101112131415161718192021222324$ sudo systemctl start docker.service配置让 docker 服务随系统自动启动$ sudo chkconfig docker on验证 docker 是否安装成功$ sudo systemctl enable docker.service安装一个hello-world镜像[xxxx@xxxxx ~]$ sudo docker run hello-worldHello from Docker.This message shows that your installation appears to be working correctly.To generate this message, Docker took the following steps:The Docker client contacted the Docker daemon.The Docker daemon pulled the &quot;hello-world&quot; image from the Docker Hub.The Docker daemon created a new container from that image which runs theexecutable that produces the output you are currently reading.The Docker daemon streamed that output to the Docker client, which sent itto your terminal.To try something more ambitious, you can run an Ubuntu container with:$ docker run -it ubuntu bashShare images, automate workflows, and more with a free Docker Hub account:https://hub.docker.comFor more examples and ideas, visit:https://docs.docker.com/userguide/\n整个过程是这样的：12345Docker 客户端连接到 Docker 守护进程；Docker 守护进程从 Docker Hub 中拉取名为 “hello-world” 的 image（镜像）；Docker 守护程序从该 image 中创建新的容器，该容器执行输出动作，输出的内容就是上面所看到的；Docker 守护程序将输出流到 Docker 客户端并发送你的终端显示。Docker Daemon是Docker架构中运行在后台的守护进程，大致可以分为Docker Server、Engine和Job三部分。Docker Daemon可以认为是通过Docker Server模块接受Docker Client的请求，并在Engine中处理请求，然后根据请求类型，创建出指定的Job并运行，运行过程的作用有以下几种可能：向Docker Registry获取镜像，通过graphdriver执行容器镜像的本地化操作，通过networkdriver执行容器网络环境的配置，通过execdriver执行容器内部运行的执行工作等。\n常用命令：1234567docker ps //查看所有运行中的dockerdocker images //查看所有镜像docker -d -p [this.port]:[docker.port] dockerName;docker -it run -it [Docker.Name] bashdocker tag [docker.Name] [userAccount]/[new Create Repository]docker push [userAccount]/[new Create Repository]Mysql 中文乱码问题: –character-set-server=utf8mb4 –collation-server=utf8mb4_unicode_ci\n","dateCreated":"2017-10-14T14:35:27+08:00","dateModified":"2017-11-29T10:20:44+08:00","datePublished":"2017-10-14T14:35:27+08:00","description":"Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.\n—wikipedia","headline":"Docker","image":["https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png","http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2017/10/14/Docker/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/"],"image":"my.jpg","logo":{"@type":"ImageObject","url":"my.jpg"}},"url":"http://yoursite.com/2017/10/14/Docker/","keywords":"CentOS","thumbnailUrl":"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png"}</script>
     <meta name="description" content="Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of o">
 <meta name="keywords" content="CentOS">
 <meta property="og:type" content="blog">
@@ -28,6 +28,8 @@
     
         
     
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/my.jpg"/>
     
     
         <meta property="og:image" content="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png"/>
@@ -52,6 +54,10 @@
 
 
     
+        
+            
+        
+    
 
 <header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
@@ -64,6 +70,8 @@
                 href="#about">
         
         
+            <img class="header-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+        
         </a>
     
 </header>
@@ -71,8 +79,23 @@
             <!-- Define author's picture -->
 
 
+
+        
+    
+
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher</p>
+</h5>
+                
+            </div>
         
         
             <ul class="sidebar-buttons">
@@ -131,19 +154,6 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Search"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Search</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
                         <a  class="sidebar-button-link "
                              href="#about"
                             
@@ -165,80 +175,6 @@
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google +">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google +</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
             
@@ -346,30 +282,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/10/14/Docker/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2017/10/14/Docker/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2017/10/14/Docker/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -431,30 +343,6 @@
             </a>
         </li>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/10/14/Docker/" title="Share on Facebook">
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2017/10/14/Docker/" title="Share on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2017/10/14/Docker/" title="Share on Google+">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
         
             
         
@@ -474,30 +362,6 @@
     <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/10/14/Docker/">
-                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2017/10/14/Docker/">
-                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2017/10/14/Docker/">
-                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
-                </a>
-            </li>
-        
     </ul>
 </div>
 
@@ -506,11 +370,17 @@
         
 
 
+    
+        
+    
+
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
             <i class="fa fa-times"></i>
         </div>
+        
+            <img id="about-card-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
@@ -525,6 +395,12 @@
 
             </div>
         
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
         
     </div>
 </div>

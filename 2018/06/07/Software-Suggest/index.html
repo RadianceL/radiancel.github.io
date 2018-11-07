@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"my.jpg"},"articleBody":"When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.\nThree Layer ArchitectureData access layer + Business logic layer + Presentation layer\nWhen I design interface platform system, I made a DTO to result.But it go through business logic layer straight up controller.\nand all data assemble at business logic layer,When I finish this system.Oh, shit!A lot kind of log, exception, DAO at here.\nAlthough all service implements method result the same type.but it also not good for read.\nso i reflect,\n\ndata assemble should in another class with static method. this method will cache all possible throws exception.\ndata parsing should in another class with static method. also ache all possible throws exception.\nthe system should has itself exception, like FooException as root Exception, all other exception extends the root exception.\nthe system should has itself error code. and some solution for those code.\nbusiness logic layer should clear. just communicate with database.\nall controller result should have a agreement. structural consistency.\n\nAbout Design patternJust make a good way to coding, if unnecessary, do not use Design patternif you coding experience is not enough, at last 5 years maybe.It well let you can’t coding.\n","dateCreated":"2018-06-07T10:06:34+08:00","dateModified":"2018-07-16T16:55:40+08:00","datePublished":"2018-06-07T10:06:34+08:00","description":"When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.","headline":"Software Suggest","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/06/07/Software-Suggest/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"my.jpg","logo":{"@type":"ImageObject","url":"my.jpg"}},"url":"http://yoursite.com/2018/06/07/Software-Suggest/","keywords":"Design","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.\nThree Layer ArchitectureData access layer + Business logic layer + Presentation layer\nWhen I design interface platform system, I made a DTO to result.But it go through business logic layer straight up controller.\nand all data assemble at business logic layer,When I finish this system.Oh, shit!A lot kind of log, exception, DAO at here.\nAlthough all service implements method result the same type.but it also not good for read.\nso i reflect,\n\ndata assemble should in another class with static method. this method will cache all possible throws exception.\ndata parsing should in another class with static method. also ache all possible throws exception.\nthe system should has itself exception, like FooException as root Exception, all other exception extends the root exception.\nthe system should has itself error code. and some solution for those code.\nbusiness logic layer should clear. just communicate with database.\nall controller result should have a agreement. structural consistency.\n\nAbout Design patternJust make a good way to coding, if unnecessary, do not use Design patternif you coding experience is not enough, at last 5 years maybe.It well let you can’t coding.\n","dateCreated":"2018-06-07T10:06:34+08:00","dateModified":"2018-07-16T16:55:40+08:00","datePublished":"2018-06-07T10:06:34+08:00","description":"When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.","headline":"Software Suggest","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/06/07/Software-Suggest/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"http://yoursite.com/2018/06/07/Software-Suggest/","keywords":"Design","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="When I design a interface platform system.I find my system is not elegant realization.Detrimental to maintenance.So this my summary.">
 <meta name="keywords" content="Design">
 <meta property="og:type" content="blog">
@@ -29,7 +29,7 @@
         
     
     
-        <meta property="og:image" content="http://yoursite.com/assets/images/my.jpg"/>
+        <meta property="og:image" content="http://yoursite.com/assets/images/alan-walker.jpg"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -70,7 +70,7 @@
                 href="#about">
         
         
-            <img class="header-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
         
         </a>
     
@@ -88,7 +88,7 @@
         
             <div class="sidebar-profile">
                 <a href="/#about">
-                    <img class="sidebar-profile-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">Eddie Lee</h4>
                 
@@ -387,7 +387,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/my.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Eddie Lee</h4>
         

@@ -1,0 +1,438 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Blog Bom!!BO!">
+    <title>kafka note - Blog Bom!!BO!</title>
+    <meta name="author" content="Eddie Lee">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"之前我想要把数据结构写完，再来写这些乱七八糟的东西。不过最近一段时间工作比较忙，加上未来涉及到中间件的使用，回头还是先把中间件的理解先放在前面吧，数据结构这块不会烂尾的。\n\nkafka 是什么官网上指出”A Distributed Streaming Platform”，一个分布式的流处理平台\n\nPUBLISH &amp; SUBSCRIBE     发布和订阅\nPROCESS                处理\nSTORE                      贮存\n\n流处理具体是什么含义相信大家都理解，毕竟一个java工程师对Linux和C一定是很熟悉的。那么kafka三大功能都是什么含义呢？\nPUBLISH &amp; SUBSCRIBEe.g.我们开车通常会听广播，那广播是从广播电台统一发布那我们接受广播，只需要打开收音机，订阅广播即可听到这个声音那么这个关系，就是发布和订阅的关系，一端发出，一端订阅\n对应到kafka中的概念，就是\n\nProducer    生产发布\nConsumer    消费订阅\n\nPROCESS编写可扩展的流处理应用程序，用于实时事件响应的场景。一开始我们看到kafka定位为“一个分布式的流处理平台”既然是流处理，那处理必然是一个很关键的一点e.g. 一个秒杀活动，并发量特别大，并发量大的时候，可能会有大量用户同时提交付款，但我们的服务器可能无法承载这么多并发，那我们采用延时订阅等方式，以达到可以处理历史数据的应用程序\nSTORE安全的将流式的数据存储在一个分布式，有副本备份，容错的集群。这个概念比较简单了，意思是这个数据是有备份的，你有几个集群，这个数据就会被备份几份，比如说你有总容量600G的3台主机建立了3个kafka集群，那么实际有效存储只有200G，这是因为每个数据都会被同时备份到另外两台主机中，以保证数据不会丢失，利用空间换取稳定。同时这个集群是一个容错的集群，后期我会做这个容错测试，让自己也能更放心大胆的用kafka。在这里延伸两个名词\n\nTopic        Kafka将消息种子(Feed)分门别类，每一类的消息称之为一个主题(Topic).\nBroker    已发布的消息保存在一组服务器中，称之为Kafka集群。集群中的每一个服务器都是一个代理(Broker). 消费者可以订阅一个或多个主题（topic），并从Broker拉数据，从而消费这些已发布的消息。\n\n\n那么以上就是kafka的官网概念回顾。总体来讲只要接触过集群，分布式，微服务的概念，理解这些应该是非常非常简单的总之kafka有四个小概念，Producer,Consumer,Topic,Broker那么根据这四个概念，我们简单建立一个消息系统模型\n工厂A 每分钟生产馒头5个        —为工厂A建立 Topic FactoryA工厂B 每分钟生产窝头1个        —为工厂B建立 Topic FactoryB那么两个工厂每分钟都会发布一个消息到各自的主题（Topic）中为了保证工厂发布渠道的稳定性，那两个工厂合资创建了3个销售渠道Broker0，Broker1，Broker2因为工厂每分钟总共就生产出固定的馒头，不会因为某个销售渠道卖的多而增加产量，所有这三个渠道之间的库存数据（待消费数据）是同步的此时客户来了，客户可能只想吃馒头，那他只订阅FactoryA，那么FactoryB的数据就不会给这个客户，而客户也并不关心是哪个销售渠道提供的，他只关心最后送来的东西是工厂A生产的馒头，就OK了。如果客户比较能吃（服务器承载量大），那他可以订阅两个Topic，一起处理\n这种就是我们的消息系统的实际应用场景ps: 官网上提供了很完整的下载，启动，测试的方法，这个笔记中不做记录，想练回头看下官网的Quick Start即可，同时安利一个中文版的国内网站，翻译的有些偏差，不过也非常棒，减少了我的一些阅读障碍\nkafka重要配置项1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950############################# Server Basics ############################## 核心配置broker.id=0############################# Socket Server Settings #############################listeners=PLAINTEXT://:9092advertised.listeners=PLAINTEXT://47.96.29.8:9092#listener.security.protocol.map=PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL# server用来处理网络请求的网络线程数目；一般你不需要更改这个属性。num.network.threads=3#server用来处理请求的I/O线程的数目；这个线程数目至少要等于硬盘的个数。num.io.threads=8# SO_SNDBUFF 缓存大小，server进行socket 连接所用socket.send.buffer.bytes=102400# SO_RCVBUFF缓存大小，server进行socket连接时所用socket.receive.buffer.bytes=102400# server允许的最大请求尺寸；  这将避免server溢出，它应该小于Java heap sizesocket.request.max.bytes=10485760############################# Log Basics ############################## 此目录每次重启会被清理，测试用就不改了log.dirs=/tmp/kafka-logs# 如果创建topic时没有给出划分partitions个数，这个数字将是topic下partitions数目的默认数值。num.partitions=1num.recovery.threads.per.data.dir=1############################# Internal Topic Settings  #############################offsets.topic.replication.factor=1transaction.state.log.replication.factor=1transaction.state.log.min.isr=1############################# Log Flush Policy ############################## The number of messages to accept before forcing a flush of data to disk#log.flush.interval.messages=10000# The maximum amount of time a message can sit in a log before we force a flush#log.flush.interval.ms=1000############################# Log Retention Policy #############################log.retention.hours=168log.segment.bytes=1073741824log.retention.check.interval.ms=300000############################# Zookeeper #############################zookeeper.connect=localhost:2181# Timeout in ms for connecting to zookeeperzookeeper.connection.timeout.ms=6000############################# Group Coordinator Settings #############################group.initial.rebalance.delay.ms=0\n使用kafka java API说了一大堆，没实战就是耍流氓，现在起开始正式进入编码阶段。首先，Jar包是肯定的了，此时我会选用最新版本的jar包，毕竟是测试联系，不会太计较稳定性，也想通过新版本的一些坑对比老版本。12345&lt;dependency&gt;    &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;    &lt;artifactId&gt;kafka_2.12&lt;/artifactId&gt;    &lt;version&gt;2.0.0&lt;/version&gt;&lt;/dependency&gt;\n仔细看了官网的文档，发现生产和消费，貌似用的同一个Jar包？先试试看吧，回头有问题再改。而且官网的文档只更新到了0.10.2，这个多少有些坑人，要知道最新的都2.0了啊，中间你是省略了多少版本。。。。\n","dateCreated":"2018-11-07T09:33:46+08:00","dateModified":"2018-11-07T15:34:56+08:00","datePublished":"2018-11-07T09:33:46+08:00","description":"之前我想要把数据结构写完，再来写这些乱七八糟的东西。不过最近一段时间工作比较忙，加上未来涉及到中间件的使用，回头还是先把中间件的理解先放在前面吧，数据结构这块不会烂尾的。","headline":"kafka note","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://pic.paopaoche.net/up/2015-11/201511101726368467375.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/11/07/kafka-note/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"http://yoursite.com/2018/11/07/kafka-note/","keywords":"Middleware","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <meta name="description" content="之前我想要把数据结构写完，再来写这些乱七八糟的东西。不过最近一段时间工作比较忙，加上未来涉及到中间件的使用，回头还是先把中间件的理解先放在前面吧，数据结构这块不会烂尾的。">
+<meta name="keywords" content="Middleware">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="kafka note">
+<meta property="og:url" content="http://yoursite.com/2018/11/07/kafka-note/index.html">
+<meta property="og:site_name" content="Blog Bom!!BO!">
+<meta property="og:description" content="之前我想要把数据结构写完，再来写这些乱七八糟的东西。不过最近一段时间工作比较忙，加上未来涉及到中间件的使用，回头还是先把中间件的理解先放在前面吧，数据结构这块不会烂尾的。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-11-07T07:34:56.282Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kafka note">
+<meta name="twitter:description" content="之前我想要把数据结构写完，再来写这些乱七八糟的东西。不过最近一段时间工作比较忙，加上未来涉及到中间件的使用，回头还是先把中间件的理解先放在前面吧，数据结构这块不会烂尾的。">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/alan-walker.jpg"/>
+    
+    
+        <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" />
+    
+    
+        <meta property="og:image" content="http://pic.paopaoche.net/up/2015-11/201511101726368467375.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://pic.paopaoche.net/up/2015-11/201511101726368467375.jpg" />
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Blog Bom!!BO!</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                            title="Home"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                            title="Categories"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                            title="Tags"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                            title="Archives"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                            title="About"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-left
+                    "
+             style="background-image:url('http://pic.paopaoche.net/up/2015-11/201511101726368467375.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            kafka note
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2018-11-07T09:33:46+08:00">
+	
+		    Nov 07, 2018
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Java/">Java</a>
+
+
+    
+</div>
+
+    
+</div>
+
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>之前我想要把数据结构写完，再来写这些乱七八糟的东西。不过最近一段时间工作比较忙，加上未来涉及到中间件的使用，回头还是先把中间件的理解先放在前面吧，数据结构这块不会烂尾的。</p>
+<a id="more"></a>
+<h1 id="kafka-是什么"><a href="#kafka-是什么" class="headerlink" title="kafka 是什么"></a>kafka 是什么</h1><p>官网上指出”A Distributed Streaming Platform”，一个分布式的流处理平台</p>
+<ul>
+<li>PUBLISH &amp; SUBSCRIBE     发布和订阅</li>
+<li>PROCESS                处理</li>
+<li>STORE                      贮存</li>
+</ul>
+<p>流处理具体是什么含义相信大家都理解，毕竟一个java工程师对Linux和C一定是很熟悉的。<br>那么kafka三大功能都是什么含义呢？</p>
+<h2 id="PUBLISH-amp-SUBSCRIBE"><a href="#PUBLISH-amp-SUBSCRIBE" class="headerlink" title="PUBLISH &amp; SUBSCRIBE"></a>PUBLISH &amp; SUBSCRIBE</h2><p>e.g.<br>我们开车通常会听广播，那广播是从广播电台统一发布<br>那我们接受广播，只需要打开收音机，订阅广播即可听到这个声音<br>那么这个关系，就是发布和订阅的关系，一端发出，一端订阅</p>
+<p>对应到kafka中的概念，就是</p>
+<ul>
+<li>Producer    生产发布</li>
+<li>Consumer    消费订阅</li>
+</ul>
+<h2 id="PROCESS"><a href="#PROCESS" class="headerlink" title="PROCESS"></a>PROCESS</h2><p>编写可扩展的流处理应用程序，用于实时事件响应的场景。一开始我们看到kafka定位为“一个分布式的流处理平台”<br>既然是流处理，那处理必然是一个很关键的一点<br>e.g. 一个秒杀活动，并发量特别大，并发量大的时候，可能会有大量用户同时提交付款，但我们的服务器可能无法承载这么多并发，那我们采用延时订阅等方式，以达到可以处理历史数据的应用程序</p>
+<h2 id="STORE"><a href="#STORE" class="headerlink" title="STORE"></a>STORE</h2><p>安全的将流式的数据存储在一个分布式，有副本备份，容错的集群。<br>这个概念比较简单了，意思是这个数据是有备份的，你有几个集群，这个数据就会被备份几份，比如说你有总容量600G的3台主机建立了3个kafka集群，那么实际有效存储只有200G，这是因为每个数据都会被同时备份到另外两台主机中，以保证数据不会丢失，利用空间换取稳定。同时这个集群是一个容错的集群，后期我会做这个容错测试，让自己也能更放心大胆的用kafka。<br>在这里延伸两个名词</p>
+<ul>
+<li>Topic        Kafka将消息种子(Feed)分门别类，每一类的消息称之为一个主题(Topic).</li>
+<li>Broker    已发布的消息保存在一组服务器中，称之为Kafka集群。集群中的每一个服务器都是一个代理(Broker). 消费者可以订阅一个或多个主题（topic），并从Broker拉数据，从而消费这些已发布的消息。</li>
+</ul>
+<hr>
+<p>那么以上就是kafka的官网概念回顾。总体来讲只要接触过集群，分布式，微服务的概念，理解这些应该是非常非常简单的<br>总之kafka有四个小概念，<code>Producer</code>,<code>Consumer</code>,<code>Topic</code>,<code>Broker</code><br>那么根据这四个概念，我们简单建立一个消息系统模型</p>
+<p>工厂A 每分钟生产馒头5个        —为工厂A建立 Topic FactoryA<br>工厂B 每分钟生产窝头1个        —为工厂B建立 Topic FactoryB<br>那么两个工厂每分钟都会发布一个消息到各自的主题（Topic）中<br>为了保证工厂发布渠道的稳定性，那两个工厂合资创建了3个销售渠道Broker0，Broker1，Broker2<br>因为工厂每分钟总共就生产出固定的馒头，不会因为某个销售渠道卖的多而增加产量，所有这三个渠道之间的库存数据（待消费数据）是同步的<br>此时客户来了，客户可能只想吃馒头，那他只订阅FactoryA，那么FactoryB的数据就不会给这个客户，而客户也并不关心是哪个销售渠道提供的，他只关心最后送来的东西是工厂A生产的馒头，就OK了。<br>如果客户比较能吃（服务器承载量大），那他可以订阅两个Topic，一起处理</p>
+<p>这种就是我们的消息系统的实际应用场景<br>ps: 官网上提供了很完整的下载，启动，测试的方法，这个笔记中不做记录，想练回头看下官网的Quick Start即可，同时安利一个中文版的国内<a href="http://orchome.com/kafka/index" target="_blank" rel="noopener">网站</a>，翻译的有些偏差，不过也非常棒，减少了我的一些阅读障碍</p>
+<h2 id="kafka重要配置项"><a href="#kafka重要配置项" class="headerlink" title="kafka重要配置项"></a>kafka重要配置项</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">############################# Server Basics #############################</span><br><span class="line"># 核心配置</span><br><span class="line">broker.id=0</span><br><span class="line"></span><br><span class="line">############################# Socket Server Settings #############################</span><br><span class="line">listeners=PLAINTEXT://:9092</span><br><span class="line">advertised.listeners=PLAINTEXT://47.96.29.8:9092</span><br><span class="line">#listener.security.protocol.map=PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL</span><br><span class="line"># server用来处理网络请求的网络线程数目；一般你不需要更改这个属性。</span><br><span class="line">num.network.threads=3</span><br><span class="line">#server用来处理请求的I/O线程的数目；这个线程数目至少要等于硬盘的个数。</span><br><span class="line">num.io.threads=8</span><br><span class="line"># SO_SNDBUFF 缓存大小，server进行socket 连接所用</span><br><span class="line">socket.send.buffer.bytes=102400</span><br><span class="line"># SO_RCVBUFF缓存大小，server进行socket连接时所用</span><br><span class="line">socket.receive.buffer.bytes=102400</span><br><span class="line"># server允许的最大请求尺寸；  这将避免server溢出，它应该小于Java heap size</span><br><span class="line">socket.request.max.bytes=10485760</span><br><span class="line"></span><br><span class="line">############################# Log Basics #############################</span><br><span class="line"># 此目录每次重启会被清理，测试用就不改了</span><br><span class="line">log.dirs=/tmp/kafka-logs</span><br><span class="line"># 如果创建topic时没有给出划分partitions个数，这个数字将是topic下partitions数目的默认数值。</span><br><span class="line">num.partitions=1</span><br><span class="line">num.recovery.threads.per.data.dir=1</span><br><span class="line"></span><br><span class="line">############################# Internal Topic Settings  #############################</span><br><span class="line">offsets.topic.replication.factor=1</span><br><span class="line">transaction.state.log.replication.factor=1</span><br><span class="line">transaction.state.log.min.isr=1</span><br><span class="line"></span><br><span class="line">############################# Log Flush Policy #############################</span><br><span class="line"># The number of messages to accept before forcing a flush of data to disk</span><br><span class="line">#log.flush.interval.messages=10000</span><br><span class="line"># The maximum amount of time a message can sit in a log before we force a flush</span><br><span class="line">#log.flush.interval.ms=1000</span><br><span class="line"></span><br><span class="line">############################# Log Retention Policy #############################</span><br><span class="line">log.retention.hours=168</span><br><span class="line">log.segment.bytes=1073741824</span><br><span class="line">log.retention.check.interval.ms=300000</span><br><span class="line"></span><br><span class="line">############################# Zookeeper #############################</span><br><span class="line">zookeeper.connect=localhost:2181</span><br><span class="line"># Timeout in ms for connecting to zookeeper</span><br><span class="line">zookeeper.connection.timeout.ms=6000</span><br><span class="line"></span><br><span class="line">############################# Group Coordinator Settings #############################</span><br><span class="line">group.initial.rebalance.delay.ms=0</span><br></pre></td></tr></table></figure>
+<h2 id="使用kafka-java-API"><a href="#使用kafka-java-API" class="headerlink" title="使用kafka java API"></a>使用kafka java API</h2><p>说了一大堆，没实战就是耍流氓，现在起开始正式进入编码阶段。<br>首先，Jar包是肯定的了，此时我会选用最新版本的jar包，毕竟是测试联系，不会太计较稳定性，也想通过新版本的一些坑对比老版本。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.kafka<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>kafka_2.12<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>仔细看了官网的文档，发现生产和消费，貌似用的同一个Jar包？先试试看吧，回头有问题再改。<br>而且官网的文档只更新到了0.10.2，这个多少有些坑人，要知道最新的都2.0了啊，中间你是省略了多少版本。。。。</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Middleware/">Middleware</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/10/19/“Https”/" data-tooltip="Https" aria-label="NEXT: Https">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 Eddie Lee. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/10/19/“Https”/" data-tooltip="Https" aria-label="NEXT: Https">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Eddie Lee</h4>
+        
+            <div id="about-card-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+
+    </body>
+</html>

@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Blog Bom!!BO!">
+    <title>Working Principle of Multithreading - Blog Bom!!BO!</title>
+    <meta name="author" content="Eddie Lee">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"感谢Java知音小知同学提供的渠道，今天来总结下Java内存模型和乐观锁ABA问题。\n\n内存模型众所周之，Java是有个内存模型的，也就是堆区，栈区，本地方法区，方法区，程序计数器。其目的是为了让Java能够在不同平台运行的效果一致。\n这个只是其表面状态，就像面向对象编程，是给你看到的一层假象，就算你是面向对象编程，CPU执行命令时还是顺序执行，遇到特定指令跳到对应位置执行，执行结束后返回指令的下一行。\n那其真谛是什么？OK，接下来我们一起给JVM内存模型脱一脱衣服。\n与内存聊天首先cpu在执行中，执行的是高速缓存中的记录,这个高速内存就是买cpu时很关键的一个参数叫缓存，一般现在CPU都拥有三级缓存，L1、L2、L3。而高速缓存中的记录是从主内存中拿到的副本，也就是拷贝了一份。\n原因是我们的CPU操作太快了，快到我们的内存根本跟不上CPU的速度，就更别提硬盘了。那CPU厂商为了能够让CPU充分利用运算能力，不去等其他硬件的配合，于是CPU就有了高速缓存，越接近CPU那一级的缓存越快，同理也越昂贵。\n当CPU需要一条数据时，会把数据加载到高速缓存中，这个过程并不是把内存中的数据“剪切”到高速缓存中的，他是拿了这份数据的副本进行处理，处理完成后再回写到内存中，再由程序决定是否需要写入硬盘持久化。\n那这个过程中CPU都做了哪些操作，JVM又配合了什么呢？首先所有线程栈和堆会被保存在缓存里面，部分可能会出现在CPU缓存中和CPU内部的寄存器里面\n\nlock（锁定）：作用于主内存的变量，把一个变量标识变为一条线程独占状态\nunlock（解锁）：作用于主内存的变量，把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定\nread（读取）：作用于主内存的变量，把一个变量值从主内存传输到线程的工作内存中，以便随后的load动作使用\nload（载入）：作用于工作内存的变量，它把read操作从主内存中得到的变量值放入工作内存的变量副本中\nuse（使用）：作用于工作内存的变量，把工作内存中的一个变量值传递给执行引擎\nassign（赋值）：作用于工作内存的变量，它把一个从执行引擎接受到的值赋值给工作内存的变量\nstore（存储）：作用于工作内存的变量，把工作内存中的一个变量的值传送到主内存中，以便随后的write的操作\nwrite（写入）：作用于主内存的变量，它把store操作从工作内存中一个变量的值传送到主内存的变量中\n\n这段话我相信大家在很多网站上也见过，可能每个人描述不一样，但大同小异。需要注意的是，如果没有运算后第一步 赋值到工作区的操作 是不允许写入主内存区其作用的顺序为-&gt; Lock(锁定) -&gt; Read(读取缓存区) -&gt; Load(加载到工作内存) -&gt; Use(使用) -&gt; Assign(回写到工作内存) -&gt; Store(存储到缓存区) -&gt; write(回写到主内存) - Unlock(解锁)\n笔记：线程的本地内存，指的是cpu的缓存和寄存器，JVM的静态内存模型，他只是一种对内存模型的物理划分而已，只局限在内存，而且只局限在JVM的内存，线程共享变量一定是在主存中的\n所以共享变量的流程一定是线程A从本地存储写入变量到主存，线程B去读这个变量这问题不就出现了吗。 如果B刚读完这个变量到自己的本地内存中，A把这个变量改了，该怎么办？\n线程并发处理上面提到的问题，就涉及到了并发处理了，数据不一致，下面以程序举例子(代码有精简)：123456789101112131415private static int clientTotal = 50000;private static int count = 0;ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(\"test-%d\").build();ExecutorService service = new ThreadPoolExecutor(5, 200, 0L, TimeUnit.MILLISECONDS,      new LinkedBlockingDeque&lt;&gt;(1024), factory, new ThreadPoolExecutor.AbortPolicy());for (int i = 0; i &lt; clientTotal; i++) &#123;    service.execute(() -&gt; &#123;        add();    &#125;);&#125;private static void add()&#123;    count ++;&#125;\n这个程序一定是有问题，可以拿出来试一下，如果电脑性能特别好，可以多尝试几次，相信最终结果肯定不是50000。因为我们是多线程程序，线程并发同时处理，假设A、B同时拿到0这个值，那计算完都是1，回写到主存中都是1，也就是一次计算失效了。为了解决这个问题，我们可以通过Atomic包下的类来处理，Atomic包下的工具类实现了CAS[CompareAndSwap]算法。\nCAS的主要原理为：获取主存的值，do while方式循环判断当前要被更改的值是否与线程处理前获取到的值相同，相同则允许更改，不相同循环重新在底层内存中取值计算\nCAS只是其中一种处理方式，另外还有synchronized同步、Lock锁、wait和notify、特殊域变量volatile、ThreadLocal局部变量、阻塞队列等等方式，印象中Java并发容器中就有使用阻塞队列的容器，具体是哪个有点记不清了，有时间拿出一块时间专门写一个并发容器的总结。\nCAS这种方式并不是很好，原理有二，第一，CAS会占用资源去做循环，第二，会发生ABA问题，我个人很讨厌用这种名次来说事，但这个我还没有找到其他方式来描述\nCAS中ABA问题所谓ABA问题，回过头看CAS原理：do while方式循环判断当前要被更改的值是否与线程处理前获取到的值相同那问题就来了，仔细细考一下，如果我A线程计算特别快，同样一次计算，A线程用时2ms，B线程用了4ms这时候等B执行完，A都执行两次了，如果初始值为0，A线程第一次计算，+1，第二次计算 -1，此时主存中的结果仍为0A线程第二次计算结束后，B线程终于执行完了，一看，主存中还是0，跟他拿到的计算前的值相同，乐呵呵的就把他计算的值放主存里了\n打眼一看，这个结果貌似也还可以接受。但如果遇到特殊场景，需要针对这个问题进行处理.比如有个变量是记录发送消息个数的，A线程发送，B线程统计，AB线程恰好第十条数据同步，A线程发送第10条数据，失败了，第十一条数据成功，此时记录消息的变量为10，线程B记录完第9条数据，恰好读到第十条数据，此时B线程认为，A线程一共发了10条，10条成功。那这个情况是不允许发生的。     —场景仅供参考\n为了解决这个问题，最简单的办法还是去Atomic包，去找AtomicXXXXXXXFieldUpdater，这个处理方式为，会在存储时增加一个东西，就是版本，比较值是否相同时还会比较小版本是否一致\n但这个弊端就是，方法在高并发情况可能会增加CAS失败率,造成更多循环,浪费资源,这个是没法避免的\n总结其实线程这块，主要就那么几块，内存，内存包括安全发布，可见性，还有J.U.C，原子性包，线程那几种方式再加上信号量那些概念，同步相关，包括synchronized同步，Lock锁，上面提到的那些，剩下的也就没啥了，搞懂这些，估计在遇到啥也不是问题\n","dateCreated":"2018-12-11T17:36:44+08:00","dateModified":"2018-12-11T18:43:27+08:00","datePublished":"2018-12-11T17:36:44+08:00","description":"感谢Java知音小知同学提供的渠道，今天来总结下Java内存模型和乐观锁ABA问题。","headline":"Working Principle of Multithreading","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2018/12/11/Working-Principle-of-Multithreading/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"https://radiancel.github.io/2018/12/11/Working-Principle-of-Multithreading/","keywords":"Java","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <meta name="description" content="感谢Java知音小知同学提供的渠道，今天来总结下Java内存模型和乐观锁ABA问题。">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Working Principle of Multithreading">
+<meta property="og:url" content="https://radiancel.github.io/2018/12/11/Working-Principle-of-Multithreading/index.html">
+<meta property="og:site_name" content="Blog Bom!!BO!">
+<meta property="og:description" content="感谢Java知音小知同学提供的渠道，今天来总结下Java内存模型和乐观锁ABA问题。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-12-11T10:43:27.506Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Working Principle of Multithreading">
+<meta name="twitter:description" content="感谢Java知音小知同学提供的渠道，今天来总结下Java内存模型和乐观锁ABA问题。">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://radiancel.github.io/assets/images/alan-walker.jpg"/>
+    
+    
+        <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" />
+    
+    
+        <meta property="og:image" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg" />
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Blog Bom!!BO!</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                            title="Home"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                            title="Categories"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                            title="Tags"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                            title="Archives"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                            title="About"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-left
+                    "
+             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            Working Principle of Multithreading
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2018-12-11T17:36:44+08:00">
+	
+		    Dec 11, 2018
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Java/">Java</a>
+
+
+    
+</div>
+
+    
+</div>
+
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>感谢<a href="https://www.javazhiyin.com/" target="_blank" rel="noopener">Java知音</a>小知同学提供的渠道，今天来总结下Java内存模型和乐观锁ABA问题。</p>
+<a id="more"></a>
+<h1 id="内存模型"><a href="#内存模型" class="headerlink" title="内存模型"></a>内存模型</h1><p>众所周之，Java是有个内存模型的，也就是堆区，栈区，本地方法区，方法区，程序计数器。<br>其目的是为了让Java能够在不同平台运行的效果一致。</p>
+<p>这个只是其表面状态，就像面向对象编程，是给你看到的一层假象，就算你是面向对象编程，CPU执行命令时还是顺序执行，遇到特定指令跳到对应位置执行，执行结束后返回指令的下一行。</p>
+<p>那其真谛是什么？<br>OK，接下来我们一起给JVM内存模型脱一脱衣服。</p>
+<h3 id="与内存聊天"><a href="#与内存聊天" class="headerlink" title="与内存聊天"></a>与内存聊天</h3><p>首先cpu在执行中，执行的是高速缓存中的记录,这个高速内存就是买cpu时很关键的一个参数叫缓存，一般现在CPU都拥有三级缓存，L1、L2、L3。而高速缓存中的记录是从主内存中拿到的副本，也就是拷贝了一份。</p>
+<p>原因是我们的CPU操作太快了，快到我们的内存根本跟不上CPU的速度，就更别提硬盘了。那CPU厂商为了能够让CPU充分利用运算能力，不去等其他硬件的配合，于是CPU就有了高速缓存，越接近CPU那一级的缓存越快，同理也越昂贵。</p>
+<p>当CPU需要一条数据时，会把数据加载到高速缓存中，这个过程并不是把内存中的数据“剪切”到高速缓存中的，他是拿了这份数据的副本进行处理，处理完成后再回写到内存中，再由程序决定是否需要写入硬盘持久化。</p>
+<p>那这个过程中CPU都做了哪些操作，JVM又配合了什么呢？<br>首先所有线程栈和堆会被保存在缓存里面，部分可能会出现在CPU缓存中和CPU内部的寄存器里面</p>
+<ol>
+<li>lock（锁定）：作用于主内存的变量，把一个变量标识变为一条线程独占状态</li>
+<li>unlock（解锁）：作用于主内存的变量，把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定</li>
+<li>read（读取）：作用于主内存的变量，把一个变量值从主内存传输到线程的工作内存中，以便随后的load动作使用</li>
+<li>load（载入）：作用于工作内存的变量，它把read操作从主内存中得到的变量值放入工作内存的变量副本中</li>
+<li>use（使用）：作用于工作内存的变量，把工作内存中的一个变量值传递给执行引擎</li>
+<li>assign（赋值）：作用于工作内存的变量，它把一个从执行引擎接受到的值赋值给工作内存的变量</li>
+<li>store（存储）：作用于工作内存的变量，把工作内存中的一个变量的值传送到主内存中，以便随后的write的操作</li>
+<li>write（写入）：作用于主内存的变量，它把store操作从工作内存中一个变量的值传送到主内存的变量中</li>
+</ol>
+<p>这段话我相信大家在很多网站上也见过，可能每个人描述不一样，但大同小异。<br>需要注意的是，如果没有运算后第一步 赋值到工作区的操作 是不允许写入主内存区<br>其作用的顺序为-&gt; Lock(锁定) -&gt; Read(读取缓存区) -&gt; Load(加载到工作内存) -&gt; Use(使用) -&gt; Assign(回写到工作内存) -&gt; Store(存储到缓存区) -&gt; write(回写到主内存) - Unlock(解锁)</p>
+<p>笔记：线程的本地内存，指的是cpu的缓存和寄存器，JVM的静态内存模型，他只是一种对内存模型的物理划分而已，只局限在内存，而且只局限在JVM的内存，线程共享变量一定是在主存中的</p>
+<p>所以共享变量的流程一定是线程A从本地存储写入变量到主存，线程B去读这个变量<br>这问题不就出现了吗。 如果B刚读完这个变量到自己的本地内存中，A把这个变量改了，该怎么办？</p>
+<h3 id="线程并发处理"><a href="#线程并发处理" class="headerlink" title="线程并发处理"></a>线程并发处理</h3><p>上面提到的问题，就涉及到了并发处理了，数据不一致，下面以程序举例子(代码有精简)：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> clientTotal = <span class="number">50000</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">ThreadFactory factory = <span class="keyword">new</span> ThreadFactoryBuilder().setNameFormat(<span class="string">"test-%d"</span>).build();</span><br><span class="line">ExecutorService service = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">5</span>, <span class="number">200</span>, <span class="number">0L</span>, TimeUnit.MILLISECONDS,</span><br><span class="line">      <span class="keyword">new</span> LinkedBlockingDeque&lt;&gt;(<span class="number">1024</span>), factory, <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy());</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; clientTotal; i++) &#123;</span><br><span class="line">    service.execute(() -&gt; &#123;</span><br><span class="line">        add();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span></span>&#123;</span><br><span class="line">    count ++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个程序一定是有问题，可以拿出来试一下，如果电脑性能特别好，可以多尝试几次，相信最终结果肯定不是50000。<br>因为我们是多线程程序，线程并发同时处理，假设A、B同时拿到0这个值，那计算完都是1，回写到主存中都是1，也就是一次计算失效了。<br>为了解决这个问题，我们可以通过Atomic包下的类来处理，Atomic包下的工具类实现了CAS[CompareAndSwap]算法。</p>
+<p>CAS的主要原理为：<br>获取主存的值，do while方式循环判断当前要被更改的值是否与线程处理前获取到的值相同，<br>相同则允许更改，不相同循环重新在底层内存中取值计算</p>
+<p>CAS只是其中一种处理方式，另外还有synchronized同步、Lock锁、wait和notify、特殊域变量volatile、ThreadLocal局部变量、阻塞队列等等方式，印象中Java并发容器中就有使用阻塞队列的容器，具体是哪个有点记不清了，有时间拿出一块时间专门写一个并发容器的总结。</p>
+<p>CAS这种方式并不是很好，原理有二，第一，CAS会占用资源去做循环，第二，会发生ABA问题，我个人很讨厌用这种名次来说事，但这个我还没有找到其他方式来描述</p>
+<h3 id="CAS中ABA问题"><a href="#CAS中ABA问题" class="headerlink" title="CAS中ABA问题"></a>CAS中ABA问题</h3><p>所谓ABA问题，回过头看CAS原理：do while方式循环判断当前要被更改的值是否与线程处理前获取到的值相同<br>那问题就来了，仔细细考一下，如果我A线程计算特别快，同样一次计算，A线程用时2ms，B线程用了4ms<br>这时候等B执行完，A都执行两次了，如果初始值为0，A线程第一次计算，+1，第二次计算 -1，此时主存中的结果仍为0<br>A线程第二次计算结束后，B线程终于执行完了，一看，主存中还是0，跟他拿到的计算前的值相同，乐呵呵的就把他计算的值放主存里了</p>
+<p>打眼一看，这个结果貌似也还可以接受。但如果遇到特殊场景，需要针对这个问题进行处理.<br>比如有个变量是记录发送消息个数的，A线程发送，B线程统计，AB线程恰好第十条数据同步，A线程发送第10条数据，失败了，第十一条数据成功，此时记录消息的变量为10，线程B记录完第9条数据，恰好读到第十条数据，此时B线程认为，A线程一共发了10条，10条成功。那这个情况是不允许发生的。     —场景仅供参考</p>
+<p>为了解决这个问题，最简单的办法还是去Atomic包，去找AtomicXXXXXXXFieldUpdater，这个处理方式为，会在存储时增加一个东西，就是版本，比较值是否相同时还会比较小版本是否一致</p>
+<p>但这个弊端就是，方法在高并发情况可能会增加CAS失败率,造成更多循环,浪费资源,这个是没法避免的</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>其实线程这块，主要就那么几块，内存，内存包括安全发布，可见性，还有J.U.C，原子性包，线程那几种方式再加上信号量那些概念，同步相关，包括synchronized同步，Lock锁，上面提到的那些，剩下的也就没啥了，搞懂这些，估计在遇到啥也不是问题</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Java/">Java</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/12/09/Miscellanea-1/" data-tooltip="Miscellanea-1" aria-label="NEXT: Miscellanea-1">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 Eddie Lee. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/12/09/Miscellanea-1/" data-tooltip="Miscellanea-1" aria-label="NEXT: Miscellanea-1">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Eddie Lee</h4>
+        
+            <div id="about-card-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+
+    </body>
+</html>

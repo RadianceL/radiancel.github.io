@@ -1,0 +1,428 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Blog Bom!!BO!">
+    <title>ELK-SetSail - Blog Bom!!BO!</title>
+    <meta name="author" content="Eddie Lee">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"公司面对日益增长的日志和集群主机，日志观察变得越发困难，部分实习生对Linux不熟练，查日志效率低，决定寻找一个图形化的日志查询工具，经过对比，ELK在部署复杂度，可拓展性等各个方面均超越其他方案，更符合我们公司对日志监控的需求\nELK首先ELK是由Elasticsearch + LogStash + Kibana组成， 5.0起增加了FileBeat，拥有Beat的体系称为Elastic Stack大名鼎鼎的Elasticsearch，使用apache顶级项目Lucene - 全文检索引擎工具包，进一步完善并简化使用，在这个体系中提供了分析，存储的功能。LogStash是一个日志收集、过滤的框架。Kibana是一个图形化的展示框架。\n最后FileBeat是新加入的成员，他的作用跟LogStash基本差不多，但FileBeat更加轻，对系统占用较低，所以现在的架构变成ELK + 一大堆FileBeat的节点，FileBeat把日志输送到LogStash中，由LogStash过滤整理，发送到ElesticSearch中，最终由Kibana做界面展示\n搭建注：博客中所提及的软件版本基于当前最新版本 - 6.5.7先安装JDK，因为Oracle可能要收费，最好采用OpenJDK，避免日后麻烦然后引入官方的镜像源：1234567891011rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearchvim /etc/yum.repos.d/elastic.repo[elasticsearch-6.x]name=Elasticsearch repository for 6.x packagesbaseurl=https://artifacts.elastic.co/packages/6.x/yumgpgcheck=1gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearchenabled=1autorefresh=1type=rpm-md\n然后就可以安装这四个软件了1234yum install -y elasticsearchyum install -y kibana yum install -y logstashyum install -y filebeat\n当然是不建议ELK安装在同一台主机上，elasticsearch最好组成分布式，一个主节点，两个数据节点kibana和logstash可以安装在同一台主机上，而filebeat安装在被监控的主机上\nES配置&amp;启动123456789101112131415161718192021222324252627282930vim /etc/elasticsearch/elasticsearch.yml # es配置文件systemctl start elasticsearch.service #启动ps aux |grep elasticsearch #查询是否有进程netstat -lntp |grep java   #es会启动两个端口 9300端口是集群通信用的，9200则是数据传输时用的。ls /var/log/elasticsearch/ #查看日志#注意 此时如果log/下没有日志 可以使用tail -n50 /var/log/messages 查看系统日志curl 'ip:9200/_cluster/health?pretty' #查询健康情况# 结果大概是这样，status 为 green表示OK，没问题&#123;  \"cluster_name\" : \"master-node\",  \"status\" : \"green\",  # 为green则代表健康没问题，如果是yellow或者red则是集群有问题  \"timed_out\" : false,  # 是否有超时  \"number_of_nodes\" : 2, # 集群中的节点数量  \"number_of_data_nodes\" : 1, # 集群中data节点的数量  \"active_primary_shards\" : 0,  \"active_shards\" : 0,  \"relocating_shards\" : 0,  \"initializing_shards\" : 0,  \"unassigned_shards\" : 0,  \"delayed_unassigned_shards\" : 0,  \"number_of_pending_tasks\" : 0,  \"number_of_in_flight_fetch\" : 0,  \"task_max_waiting_in_queue_millis\" : 0,  \"active_shards_percent_as_number\" : 100.0&#125;#查详细信息curl 'ip:9200/_cluster/state?pretty'\nlogstash配置&amp;启动12345vim /etc/logstash/conf.d/syslog.conf # logstash配置文件cd /usr/share/logstash/bin #进入logstash路径./logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/syslog.conf --config.test_and_exit #检查配置文件是否正确./logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/syslog.conf   #启动netstat -lntp |grep 9210 #查询端口是否监听 此处为你配置监听的端口号\nkibana配置&amp;启动12345vim /etc/kibana/kibana.yml # kibana配置文件touch /var/log/kibana.log; chmod 777 /var/log/kibana.logsystemctl start kibanaps aux |grep kibana      #查询是否有进程netstat -lntp |grep 9201 #查询端口是否监听 此处为你配置的端口号\n启动成功后，浏览器访问http://ip:9201/，应该可以看到你的kibana洁面\nfilebeat配置&amp;启动1234567vim /etc/filebeat/filebeat.yml  # filebeat配置文件#首先我们设置一下输出到控制台，然后执行这条查看是否有输出，有输出表示正常/usr/share/filebeat/bin/filebeat -c /etc/filebeat/filebeat.yml systemctl start filebeat #正式启动前，需要把输出改为logstash的地址，建议不要直接输出到es中ps axu |grep filebeat      #查询是否有进程netstat -lntp |grep 9202 #查询端口是否监听 此处为你配置的端口号curl 'es_ip:9200/_cat/indices?v' #查看是否有索引\n配置其实配置这一块我觉得还是挺简单的\n首先配置ES1234567891011121314151617181920212223242526272829303132333435363738# ---------------------------------- 集群 -----------------------------------## 为集群设置一个描述名称:cluster.name: master# ------------------------------------ Node ------------------------------------## 为节点设置一个名称:node.name: master-node# 是否为master节点node.master: true# Add custom attributes to the node:#node.attr.rack: r1## ----------------------------------- Paths ------------------------------------## 存储数据路径 (separate multiple locations by comma):path.data: /var/lib/elasticsearch## 日志文件路径:path.logs: /var/log/elasticsearch## ---------------------------------- Network -----------------------------------## 设置绑定的IP 默认的0.0.0.0即可 (IPv4 or IPv6):network.host: 0.0.0.0##设置端口号:http.port: 9200## --------------------------------- Discovery ----------------------------------# 如果是集群模式在这里配置## discovery.zen.ping.unicast.hosts: [&quot;49.4.15.184&quot;]## Prevent the &quot;split brain&quot; by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):## discovery.zen.minimum_master_nodes: #\n配置完成后，就可以启动ES了。\n然后配置logstash，这个文件有点说道，他可以开好几个端口监听不同来源的日志，也可以通过一个端口来监听多个来源重要的是打Tag123456789101112131415161718192021input &#123;                                             # 定义日志源  beats &#123;    port =&gt; 9203  &#125;  syslog &#123;        type =&gt; &quot;system-syslog&quot;                         # 定义类型    port =&gt; 9202                                    # 定义监听端口  &#125;&#125;output &#123;                                            # 定义日志输出  if &quot;telecom-64-server-8080&quot; in [tags]&#123;            # 判断日志的标签    elasticsearch &#123;      hosts =&gt; [&quot;localhost:9200&quot;]                   # 定义es服务器的ip      index =&gt; &quot;telecom-64-server-8080-%&#123;+YYYY.MM&#125;&quot; # 定义索引    &#125;   &#125;  elasticsearch &#123;      hosts =&gt; [&quot;localhost:9200&quot;]                   # 定义es服务器的ip      index =&gt; &quot;system-syslog-%&#123;+YYYY.MM&#125;&quot;          # 定义索引  &#125;  &#125;\n启动完logstash后，先把kibana启动起来就四行配置即可1234server.port: 9201server.host: &quot;0.0.0.0&quot;logging.dest: /var/log/kibana.logelasticsearch.url: &quot;http://49.4.15.184:9200&quot;\n最后到需要被监听的服务的主机上，配置filebeat1234567891011121314151617181920212223242526272829#=========================== Filebeat inputs =============================filebeat.inputs:- type: log  # 是否启用这个配置  enabled: true  # 配置一个数据源  paths:    - /home/webapp/tomcat-8.0.36_telecom_8080/logs/catalina.out  # 配置这个数据源的标签  tags: [&quot;telecom-64-server-8080&quot;]#============================= Filebeat modules ===============================filebeat.config.modules:  path: $&#123;path.config&#125;/modules.d/*.yml  reload.enabled: false#==================== Elasticsearch template setting ==========================setup.template.settings:  index.number_of_shards: 3#============================== Kibana =====================================setup.kibana:#----------------------------- Logstash output --------------------------------output.logstash:  hosts: [&quot;49.4.15.184:9203&quot;]#================================ Procesors =====================================processors:  - add_host_metadata: ~  - add_cloud_metadata: ~\n总结这样就配置好了Elastic Stack，下一篇来弄一下警告系统的集成\n","dateCreated":"2019-01-02T09:17:36+08:00","dateModified":"2019-01-02T11:11:17+08:00","datePublished":"2019-01-02T09:17:36+08:00","description":"公司面对日益增长的日志和集群主机，日志观察变得越发困难，部分实习生对Linux不熟练，查日志效率低，决定寻找一个图形化的日志查询工具，经过对比，ELK在部署复杂度，可拓展性等各个方面均超越其他方案，更符合我们公司对日志监控的需求","headline":"ELK-SetSail","image":["https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png","http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2019/01/02/ELK-SetSail/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"https://radiancel.github.io/2019/01/02/ELK-SetSail/","keywords":"CentOS","thumbnailUrl":"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png"}</script>
+    <meta name="description" content="公司面对日益增长的日志和集群主机，日志观察变得越发困难，部分实习生对Linux不熟练，查日志效率低，决定寻找一个图形化的日志查询工具，经过对比，ELK在部署复杂度，可拓展性等各个方面均超越其他方案，更符合我们公司对日志监控的需求">
+<meta name="keywords" content="CentOS">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="ELK-SetSail">
+<meta property="og:url" content="https://radiancel.github.io/2019/01/02/ELK-SetSail/index.html">
+<meta property="og:site_name" content="Blog Bom!!BO!">
+<meta property="og:description" content="公司面对日益增长的日志和集群主机，日志观察变得越发困难，部分实习生对Linux不熟练，查日志效率低，决定寻找一个图形化的日志查询工具，经过对比，ELK在部署复杂度，可拓展性等各个方面均超越其他方案，更符合我们公司对日志监控的需求">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-01-02T03:11:17.268Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ELK-SetSail">
+<meta name="twitter:description" content="公司面对日益增长的日志和集群主机，日志观察变得越发困难，部分实习生对Linux不熟练，查日志效率低，决定寻找一个图形化的日志查询工具，经过对比，ELK在部署复杂度，可拓展性等各个方面均超越其他方案，更符合我们公司对日志监控的需求">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://radiancel.github.io/assets/images/alan-walker.jpg"/>
+    
+    
+        <meta property="og:image" content="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png" />
+    
+    
+        <meta property="og:image" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg" />
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Blog Bom!!BO!</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                            title="Home"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                            title="Categories"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                            title="Tags"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                            title="Archives"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                            title="About"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-left
+                    "
+             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            ELK-SetSail
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-01-02T09:17:36+08:00">
+	
+		    Jan 02, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/common/">common</a>
+
+
+    
+</div>
+
+    
+</div>
+
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>公司面对日益增长的日志和集群主机，日志观察变得越发困难，部分实习生对Linux不熟练，查日志效率低，决定寻找一个图形化的日志查询工具，经过对比，ELK在部署复杂度，可拓展性等各个方面均超越其他方案，更符合我们公司对日志监控的需求<br><a id="more"></a></p>
+<h1 id="ELK"><a href="#ELK" class="headerlink" title="ELK"></a>ELK</h1><p>首先ELK是由Elasticsearch + LogStash + Kibana组成， 5.0起增加了FileBeat，拥有Beat的体系称为<code>Elastic Stack</code><br>大名鼎鼎的Elasticsearch，使用apache顶级项目<code>Lucene</code> - 全文检索引擎工具包，进一步完善并简化使用，在这个体系中提供了分析，存储的功能。<br>LogStash是一个日志收集、过滤的框架。Kibana是一个图形化的展示框架。</p>
+<p>最后FileBeat是新加入的成员，他的作用跟LogStash基本差不多，但FileBeat更加轻，对系统占用较低，所以现在的架构变成ELK + 一大堆FileBeat的节点，FileBeat把日志输送到LogStash中，由LogStash过滤整理，发送到ElesticSearch中，最终由Kibana做界面展示</p>
+<h2 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h2><p>注：博客中所提及的软件版本基于当前最新版本 - 6.5.7<br>先安装JDK，因为Oracle可能要收费，最好采用OpenJDK，避免日后麻烦<br>然后引入官方的镜像源：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line">vim /etc/yum.repos.d/elastic.repo</span><br><span class="line"></span><br><span class="line">[elasticsearch-6.x]</span><br><span class="line">name=Elasticsearch repository <span class="keyword">for</span> 6.x packages</span><br><span class="line">baseurl=https://artifacts.elastic.co/packages/6.x/yum</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line">enabled=1</span><br><span class="line">autorefresh=1</span><br><span class="line"><span class="built_in">type</span>=rpm-md</span><br></pre></td></tr></table></figure></p>
+<p>然后就可以安装这四个软件了<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install -y elasticsearch</span><br><span class="line">yum install -y kibana </span><br><span class="line">yum install -y logstash</span><br><span class="line">yum install -y filebeat</span><br></pre></td></tr></table></figure></p>
+<p>当然是不建议ELK安装在同一台主机上，elasticsearch最好组成分布式，一个主节点，两个数据节点<br>kibana和logstash可以安装在同一台主机上，而filebeat安装在被监控的主机上</p>
+<h3 id="ES配置-amp-启动"><a href="#ES配置-amp-启动" class="headerlink" title="ES配置&amp;启动"></a>ES配置&amp;启动</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/elasticsearch/elasticsearch.yml <span class="comment"># es配置文件</span></span><br><span class="line">systemctl start elasticsearch.service <span class="comment">#启动</span></span><br><span class="line">ps aux |grep elasticsearch <span class="comment">#查询是否有进程</span></span><br><span class="line">netstat -lntp |grep java   <span class="comment">#es会启动两个端口 9300端口是集群通信用的，9200则是数据传输时用的。</span></span><br><span class="line">ls /var/<span class="built_in">log</span>/elasticsearch/ <span class="comment">#查看日志</span></span><br><span class="line"><span class="comment">#注意 此时如果log/下没有日志 可以使用tail -n50 /var/log/messages 查看系统日志</span></span><br><span class="line"></span><br><span class="line">curl <span class="string">'ip:9200/_cluster/health?pretty'</span> <span class="comment">#查询健康情况</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 结果大概是这样，status 为 green表示OK，没问题</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"cluster_name"</span> : <span class="string">"master-node"</span>,</span><br><span class="line">  <span class="string">"status"</span> : <span class="string">"green"</span>,  <span class="comment"># 为green则代表健康没问题，如果是yellow或者red则是集群有问题</span></span><br><span class="line">  <span class="string">"timed_out"</span> : <span class="literal">false</span>,  <span class="comment"># 是否有超时</span></span><br><span class="line">  <span class="string">"number_of_nodes"</span> : 2, <span class="comment"># 集群中的节点数量</span></span><br><span class="line">  <span class="string">"number_of_data_nodes"</span> : 1, <span class="comment"># 集群中data节点的数量</span></span><br><span class="line">  <span class="string">"active_primary_shards"</span> : 0,</span><br><span class="line">  <span class="string">"active_shards"</span> : 0,</span><br><span class="line">  <span class="string">"relocating_shards"</span> : 0,</span><br><span class="line">  <span class="string">"initializing_shards"</span> : 0,</span><br><span class="line">  <span class="string">"unassigned_shards"</span> : 0,</span><br><span class="line">  <span class="string">"delayed_unassigned_shards"</span> : 0,</span><br><span class="line">  <span class="string">"number_of_pending_tasks"</span> : 0,</span><br><span class="line">  <span class="string">"number_of_in_flight_fetch"</span> : 0,</span><br><span class="line">  <span class="string">"task_max_waiting_in_queue_millis"</span> : 0,</span><br><span class="line">  <span class="string">"active_shards_percent_as_number"</span> : 100.0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#查详细信息</span></span><br><span class="line">curl <span class="string">'ip:9200/_cluster/state?pretty'</span></span><br></pre></td></tr></table></figure>
+<h3 id="logstash配置-amp-启动"><a href="#logstash配置-amp-启动" class="headerlink" title="logstash配置&amp;启动"></a>logstash配置&amp;启动</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/logstash/conf.d/syslog.conf <span class="comment"># logstash配置文件</span></span><br><span class="line"><span class="built_in">cd</span> /usr/share/logstash/bin <span class="comment">#进入logstash路径</span></span><br><span class="line">./logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/syslog.conf --config.test_and_exit <span class="comment">#检查配置文件是否正确</span></span><br><span class="line">./logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/syslog.conf   <span class="comment">#启动</span></span><br><span class="line">netstat -lntp |grep 9210 <span class="comment">#查询端口是否监听 此处为你配置监听的端口号</span></span><br></pre></td></tr></table></figure>
+<h3 id="kibana配置-amp-启动"><a href="#kibana配置-amp-启动" class="headerlink" title="kibana配置&amp;启动"></a>kibana配置&amp;启动</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/kibana/kibana.yml <span class="comment"># kibana配置文件</span></span><br><span class="line">touch /var/<span class="built_in">log</span>/kibana.log; chmod 777 /var/<span class="built_in">log</span>/kibana.log</span><br><span class="line">systemctl start kibana</span><br><span class="line">ps aux |grep kibana      <span class="comment">#查询是否有进程</span></span><br><span class="line">netstat -lntp |grep 9201 <span class="comment">#查询端口是否监听 此处为你配置的端口号</span></span><br></pre></td></tr></table></figure>
+<p>启动成功后，浏览器访问<code>http://ip:9201/</code>，应该可以看到你的kibana洁面</p>
+<h3 id="filebeat配置-amp-启动"><a href="#filebeat配置-amp-启动" class="headerlink" title="filebeat配置&amp;启动"></a>filebeat配置&amp;启动</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/filebeat/filebeat.yml  <span class="comment"># filebeat配置文件</span></span><br><span class="line"><span class="comment">#首先我们设置一下输出到控制台，然后执行这条查看是否有输出，有输出表示正常</span></span><br><span class="line">/usr/share/filebeat/bin/filebeat -c /etc/filebeat/filebeat.yml </span><br><span class="line">systemctl start filebeat <span class="comment">#正式启动前，需要把输出改为logstash的地址，建议不要直接输出到es中</span></span><br><span class="line">ps axu |grep filebeat      <span class="comment">#查询是否有进程</span></span><br><span class="line">netstat -lntp |grep 9202 <span class="comment">#查询端口是否监听 此处为你配置的端口号</span></span><br><span class="line">curl <span class="string">'es_ip:9200/_cat/indices?v'</span> <span class="comment">#查看是否有索引</span></span><br></pre></td></tr></table></figure>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>其实配置这一块我觉得还是挺简单的</p>
+<p>首先配置ES<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"># ---------------------------------- 集群 -----------------------------------</span><br><span class="line">#</span><br><span class="line"># 为集群设置一个描述名称:</span><br><span class="line">cluster.name: master</span><br><span class="line"># ------------------------------------ Node ------------------------------------</span><br><span class="line">#</span><br><span class="line"># 为节点设置一个名称:</span><br><span class="line">node.name: master-node</span><br><span class="line"># 是否为master节点</span><br><span class="line">node.master: true</span><br><span class="line"># Add custom attributes to the node:</span><br><span class="line">#node.attr.rack: r1</span><br><span class="line">#</span><br><span class="line"># ----------------------------------- Paths ------------------------------------</span><br><span class="line">#</span><br><span class="line"># 存储数据路径 (separate multiple locations by comma):</span><br><span class="line">path.data: /var/lib/elasticsearch</span><br><span class="line">#</span><br><span class="line"># 日志文件路径:</span><br><span class="line">path.logs: /var/log/elasticsearch</span><br><span class="line">#</span><br><span class="line"># ---------------------------------- Network -----------------------------------</span><br><span class="line">#</span><br><span class="line"># 设置绑定的IP 默认的0.0.0.0即可 (IPv4 or IPv6):</span><br><span class="line">network.host: 0.0.0.0</span><br><span class="line">#</span><br><span class="line">#设置端口号:</span><br><span class="line">http.port: 9200</span><br><span class="line">#</span><br><span class="line"># --------------------------------- Discovery ----------------------------------</span><br><span class="line"># 如果是集群模式在这里配置</span><br><span class="line">#</span><br><span class="line"># discovery.zen.ping.unicast.hosts: [&quot;49.4.15.184&quot;]</span><br><span class="line">#</span><br><span class="line"># Prevent the &quot;split brain&quot; by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):</span><br><span class="line">#</span><br><span class="line"># discovery.zen.minimum_master_nodes: </span><br><span class="line">#</span><br></pre></td></tr></table></figure></p>
+<p>配置完成后，就可以启动ES了。</p>
+<p>然后配置logstash，这个文件有点说道，他可以开好几个端口监听不同来源的日志，也可以通过一个端口来监听多个来源<br>重要的是打Tag<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">input &#123;                                             # 定义日志源</span><br><span class="line">  beats &#123;</span><br><span class="line">    port =&gt; 9203</span><br><span class="line">  &#125;</span><br><span class="line">  syslog &#123;    </span><br><span class="line">    type =&gt; &quot;system-syslog&quot;                         # 定义类型</span><br><span class="line">    port =&gt; 9202                                    # 定义监听端口</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;                                            # 定义日志输出</span><br><span class="line">  if &quot;telecom-64-server-8080&quot; in [tags]&#123;            # 判断日志的标签</span><br><span class="line">    elasticsearch &#123;</span><br><span class="line">      hosts =&gt; [&quot;localhost:9200&quot;]                   # 定义es服务器的ip</span><br><span class="line">      index =&gt; &quot;telecom-64-server-8080-%&#123;+YYYY.MM&#125;&quot; # 定义索引</span><br><span class="line">    &#125; </span><br><span class="line">  &#125;</span><br><span class="line">  elasticsearch &#123;</span><br><span class="line">      hosts =&gt; [&quot;localhost:9200&quot;]                   # 定义es服务器的ip</span><br><span class="line">      index =&gt; &quot;system-syslog-%&#123;+YYYY.MM&#125;&quot;          # 定义索引</span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>启动完logstash后，先把kibana启动起来<br>就四行配置即可<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">server.port: 9201</span><br><span class="line">server.host: &quot;0.0.0.0&quot;</span><br><span class="line">logging.dest: /var/log/kibana.log</span><br><span class="line">elasticsearch.url: &quot;http://49.4.15.184:9200&quot;</span><br></pre></td></tr></table></figure></p>
+<p>最后到需要被监听的服务的主机上，配置filebeat<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#=========================== Filebeat inputs =============================</span><br><span class="line"></span><br><span class="line">filebeat.inputs:</span><br><span class="line">- type: log</span><br><span class="line">  # 是否启用这个配置</span><br><span class="line">  enabled: true</span><br><span class="line">  # 配置一个数据源</span><br><span class="line">  paths:</span><br><span class="line">    - /home/webapp/tomcat-8.0.36_telecom_8080/logs/catalina.out</span><br><span class="line">  # 配置这个数据源的标签</span><br><span class="line">  tags: [&quot;telecom-64-server-8080&quot;]</span><br><span class="line">#============================= Filebeat modules ===============================</span><br><span class="line"></span><br><span class="line">filebeat.config.modules:</span><br><span class="line">  path: $&#123;path.config&#125;/modules.d/*.yml</span><br><span class="line">  reload.enabled: false</span><br><span class="line">#==================== Elasticsearch template setting ==========================</span><br><span class="line">setup.template.settings:</span><br><span class="line">  index.number_of_shards: 3</span><br><span class="line">#============================== Kibana =====================================</span><br><span class="line">setup.kibana:</span><br><span class="line"></span><br><span class="line">#----------------------------- Logstash output --------------------------------</span><br><span class="line">output.logstash:</span><br><span class="line">  hosts: [&quot;49.4.15.184:9203&quot;]</span><br><span class="line">#================================ Procesors =====================================</span><br><span class="line">processors:</span><br><span class="line">  - add_host_metadata: ~</span><br><span class="line">  - add_cloud_metadata: ~</span><br></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这样就配置好了Elastic Stack，下一篇来弄一下警告系统的集成</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/CentOS/">CentOS</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/12/11/Working-Principle-of-Multithreading/" data-tooltip="Working Principle of Multithreading" aria-label="NEXT: Working Principle of Multithreading">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2019 Eddie Lee. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/12/11/Working-Principle-of-Multithreading/" data-tooltip="Working Principle of Multithreading" aria-label="NEXT: Working Principle of Multithreading">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Eddie Lee</h4>
+        
+            <div id="about-card-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+
+    </body>
+</html>

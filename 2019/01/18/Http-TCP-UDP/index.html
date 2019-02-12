@@ -6,24 +6,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Blog Bom!!BO!">
-    <title>C-static-Library - Blog Bom!!BO!</title>
+    <title>Http-TCP&amp;&amp;UDP - Blog Bom!!BO!</title>
     <meta name="author" content="Eddie Lee">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"UNIX is very simple, it just needs a genius to understand its simplicity.\n-Dennis MacAlistair Ritchie\nC语言引入静态库\n静态库：\n\n\n链接时将程序放进进可执行程序  \n会产生多分副本\n不依赖程序运行\n\n\n动态库：\n\n\n程序运行时，加载时才去动态库找函数\n多进程共享\n依赖程序运行\n\n通常我们的做法是：先对library.c与library.h进行编译gcc -c library.c然后ar rcs libTest.a library.o ....生成libTest.a文件，也就是静态库文件\n然后使用这个库的方法：在项目中编写一个lib_static.h文件，里面包含：extern void name(void);在main函数中引入这个头文件，就可以拿到这些方法了在编译项目时，需要把库文件指定给当前项目。\n使用gcc编译的方法是：-L指定搜索的路径，一般为项目的lib目录下，需要手动考入，-l指定具体文件，这个文件可以是自己编译的也可以是三方提供gcc -L/home/user/xxx/lib main.c -llibTest.a -o app\n但通常使用IDE时，使用cMake的方式编译，贴出CMakeList.txt的代码\n12345678910111213141516171819202122232425//设置最低版本cmake_minimum_required(VERSION 3.8)//项目名称project(webTest)//编译版本set(CMAKE_C_STANDARD 99)//包含的目录include_directories(lib/)//相当于-Llink_directories(lib/)//相当于-llink_libraries(libIMprotocol.a)//设置编译的源文件set(SOURCE_FILES main.c        SETCONFIG/CONNECTIONSET.h        FUNCTION/Connection.c FUNCTION/Connection.h FUNCTION/InitConnection.c FUNCTION/InitConnection.h        TOOL/GETConfig.c        lib/static_lib.h)add_executable(webTest $&#123;SOURCE_FILES&#125;)//防止linux下线程方法不可用，应该是某种机制target_link_libraries(webTest pthread)\n","dateCreated":"2017-12-28T13:49:07+08:00","dateModified":"2018-06-03T12:35:08+08:00","datePublished":"2017-12-28T13:49:07+08:00","description":"UNIX is very simple, it just needs a genius to understand its simplicity.\n-Dennis MacAlistair Ritchie","headline":"C-static-Library","image":["http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2017/12/28/C-static-Library/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"https://radiancel.github.io/2017/12/28/C-static-Library/","keywords":"C","thumbnailUrl":"http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg"}</script>
-    <meta name="description" content="UNIX is very simple, it just needs a genius to understand its simplicity. -Dennis MacAlistair Ritchie">
-<meta name="keywords" content="C">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"文章整理\nHttp,Tcp,Udp简介及区别（网络传输协议)\nLock和synchronized的区别和使用\n","dateCreated":"2019-01-18T13:45:22+08:00","dateModified":"2019-02-12T13:19:29+08:00","datePublished":"2019-01-18T13:45:22+08:00","description":"文章整理","headline":"Http-TCP&&UDP","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2019/01/18/Http-TCP-UDP/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"https://radiancel.github.io/2019/01/18/Http-TCP-UDP/","keywords":"document","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <meta name="description" content="文章整理">
+<meta name="keywords" content="document">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="C-static-Library">
-<meta property="og:url" content="https://radiancel.github.io/2017/12/28/C-static-Library/index.html">
+<meta property="og:title" content="Http-TCP&amp;&amp;UDP">
+<meta property="og:url" content="https://radiancel.github.io/2019/01/18/Http-TCP-UDP/index.html">
 <meta property="og:site_name" content="Blog Bom!!BO!">
-<meta property="og:description" content="UNIX is very simple, it just needs a genius to understand its simplicity. -Dennis MacAlistair Ritchie">
+<meta property="og:description" content="文章整理">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-06-03T04:35:08.000Z">
+<meta property="og:updated_time" content="2019-02-12T05:19:29.629Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="C-static-Library">
-<meta name="twitter:description" content="UNIX is very simple, it just needs a genius to understand its simplicity. -Dennis MacAlistair Ritchie">
+<meta name="twitter:title" content="Http-TCP&amp;&amp;UDP">
+<meta name="twitter:description" content="文章整理">
     
     
         
@@ -32,12 +32,12 @@
         <meta property="og:image" content="https://radiancel.github.io/assets/images/alan-walker.jpg"/>
     
     
-        <meta property="og:image" content="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg" />
+        <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" />
     
     
-        <meta property="og:image" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg" />
+        <meta property="og:image" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg" />
     
     
     <!--STYLES-->
@@ -187,26 +187,26 @@
         <div class="post-header-cover
                     text-left
                     "
-             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg');"
+             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg');"
              data-behavior="4">
             
                 <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            C-static-Library
+            Http-TCP&amp;&amp;UDP
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2017-12-28T13:49:07+08:00">
+    <time datetime="2019-01-18T13:45:22+08:00">
 	
-		    Dec 28, 2017
+		    Jan 18, 2019
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/Library/">Library</a>
+    <a class="category-link" href="/categories/common/">common</a>
 
 
     
@@ -228,29 +228,9 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>UNIX is very simple, it just needs a genius to understand its simplicity.</p>
-<p><div align="right">-Dennis MacAlistair Ritchie</div><br><a id="more"></a></p>
-<h2 id="C语言引入静态库"><a href="#C语言引入静态库" class="headerlink" title="C语言引入静态库"></a>C语言引入静态库</h2><ul>
-<li>静态库：</li>
-</ul>
-<ol>
-<li>链接时将程序放进进可执行程序  </li>
-<li>会产生多分副本</li>
-<li>不依赖程序运行</li>
-</ol>
-<ul>
-<li>动态库：</li>
-</ul>
-<ol>
-<li>程序运行时，加载时才去动态库找函数</li>
-<li>多进程共享</li>
-<li>依赖程序运行</li>
-</ol>
-<p>通常我们的做法是：<br>先对library.c与library.h进行编译<br><code>gcc -c library.c</code><br>然后<br><code>ar rcs libTest.a library.o ....</code><br>生成libTest.a文件，也就是静态库文件</p>
-<p>然后使用这个库的方法：<br>在项目中编写一个lib_static.h文件，里面包含：<br><code>extern void name(void);</code><br>在main函数中引入这个头文件，就可以拿到这些方法了<br>在编译项目时，需要把库文件指定给当前项目。</p>
-<p>使用gcc编译的方法是：<br>-L指定搜索的路径，一般为项目的lib目录下，需要手动考入，<br>-l指定具体文件，这个文件可以是自己编译的也可以是三方提供<br><code>gcc -L/home/user/xxx/lib main.c -llibTest.a -o app</code></p>
-<p>但通常使用IDE时，使用cMake的方式编译，贴出CMakeList.txt的代码</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置最低版本</span></span><br><span class="line">cmake_minimum_required(VERSION <span class="number">3.8</span>)</span><br><span class="line"><span class="comment">//项目名称</span></span><br><span class="line">project(webTest)</span><br><span class="line"></span><br><span class="line"><span class="comment">//编译版本</span></span><br><span class="line"><span class="built_in">set</span>(CMAKE_C_STANDARD <span class="number">99</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//包含的目录</span></span><br><span class="line">include_directories(lib/)</span><br><span class="line"><span class="comment">//相当于-L</span></span><br><span class="line">link_directories(lib/)</span><br><span class="line"><span class="comment">//相当于-l</span></span><br><span class="line">link_libraries(libIMprotocol.a)</span><br><span class="line"></span><br><span class="line"><span class="comment">//设置编译的源文件</span></span><br><span class="line"><span class="built_in">set</span>(SOURCE_FILES main.c</span><br><span class="line">        SETCONFIG/CONNECTIONSET.h</span><br><span class="line">        FUNCTION/Connection.c FUNCTION/Connection.h FUNCTION/InitConnection.c FUNCTION/InitConnection.h</span><br><span class="line">        TOOL/GETConfig.c</span><br><span class="line">        lib/static_lib.h)</span><br><span class="line"></span><br><span class="line">add_executable(webTest $&#123;SOURCE_FILES&#125;)</span><br><span class="line"><span class="comment">//防止linux下线程方法不可用，应该是某种机制</span></span><br><span class="line">target_link_libraries(webTest pthread)</span><br></pre></td></tr></table></figure>
+            <p>文章整理<br><a id="more"></a></p>
+<p><a href="https://baijiahao.baidu.com/s?id=1568902140863367&amp;wfr=spider&amp;for=pc" target="_blank" rel="noopener">Http,Tcp,Udp简介及区别（网络传输协议)</a></p>
+<p><a href="https://www.cnblogs.com/baizhanshi/p/6419268.html" target="_blank" rel="noopener">Lock和synchronized的区别和使用</a></p>
 
             
 
@@ -261,7 +241,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/C/">C</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/document/">document</a>
 
             </div>
         
@@ -271,8 +251,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/12/28/C-Pointer/" data-tooltip="C-Pointer" aria-label="PREVIOUS: C-Pointer">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -281,7 +260,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/29/Java-Reference-Object/" data-tooltip="Java Reference Object" aria-label="NEXT: Java Reference Object">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/01/02/ELK-SetSail/" data-tooltip="ELK-SetSail" aria-label="NEXT: ELK-SetSail">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -333,8 +312,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/12/28/C-Pointer/" data-tooltip="C-Pointer" aria-label="PREVIOUS: C-Pointer">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -343,7 +321,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/29/Java-Reference-Object/" data-tooltip="Java Reference Object" aria-label="NEXT: Java Reference Object">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/01/02/ELK-SetSail/" data-tooltip="ELK-SetSail" aria-label="NEXT: ELK-SetSail">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>

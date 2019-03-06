@@ -1,0 +1,463 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Blog Bom!!BO!">
+    <title>EL-IOC - Blog Bom!!BO!</title>
+    <meta name="author" content="Eddie Lee">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"发现是好久都没有写博客了，不得不说有时候工作真的是温水煮青蛙。而且现在框架层出不穷，在技术浪潮里，找到一条路变得比学习新技术更为重要\n—wikipedia\nSpring IOC我曾经多次聊过Spring的底层原理，以及Spring Boot Operational Principle这篇文章中也详细描述了一些底层的运行原理，但真正从低往上聊，这个系列应该是第一次。现在课程，大多都讲的是应用，然后在摸一摸底层，深度是不够的。曾经老师就跟我讲过，现在你年轻，年前是你的资本，那等你老了呢，你的资本又是什么？用了多少API，会多少框架的配置嘛，绝对不是的，你的资本应该是你日积月累的，对整体的认知，对原理的探索，还有对工匠精神的敬畏。这不是一个初出茅庐的孩子所能拥有的，但也是你年龄增长之后必须要有的。\n今天我把IOC这部分内容单独拿出来，也是希望能够让更多看到这篇博客的人，对底层和框架真正知识有一个大致的概念，当然，您要是前辈，我相信您在技术上的造诣比我高深，特别希望您能够对我的文章有所指正，您可以在首页的github链接中联系到我。\n首先IOC容器指的究竟是什么，毋庸置疑ConcurrentHashMap12345/** Map from bean name to merged RootBeanDefinition. */private final Map&lt;String, RootBeanDefinition&gt; mergedBeanDefinitions = new ConcurrentHashMap&lt;&gt;(256);/** Names of beans that have already been created at least once. */private final Set&lt;String&gt; alreadyCreated = Collections.newSetFromMap(new ConcurrentHashMap&lt;&gt;(256));\n至于查询的逻辑，简单概括就是，不论你传几个参数，最终走的都是doGetBean这个方法，这个方法会找找缓存里有没有，mergedBeanDefinitions里找一找，总之各个地方找一找，没找到，就抛异常，找到了类型不对，抛异常，大概就这样\n那所以我们要做的事情很明确了\n\n第一件事，启动的时候通过注解或者配置的方式，把需要交给容器管理的类注册到容器中\n第二件事，获取的时候，能获取到\n\n这两件事情搞定了，其他东西就都是可有可无的，方便使用的\nBean容器工厂既然是IOC容器，那最关键的，必然是容器工厂，也就是我们存储Bean对象的地方。ps：我是基于Spring上一个版本的容器实现的仿制\n12345678910111213141516/*** 核心容器*/   private final Map&lt;String, BeanDefinition&gt; beanDefinitionMap = new ConcurrentHashMap&lt;&gt;(256);/*** 别名辅助容器*/   private final Map&lt;String, String&gt; aliasesDefinitionMap = new ConcurrentHashMap&lt;&gt;(256);   /*** 类型辅助容器*/   private final Map&lt;String, Class&lt;?&gt;&gt; typeDefinitionMap = new ConcurrentHashMap&lt;&gt;(256);   /*** 动态重制容器*/   private final Map&lt;Class&lt;?&gt;, Object&gt; resolvableDependencies = new ConcurrentHashMap&lt;&gt;(256);\n我设置的容器比较多，原版本中，更多的内容在BeanDefinition这个对象中，是对Bean的一个封装。那我这边希望尽可能的简化，所以并没有在BeanDefinition中增加太多的逻辑\n这个容器类的声明为public class DefaultBeanFactory implements BeanFactory, BeanRegister表明同时具有BeanFactory的管理获取能力，BeanRegister的注册能力，拍平了很多原本的设计\n获取的方法和注册的方法都很简单了，如果大家好奇，可以到我Github中查看相关的代码。\n现在，我们已经完成了容器，也就是存Bean的工具和方法，接下来，我们需要把Bean对象注入进来了吧\nBean注入之前有提到说，Bean注入有两种方式，第一种，手动配置，第二种，注解声明。我们先来看第二种，注解的方式\n定义一个注解1234567891011/** * @author eddie * @createTime 2019-02-13 * @description 自动注入 */@Target(&#123;ElementType.FIELD&#125;)@Retention(RetentionPolicy.RUNTIME)@Documentedpublic @interface AutoWried &#123;\t//没设置任何参数，需要的话可以在这里配置别名，是否单例等&#125;\n注解处理器12345678910111213141516171819202122232425262728293031323334353637383940414243444546/** * @author eddie * @createTime 2019-02-13 * @description 自动注入注解处理器 */public class AutoWriedProcessor implements AutoWriedService &#123;    private BeanFactory factory;    /**     * 获取列上的注解 如果有AutoWried注解 则处理     * @param clazz     * @return     * @throws NoSuchMethodException     */    private void classForAnnotation0(Class clazz) &#123;        Field[] fields = clazz.getDeclaredFields();        for(Field field : fields)&#123;          field.setAccessible(true);          AutoWried autoWried = field.getAnnotation(AutoWried.class);          if (autoWried != null)&#123;              Object injectBean = factory.getBean(field.getType());              if (Objects.isNull(injectBean))&#123;                  throw new RuntimeException(\"没有找到对应的Bean异常\");              &#125;              Object bean = factory.getBean(clazz);              try &#123;                  field.set(bean, injectBean);              &#125; catch (IllegalAccessException e) &#123;                  e.printStackTrace();              &#125;          &#125;        &#125;        return;    &#125;    @Override    public void start(String pkg, BeanFactory factory) &#123;        this.factory = factory;        final List&lt;Class&lt;?&gt;&gt; allClassByPackageName = AnnotationUtils.getAllClassByPackageName(pkg);        for (Class&lt;?&gt; clazz: allClassByPackageName)&#123;            classForAnnotation0(clazz);        &#125;    &#125;&#125;\n到此，注入的方式搞定了，诶，你会发现，容器和注入的类没有联系到一起啊，这各干各的没用的呀。所以，我们还需要一个启动类，也就是Spring 中非常熟悉的XXXXXApplicationContext\nApplicationContext作为一个集大成者，这个类涉及的继承实现关系就多了。先来看下类声明public class ClassPathJsonApplicationContext extends AbstractApplicationContext implements ApplicationContext\nAbstractApplicationContext的类声明public abstract class AbstractApplicationContext implements Lifecycle, ConfigurableApplicationContext, BeanFactory\n别害怕这个AbstractApplicationContext哈，他的实现非常简单1234567891011121314151617181920212223242526272829303132333435363738394041424344454647@Override  public Object getBean(String name) throws BeansException &#123;      return getBeanFactory().getBean(name);  &#125;  @Override  public &lt;T&gt; T getBean(Class&lt;T&gt; requiredType) throws BeansException &#123;      return getBeanFactory().getBean(requiredType);  &#125;  @Override  public boolean containsBean(String name) &#123;      return getBeanFactory().containsBean(name);  &#125;  @Override  public boolean isSingleton(String name) throws NoSuchBeanDefinitionException &#123;      return getBeanFactory().isSingleton(name);  &#125;  @Override  public boolean isPrototype(String name) throws NoSuchBeanDefinitionException &#123;      return getBeanFactory().isPrototype(name);  &#125;  @Override  public boolean isTypeMatch(String name, Class&lt;?&gt; typeToMatch) throws NoSuchBeanDefinitionException &#123;      return getBeanFactory().isTypeMatch(name, typeToMatch);  &#125;  @Override  public Class&lt;?&gt; getType(String name) throws NoSuchBeanDefinitionException &#123;      return getBeanFactory().getType(name);  &#125;  @Override  public String getAliases(String name) &#123;      return getBeanFactory().getAliases(name);  &#125;  /**   * 获取bean工厂   * @return   * @throws IllegalStateException   */  @Override  public abstract BeanFactory getBeanFactory() throws IllegalStateException;\n都是去调的getBeanFactory()这个方法获取的BeanFactory，至于获取的是谁，由子类决定，对吧，最简单的模版模式\n回到ClassPathJsonApplicationContext类，这个类的实现更加简单123456789101112131415161718192021222324252627282930313233343536373839404142434445private static final Active active;   private static final AutoWriedService autoWriedService;   private ConfigLoader loader;   static &#123;   \t/**   \t* 获取类上的注解 如果有Bean注解 则处理   \t*/       active = new DefaultBeanProcessor();       /**   \t* 获取列上的注解 如果有AutoWried注解 则处理   \t*/       autoWriedService = new AutoWriedProcessor();   &#125;   public ClassPathJsonApplicationContext (String configPath)&#123;       log.info(\"start load context - 开始加载上下文 读取配置文件\");       loader = new ConfigLoader(configPath);       log.info(\"start load annotation - 根据配置文件 加载所有注解类 bean类型\");       start();   &#125;   @Override   public BeanFactory getBeanFactory() &#123;       return DefaultBeanFactory.getInstance();   &#125;   @Override   public void start() &#123;       BeanRegister register= DefaultBeanFactory.getInstance();       log.info(\"start load bean to IOC map - 开始注册bean对象到IOC容器\");       active.activate(loader.getBaseBeanPackage(), register);       autoWriedService.start(loader.getBaseBeanPackage(), getBeanFactory());   &#125;   @Override   public void stop() &#123;   &#125;   @Override   public boolean isRunning() &#123;       return true;   &#125;\n致此，我们是不是实现了自动获取对象注入到这个Bean容器中了？ 对嘛，注册成功了。那细心的同学会想到一个问题，和发现一个点\n这个问题时，获取完了，怎么用呢？？当然有个办法是通过ClassPathJsonApplicationContext的getBean方法，但我觉得很Low，Spring的AutoWried就很不错。\n那关注到的那个点，就是AutoWriedProcessor，我们初始化的时候，有个AutoWriedProcessor这个类，没错，就干的这事。\n自动注入实现同样非常简单，先上代码1234567891011121314151617181920212223242526272829303132333435363738private BeanFactory factory;   /**    * 获取列上的注解 如果有AutoWried注解 则处理    * @param clazz    * @return    * @throws NoSuchMethodException    */   private void classForAnnotation0(Class clazz) &#123;       Field[] fields = clazz.getDeclaredFields();       for(Field field : fields)&#123;         field.setAccessible(true);         AutoWried autoWried = field.getAnnotation(AutoWried.class);         if (autoWried != null)&#123;             Object injectBean = factory.getBean(field.getType());             if (Objects.isNull(injectBean))&#123;                 throw new RuntimeException(\"没有找到对应的Bean异常\");             &#125;             Object bean = factory.getBean(clazz);             try &#123;                 field.set(bean, injectBean);             &#125; catch (IllegalAccessException e) &#123;                 e.printStackTrace();             &#125;         &#125;       &#125;       return;   &#125;   @Override   public void start(String pkg, BeanFactory factory) &#123;       this.factory = factory;       final List&lt;Class&lt;?&gt;&gt; allClassByPackageName = AnnotationUtils.getAllClassByPackageName(pkg);       for (Class&lt;?&gt; clazz: allClassByPackageName)&#123;           classForAnnotation0(clazz);       &#125;   &#125;\n诶，乍一看，我们这个事是不是就做完了啊？ \n对嘛，主体功能已经OK了啊，你还想要什么呢，基于配置文件嘛？好吧，既然提到了，这个小功能就来看下这个小功能\n我就不放代码了。。。。就是写个xxx.json，然后再ClassPathJsonApplicationContext启动的时候加载，解析，然后用就完了。。。默认必填那几个项，没获取到或者获取为Null，“”就报个错出来，经济又实惠好，这个问题就算过了哈，没懂的，自己翻github去\n那再请大家思考下，这个事是不是做完了？？\n没有，这个事还有个问题，如果我一个类的生成，需要另一个类的配合，怎么办，一个@Bean注释的类，里面还有两个@AutoWried注解的Feild，该怎么处理？\n当然我这个项目里是没有的，写起来比较浪费时间，就没有动手写。但思路大致是这样的。\n\n在@Bean的注解处理器中，不能随意去初始化了，需要加一层判定，Feild里面有没有@AutoWried注解\n如果一个都没有，直接初始化，那就不管了，如果有且至少有一个的情况，我们就不能草草的实例化了，这个情况就需要调用一个forChildBeanClass0的方法\n别问上面的方法为啥加个0，看起来牛逼，仅此而已\nforChildBeanClass0方法中，去找这两个类对应的Bean对象，但这样会有问题，有没有聪明的同学能想到？\n如果我现在去获取，那有可能这个Bean是有的，但还没有实例化到需要的Bean，当前实例化的这个类就已经开始实例化了，这时候去找，肯定找不到哒\n好，为了解决这个问题，最简单的方式，我们后置处理，加入一个队列中，一切都等能力实例化的对象实例化完，才处理有父子关系的Bean\n那这种方式，我觉得不完美，为什么呢，你又搞了一个队列，又增加了额外的开销，不好的\n换一个思路，既然还没有，那让他有就好了嘛。那么好，你在A类初始化时候，需要B，C两个类的时候，B已经在容器里了，C还没在，就去实例化一个C，注入到Bean容器中\n诶，又出现问题了，接下来还是要实例化一个C，注入到容器里，别说什么实例化A的时候，不去注入C，那你会在全局有两个C对象，万一还有其他类需要C呢，全局有N &gt;= 2个C对象的实力\n为了解决这个，你当然可以使用一个List，实例化C之后，添加到这个List中，在循环初始化注入的时候，如果List.contains，如果有，则跳过\n可以，但不完美，我的解决方案是，在获取的时候，就遍历一边所有的类，如果某个类里面的Feild中含有@AutoWried注解，优先添加到优先级队列\n所有孩子属性的Bean，就会被优先实例化，再多级处理是，比如A有B的Feild，B有C的Feild，C这种深度的优先级最高，B第二，A第三\n\n你看我讲的蛮墨迹的，但是这个是我脑海中走过的完整思路的一个描述，其实我觉得真就把我最后的结论直接给出来，反而没这样效果好的。跟着我的思路过一遍，对这个结论怎么来的，就会有个认识。当然，你们肯定有比我方案更优的办法，可以在我Github中提出Issus哟。我的Github 这个项目的地址\n感谢大家的阅读时间，有机会我把这个博客开通留言功能，[开心的表情]\n","dateCreated":"2019-03-06T13:09:31+08:00","dateModified":"2019-03-06T14:45:40+08:00","datePublished":"2019-03-06T13:09:31+08:00","description":"发现是好久都没有写博客了，不得不说有时候工作真的是温水煮青蛙。而且现在框架层出不穷，在技术浪潮里，找到一条路变得比学习新技术更为重要\n—wikipedia","headline":"EL-IOC","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2019/03/06/EL-IOC/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"https://radiancel.github.io/2019/03/06/EL-IOC/","keywords":"Java","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <meta name="description" content="发现是好久都没有写博客了，不得不说有时候工作真的是温水煮青蛙。而且现在框架层出不穷，在技术浪潮里，找到一条路变得比学习新技术更为重要 —wikipedia">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="EL-IOC">
+<meta property="og:url" content="https://radiancel.github.io/2019/03/06/EL-IOC/index.html">
+<meta property="og:site_name" content="Blog Bom!!BO!">
+<meta property="og:description" content="发现是好久都没有写博客了，不得不说有时候工作真的是温水煮青蛙。而且现在框架层出不穷，在技术浪潮里，找到一条路变得比学习新技术更为重要 —wikipedia">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-03-06T06:45:40.133Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EL-IOC">
+<meta name="twitter:description" content="发现是好久都没有写博客了，不得不说有时候工作真的是温水煮青蛙。而且现在框架层出不穷，在技术浪潮里，找到一条路变得比学习新技术更为重要 —wikipedia">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://radiancel.github.io/assets/images/alan-walker.jpg"/>
+    
+    
+        <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg" />
+    
+    
+        <meta property="og:image" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg" />
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Blog Bom!!BO!</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Eddie Lee</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                            title="Home"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                            title="Categories"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                            title="Tags"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                            title="Archives"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                            title="About"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-left
+                    "
+             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            EL-IOC
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-03-06T13:09:31+08:00">
+	
+		    Mar 06, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Spring/">Spring</a>
+
+
+    
+</div>
+
+    
+</div>
+
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>发现是好久都没有写博客了，不得不说有时候工作真的是温水煮青蛙。而且现在框架层出不穷，在技术浪潮里，找到一条路变得比学习新技术更为重要</p>
+<p><div align="right">—wikipedia</div><br><a id="more"></a></p>
+<h1 id="Spring-IOC"><a href="#Spring-IOC" class="headerlink" title="Spring IOC"></a>Spring IOC</h1><p>我曾经多次聊过Spring的底层原理，以及<code>Spring Boot Operational Principle</code>这篇文章中也详细描述了一些底层的运行原理，但真正从低往上聊，这个系列应该是第一次。现在课程，大多都讲的是应用，然后在摸一摸底层，深度是不够的。曾经老师就跟我讲过，现在你年轻，年前是你的资本，那等你老了呢，你的资本又是什么？用了多少API，会多少框架的配置嘛，绝对不是的，你的资本应该是你日积月累的，对整体的认知，对原理的探索，还有对工匠精神的敬畏。这不是一个初出茅庐的孩子所能拥有的，但也是你年龄增长之后必须要有的。</p>
+<p>今天我把IOC这部分内容单独拿出来，也是希望能够让更多看到这篇博客的人，对底层和框架真正知识有一个大致的概念，当然，您要是前辈，我相信您在技术上的造诣比我高深，特别希望您能够对我的文章有所指正，您可以在首页的github链接中联系到我。</p>
+<p>首先IOC容器指的究竟是什么，毋庸置疑<code>ConcurrentHashMap</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** Map from bean name to merged RootBeanDefinition. */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, RootBeanDefinition&gt; mergedBeanDefinitions = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">256</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Names of beans that have already been created at least once. */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Set&lt;String&gt; alreadyCreated = Collections.newSetFromMap(<span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">256</span>));</span><br></pre></td></tr></table></figure></p>
+<p>至于查询的逻辑，简单概括就是，不论你传几个参数，最终走的都是<code>doGetBean</code>这个方法，这个方法会找找缓存里有没有，<code>mergedBeanDefinitions</code>里找一找，总之各个地方找一找，没找到，就抛异常，找到了类型不对，抛异常，大概就这样</p>
+<p>那所以我们要做的事情很明确了</p>
+<ul>
+<li>第一件事，启动的时候通过注解或者配置的方式，把需要交给容器管理的类注册到容器中</li>
+<li>第二件事，获取的时候，能获取到</li>
+</ul>
+<p>这两件事情搞定了，其他东西就都是可有可无的，方便使用的</p>
+<h2 id="Bean容器工厂"><a href="#Bean容器工厂" class="headerlink" title="Bean容器工厂"></a>Bean容器工厂</h2><p>既然是IOC容器，那最关键的，必然是容器工厂，也就是我们存储Bean对象的地方。<br>ps：我是基于Spring上一个版本的容器实现的仿制</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 核心容器</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, BeanDefinition&gt; beanDefinitionMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">256</span>);</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 别名辅助容器</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, String&gt; aliasesDefinitionMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">256</span>);</span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">* 类型辅助容器</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Class&lt;?&gt;&gt; typeDefinitionMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">256</span>);</span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">* 动态重制容器</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;Class&lt;?&gt;, Object&gt; resolvableDependencies = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">256</span>);</span><br></pre></td></tr></table></figure>
+<p>我设置的容器比较多，原版本中，更多的内容在BeanDefinition这个对象中，是对Bean的一个封装。那我这边希望尽可能的简化，所以并没有在BeanDefinition中增加太多的逻辑</p>
+<p>这个容器类的声明为<code>public class DefaultBeanFactory implements BeanFactory, BeanRegister</code><br>表明同时具有<code>BeanFactory</code>的管理获取能力，<code>BeanRegister</code>的注册能力，拍平了很多原本的设计</p>
+<p>获取的方法和注册的方法都很简单了，如果大家好奇，可以到我Github中查看相关的代码。</p>
+<p>现在，我们已经完成了容器，也就是存Bean的工具和方法，接下来，我们需要把Bean对象注入进来了吧</p>
+<h2 id="Bean注入"><a href="#Bean注入" class="headerlink" title="Bean注入"></a>Bean注入</h2><p>之前有提到说，Bean注入有两种方式，第一种，手动配置，第二种，注解声明。<br>我们先来看第二种，注解的方式</p>
+<p>定义一个注解<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> eddie</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@createTime</span> 2019-02-13</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 自动注入</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Target</span>(&#123;ElementType.FIELD&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> AutoWried &#123;</span><br><span class="line">	<span class="comment">//没设置任何参数，需要的话可以在这里配置别名，是否单例等</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注解处理器<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> eddie</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@createTime</span> 2019-02-13</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 自动注入注解处理器</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AutoWriedProcessor</span> <span class="keyword">implements</span> <span class="title">AutoWriedService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> BeanFactory factory;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取列上的注解 如果有AutoWried注解 则处理</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> clazz</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> NoSuchMethodException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">classForAnnotation0</span><span class="params">(Class clazz)</span> </span>&#123;</span><br><span class="line">        Field[] fields = clazz.getDeclaredFields();</span><br><span class="line">        <span class="keyword">for</span>(Field field : fields)&#123;</span><br><span class="line">          field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">          AutoWried autoWried = field.getAnnotation(AutoWried.class);</span><br><span class="line">          <span class="keyword">if</span> (autoWried != <span class="keyword">null</span>)&#123;</span><br><span class="line">              Object injectBean = factory.getBean(field.getType());</span><br><span class="line">              <span class="keyword">if</span> (Objects.isNull(injectBean))&#123;</span><br><span class="line">                  <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"没有找到对应的Bean异常"</span>);</span><br><span class="line">              &#125;</span><br><span class="line">              Object bean = factory.getBean(clazz);</span><br><span class="line">              <span class="keyword">try</span> &#123;</span><br><span class="line">                  field.set(bean, injectBean);</span><br><span class="line">              &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">                  e.printStackTrace();</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(String pkg, BeanFactory factory)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.factory = factory;</span><br><span class="line">        <span class="keyword">final</span> List&lt;Class&lt;?&gt;&gt; allClassByPackageName = AnnotationUtils.getAllClassByPackageName(pkg);</span><br><span class="line">        <span class="keyword">for</span> (Class&lt;?&gt; clazz: allClassByPackageName)&#123;</span><br><span class="line">            classForAnnotation0(clazz);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>到此，注入的方式搞定了，诶，你会发现，容器和注入的类没有联系到一起啊，这各干各的没用的呀。<br>所以，我们还需要一个启动类，也就是Spring 中非常熟悉的<code>XXXXXApplicationContext</code></p>
+<h2 id="ApplicationContext"><a href="#ApplicationContext" class="headerlink" title="ApplicationContext"></a>ApplicationContext</h2><p>作为一个集大成者，这个类涉及的继承实现关系就多了。先来看下类声明<br><code>public class ClassPathJsonApplicationContext extends AbstractApplicationContext implements ApplicationContext</code></p>
+<p><code>AbstractApplicationContext</code>的类声明<br><code>public abstract class AbstractApplicationContext implements Lifecycle, ConfigurableApplicationContext, BeanFactory</code></p>
+<p>别害怕这个<code>AbstractApplicationContext</code>哈，他的实现非常简单<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">getBean</span><span class="params">(String name)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> getBeanFactory().getBean(name);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getBean</span><span class="params">(Class&lt;T&gt; requiredType)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> getBeanFactory().getBean(requiredType);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">containsBean</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> getBeanFactory().containsBean(name);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSingleton</span><span class="params">(String name)</span> <span class="keyword">throws</span> NoSuchBeanDefinitionException </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> getBeanFactory().isSingleton(name);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isPrototype</span><span class="params">(String name)</span> <span class="keyword">throws</span> NoSuchBeanDefinitionException </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> getBeanFactory().isPrototype(name);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isTypeMatch</span><span class="params">(String name, Class&lt;?&gt; typeToMatch)</span> <span class="keyword">throws</span> NoSuchBeanDefinitionException </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> getBeanFactory().isTypeMatch(name, typeToMatch);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> Class&lt;?&gt; getType(String name) <span class="keyword">throws</span> NoSuchBeanDefinitionException &#123;</span><br><span class="line">      <span class="keyword">return</span> getBeanFactory().getType(name);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">getAliases</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> getBeanFactory().getAliases(name);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 获取bean工厂</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">   * <span class="doctag">@throws</span> IllegalStateException</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> BeanFactory <span class="title">getBeanFactory</span><span class="params">()</span> <span class="keyword">throws</span> IllegalStateException</span>;</span><br></pre></td></tr></table></figure></p>
+<p>都是去调的<code>getBeanFactory()</code>这个方法获取的BeanFactory，至于获取的是谁，由子类决定，对吧，最简单的模版模式</p>
+<p>回到<code>ClassPathJsonApplicationContext</code>类，这个类的实现更加简单<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Active active;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> AutoWriedService autoWriedService;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> ConfigLoader loader;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">static</span> &#123;</span><br><span class="line">   	<span class="comment">/**</span></span><br><span class="line"><span class="comment">   	* 获取类上的注解 如果有Bean注解 则处理</span></span><br><span class="line"><span class="comment">   	*/</span></span><br><span class="line">       active = <span class="keyword">new</span> DefaultBeanProcessor();</span><br><span class="line">       <span class="comment">/**</span></span><br><span class="line"><span class="comment">   	* 获取列上的注解 如果有AutoWried注解 则处理</span></span><br><span class="line"><span class="comment">   	*/</span></span><br><span class="line">       autoWriedService = <span class="keyword">new</span> AutoWriedProcessor();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">ClassPathJsonApplicationContext</span> <span class="params">(String configPath)</span></span>&#123;</span><br><span class="line">       log.info(<span class="string">"start load context - 开始加载上下文 读取配置文件"</span>);</span><br><span class="line">       loader = <span class="keyword">new</span> ConfigLoader(configPath);</span><br><span class="line">       log.info(<span class="string">"start load annotation - 根据配置文件 加载所有注解类 bean类型"</span>);</span><br><span class="line">       start();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> BeanFactory <span class="title">getBeanFactory</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> DefaultBeanFactory.getInstance();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       BeanRegister register= DefaultBeanFactory.getInstance();</span><br><span class="line">       log.info(<span class="string">"start load bean to IOC map - 开始注册bean对象到IOC容器"</span>);</span><br><span class="line">       active.activate(loader.getBaseBeanPackage(), register);</span><br><span class="line">       autoWriedService.start(loader.getBaseBeanPackage(), getBeanFactory());</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isRunning</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>致此，我们是不是实现了自动获取对象注入到这个Bean容器中了？ 对嘛，注册成功了。<br>那细心的同学会想到一个问题，和发现一个点</p>
+<p>这个问题时，获取完了，怎么用呢？？<br>当然有个办法是通过<code>ClassPathJsonApplicationContext</code>的<code>getBean</code>方法，但我觉得很Low，Spring的AutoWried就很不错。</p>
+<p>那关注到的那个点，就是<code>AutoWriedProcessor</code>，我们初始化的时候，有个<code>AutoWriedProcessor</code>这个类，没错，就干的这事。</p>
+<h2 id="自动注入"><a href="#自动注入" class="headerlink" title="自动注入"></a>自动注入</h2><p>实现同样非常简单，先上代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> BeanFactory factory;</span><br><span class="line"></span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 获取列上的注解 如果有AutoWried注解 则处理</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> clazz</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">    * <span class="doctag">@throws</span> NoSuchMethodException</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">classForAnnotation0</span><span class="params">(Class clazz)</span> </span>&#123;</span><br><span class="line">       Field[] fields = clazz.getDeclaredFields();</span><br><span class="line">       <span class="keyword">for</span>(Field field : fields)&#123;</span><br><span class="line">         field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">         AutoWried autoWried = field.getAnnotation(AutoWried.class);</span><br><span class="line">         <span class="keyword">if</span> (autoWried != <span class="keyword">null</span>)&#123;</span><br><span class="line">             Object injectBean = factory.getBean(field.getType());</span><br><span class="line">             <span class="keyword">if</span> (Objects.isNull(injectBean))&#123;</span><br><span class="line">                 <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"没有找到对应的Bean异常"</span>);</span><br><span class="line">             &#125;</span><br><span class="line">             Object bean = factory.getBean(clazz);</span><br><span class="line">             <span class="keyword">try</span> &#123;</span><br><span class="line">                 field.set(bean, injectBean);</span><br><span class="line">             &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">                 e.printStackTrace();</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span>;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(String pkg, BeanFactory factory)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">this</span>.factory = factory;</span><br><span class="line">       <span class="keyword">final</span> List&lt;Class&lt;?&gt;&gt; allClassByPackageName = AnnotationUtils.getAllClassByPackageName(pkg);</span><br><span class="line">       <span class="keyword">for</span> (Class&lt;?&gt; clazz: allClassByPackageName)&#123;</span><br><span class="line">           classForAnnotation0(clazz);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>诶，乍一看，我们这个事是不是就做完了啊？ </p>
+<p>对嘛，主体功能已经OK了啊，你还想要什么呢，基于配置文件嘛？<br>好吧，既然提到了，这个小功能就来看下这个小功能</p>
+<p>我就不放代码了。。。。就是写个xxx.json，然后再<code>ClassPathJsonApplicationContext</code>启动的时候加载，解析，然后用就完了。。。<br>默认必填那几个项，没获取到或者获取为Null，“”就报个错出来，经济又实惠<br>好，这个问题就算过了哈，没懂的，自己翻github去</p>
+<p>那再请大家思考下，这个事是不是做完了？？</p>
+<p>没有，这个事还有个问题，如果我一个类的生成，需要另一个类的配合，怎么办，一个@Bean注释的类，里面还有两个@AutoWried注解的Feild，该怎么处理？</p>
+<p>当然我这个项目里是没有的，写起来比较浪费时间，就没有动手写。<br>但思路大致是这样的。</p>
+<ul>
+<li>在@Bean的注解处理器中，不能随意去初始化了，需要加一层判定，Feild里面有没有@AutoWried注解</li>
+<li>如果一个都没有，直接初始化，那就不管了，如果有且至少有一个的情况，我们就不能草草的实例化了，这个情况就需要调用一个forChildBeanClass0的方法</li>
+<li>别问上面的方法为啥加个0，看起来牛逼，仅此而已</li>
+<li><code>forChildBeanClass0</code>方法中，去找这两个类对应的Bean对象，但这样会有问题，有没有聪明的同学能想到？</li>
+<li>如果我现在去获取，那有可能这个Bean是有的，但还没有实例化到需要的Bean，当前实例化的这个类就已经开始实例化了，这时候去找，肯定找不到哒</li>
+<li>好，为了解决这个问题，最简单的方式，我们后置处理，加入一个队列中，一切都等能力实例化的对象实例化完，才处理有父子关系的Bean</li>
+<li>那这种方式，我觉得不完美，为什么呢，你又搞了一个队列，又增加了额外的开销，不好的</li>
+<li>换一个思路，既然还没有，那让他有就好了嘛。那么好，你在A类初始化时候，需要B，C两个类的时候，B已经在容器里了，C还没在，就去实例化一个C，注入到Bean容器中</li>
+<li>诶，又出现问题了，接下来还是要实例化一个C，注入到容器里，别说什么实例化A的时候，不去注入C，那你会在全局有两个C对象，万一还有其他类需要C呢，全局有N &gt;= 2个C对象的实力</li>
+<li>为了解决这个，你当然可以使用一个List，实例化C之后，添加到这个List中，在循环初始化注入的时候，如果List.contains，如果有，则跳过</li>
+<li>可以，但不完美，我的解决方案是，在获取的时候，就遍历一边所有的类，如果某个类里面的Feild中含有@AutoWried注解，优先添加到优先级队列</li>
+<li>所有孩子属性的Bean，就会被优先实例化，再多级处理是，比如A有B的Feild，B有C的Feild，C这种深度的优先级最高，B第二，A第三</li>
+</ul>
+<p>你看我讲的蛮墨迹的，但是这个是我脑海中走过的完整思路的一个描述，其实我觉得真就把我最后的结论直接给出来，反而没这样效果好的。<br>跟着我的思路过一遍，对这个结论怎么来的，就会有个认识。<br>当然，你们肯定有比我方案更优的办法，可以在我Github中提出Issus哟。<br><a href="https://github.com/RadianceL" target="_blank" rel="noopener">我的Github</a> <a href="https://github.com/RadianceL/el-ioc" target="_blank" rel="noopener">这个项目的地址</a></p>
+<p>感谢大家的阅读时间，有机会我把这个博客开通留言功能，[开心的表情]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Java/">Java</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/01/18/Http-TCP-UDP/" data-tooltip="Http-TCP&amp;&amp;UDP" aria-label="NEXT: Http-TCP&amp;&amp;UDP">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2019 Eddie Lee. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/01/18/Http-TCP-UDP/" data-tooltip="Http-TCP&amp;&amp;UDP" aria-label="NEXT: Http-TCP&amp;&amp;UDP">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Eddie Lee</h4>
+        
+            <div id="about-card-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                LN
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+
+    </body>
+</html>

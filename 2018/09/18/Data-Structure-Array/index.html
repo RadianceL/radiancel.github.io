@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!\n何为数据结构数据结构是数据在计算机中存储的形态，比如一个班的学生，是站成一排，还是站成两排，还是正方形等等。\n那没有数据结构可不可以，如果没有数据结构，我们想想一下，还是这一个班的学生，我如果要找某个同学，假设我知道他叫什么，也知道他在哪，但我该怎么描述他的位置呢？\n如果是有结构的，我们可以说，第一排第六个，或者[3,4]这个位置，又或者[1,4,7]这样的三维位置可以描述他的准确位置，可如果它们没有结构，每个人都随意在任意一个位置，假设我们知道位置，但怎么告诉程序该去哪找他？\n所以，描述数据位置及组成的结构叫做数据结构。而选择合适的数据结构密切影响着我们程序运行的效率。\n数据结构在内存中大家都知道，计算机中的数据都在内存里，那么，数据结构在内存中是怎么样的？\n在内存中数据结构有四种方式\n\n顺序存储方法\n逻辑上相连的节点也存储在物理位置上也相邻的单元里，只存住节点的值，不存储节点的之间的关系\n遍历速度快\n不利于查找某个具体数据\n\n\n链表存储方法\n不要求物理上单元相邻，节点之间的关系由附加的指针来描述\n更改方便\n\n\n索引存储方法\n索引存储是在存储数据的同时，再建立一个附加的索引表，然后利用索引表中索引项的值来确定实际存储单元地址\n查找方便\n\n\n散列存储方法\n根据存储的关键字直接计算出节点的存储地址\n\n\n\n在Java中，数据结构的基本呈现首先我们第一站，肯定要描述最基本的单元，利用最基本的结构，来向上做出适应更复杂场景的结构。\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116117118119120121122123124125126127128129130131132133134135136137138139140141142143144145146public final class Array&lt;E&gt; &#123;  //泛型类保存数据\tprivate E[] data;  //一组数据中实际数据的下一个位置\tprivate int size;  //扩容参数\tprivate final float limit;\tpublic Array() &#123;\t\tthis(10, 0.4f);\t&#125;\tpublic Array(int capacity) &#123;\t\tthis(capacity, 0.4f);\t&#125;\tpublic Array(int capacity, float limit) &#123;\t\tdata = (E[]) new Object[capacity];\t\tthis.size = 0;\t\tthis.limit = limit;\t&#125;\t//O(1) 获取里面包含了多少数据\tpublic int getSize() &#123;\t\treturn size;\t&#125;\t//O(1) 获取数组当前的容量\tpublic int getCapacity() &#123;\t\treturn data.length;\t&#125;\t//O(1) 是否为空\tpublic boolean isEmpty() &#123;\t\treturn size == 0;\t&#125;\t//O(1) 存入一个数据\tpublic void put(E e) &#123;\t\tput(size, e);\t&#125;\t//O(n) 在第一个位置添加数据\tpublic void addFirst(E e) &#123;\t\tput(0, e);\t&#125;\t//O(1) 获取最后一个位置的数据\tpublic E getLast() &#123;\t\treturn data[size - 1];\t&#125;\t//O(1) 获取某个位置的数据\tpublic E get(int pos) &#123;\t\tif (pos &lt; 0 || pos &gt;= size)\t\t\tthrow new IllegalArgumentException(\"out of array, pos = \" + pos + \", size= \" + size);\t\treturn data[pos];\t&#125;\t//O(1) 设置某个位置上的数据\tpublic synchronized void set(int pos, E e) &#123;\t\tif (pos &lt; 0 || pos &gt;= size)\t\t\tthrow new IllegalArgumentException(\"set out of array, pos = \" + pos + \", size= \" + size);\t\tdata[pos] = e;\t&#125;\t//O(n) 放入一个数据，判断是否需要扩容，\tpublic synchronized void put(int pos, E e) &#123;\t\tif (pos &gt;= data.length)\t\t\tresize(data.length * 2);\t\tif (size == data.length || pos &lt; 0)\t\t\tthrow new IllegalArgumentException(\"add failed, array is already full pos = \" + pos + \" ,Size = \" + size + \" ,Capacity = \" + data.length);\t\tfor (int i = size - 1; i &gt;= pos; i--)\t\t\tdata[i + 1] = data[i];\t\tdata[pos] = e;\t\tsize++;\t&#125;\tpublic synchronized E deleteLast() &#123;\t\treturn delete(size - 1);\t&#125;\t//O(n)  删除某个位置元素，判断是否需要缩容\tpublic synchronized E delete(int pos) &#123;\t\tif (pos &lt; 0 || pos &gt;= size)\t\t\tthrow new IllegalArgumentException(\"delete failed, pos = \" + pos + \" ,Size = \" + size + \" ,Capacity = \" + data.length);\t\tE e = data[pos];\t\tif (pos != size - 1) &#123;\t\t\tfor (int i = pos; i &lt; size - 1; i++) &#123;\t\t\t\tdata[i] = data[i + 1];\t\t\t&#125;\t\t&#125;\t\tsize--;\t\tdata[size] = null;\t\tif (size &lt; data.length * limit)\t\t\tresize(data.length / 2);\t\treturn e;\t&#125;\t//O(n) 重制容器的容积\tprivate synchronized void resize(int capacity) &#123;\t\tif (capacity &lt; 5) &#123;\t\t\treturn;\t\t&#125;\t\tE[] newData = (E[]) new Object[capacity];\t\tfor (int i = 0; i &lt; size; i++) &#123;\t\t\tnewData[i] = data[i];\t\t&#125;\t\tdata = newData;\t&#125;\t@Override\tpublic String toString() &#123;\t\tStringBuilder res = new StringBuilder();\t\tres.append(String.format(\"Array: size = %d , capacity = %d\\n\", size, data.length));\t\tres.append('[');\t\tfor (int i = 0; i &lt; size; i++) &#123;\t\t\tres.append(data[i]);\t\t\tif (i != size - 1)\t\t\t\tres.append(\", \");\t\t&#125;\t\tres.append(']');\t\tSystem.out.println(\"内存中的数据&#123;\" + Arrays.toString(data) + \"&#125;\");\t\treturn res.toString();\t&#125;\tpublic static void main(String[] args) &#123;\t\tArray&lt;Integer&gt; array = new Array&lt;&gt;();\t\tfor (int i = 0; i &lt;= 20; i++)\t\t\tarray.put(i);\t\tfor (int i = 0; i &lt; 15; i++) &#123;\t\t\tarray.delete(0);\t\t\tSystem.out.println(array + \"\\n&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;\");\t\t&#125;\t&#125;&#125;\n以上就是一个可以装任意数据的组数结构的Java版本，那么有了这个结构，自然就衍生出来，堆结构和栈结构。\n第二篇数据结构就是堆栈结构的实战代码。\n","dateCreated":"2018-09-18T17:31:10+08:00","dateModified":"2018-09-19T09:18:58+08:00","datePublished":"2018-09-18T17:31:10+08:00","description":"Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!","headline":"Data Structure Array","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1537273413651&di=8b4639f3204c941e6ef026c910184646&imgtype=0&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2018/09/18/Data-Structure-Array/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"https://radiancel.github.io/2018/09/18/Data-Structure-Array/","keywords":"Data-Structure","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg"},"articleBody":"Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!\n何为数据结构数据结构是数据在计算机中存储的形态，比如一个班的学生，是站成一排，还是站成两排，还是正方形等等。\n那没有数据结构可不可以，如果没有数据结构，我们想想一下，还是这一个班的学生，我如果要找某个同学，假设我知道他叫什么，也知道他在哪，但我该怎么描述他的位置呢？\n如果是有结构的，我们可以说，第一排第六个，或者[3,4]这个位置，又或者[1,4,7]这样的三维位置可以描述他的准确位置，可如果它们没有结构，每个人都随意在任意一个位置，假设我们知道位置，但怎么告诉程序该去哪找他？\n所以，描述数据位置及组成的结构叫做数据结构。而选择合适的数据结构密切影响着我们程序运行的效率。\n数据结构在内存中大家都知道，计算机中的数据都在内存里，那么，数据结构在内存中是怎么样的？\n在内存中数据结构有四种方式\n\n顺序存储方法\n逻辑上相连的节点也存储在物理位置上也相邻的单元里，只存住节点的值，不存储节点的之间的关系\n遍历速度快\n不利于查找某个具体数据\n\n\n链表存储方法\n不要求物理上单元相邻，节点之间的关系由附加的指针来描述\n更改方便\n\n\n索引存储方法\n索引存储是在存储数据的同时，再建立一个附加的索引表，然后利用索引表中索引项的值来确定实际存储单元地址\n查找方便\n\n\n散列存储方法\n根据存储的关键字直接计算出节点的存储地址\n\n\n\n在Java中，数据结构的基本呈现首先我们第一站，肯定要描述最基本的单元，利用最基本的结构，来向上做出适应更复杂场景的结构。\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116117118119120121122123124125126127128129130131132133134135136137138139140141142143144145146public final class Array&lt;E&gt; &#123;  //泛型类保存数据\tprivate E[] data;  //一组数据中实际数据的下一个位置\tprivate int size;  //扩容参数\tprivate final float limit;\tpublic Array() &#123;\t\tthis(10, 0.4f);\t&#125;\tpublic Array(int capacity) &#123;\t\tthis(capacity, 0.4f);\t&#125;\tpublic Array(int capacity, float limit) &#123;\t\tdata = (E[]) new Object[capacity];\t\tthis.size = 0;\t\tthis.limit = limit;\t&#125;\t//O(1) 获取里面包含了多少数据\tpublic int getSize() &#123;\t\treturn size;\t&#125;\t//O(1) 获取数组当前的容量\tpublic int getCapacity() &#123;\t\treturn data.length;\t&#125;\t//O(1) 是否为空\tpublic boolean isEmpty() &#123;\t\treturn size == 0;\t&#125;\t//O(1) 存入一个数据\tpublic void put(E e) &#123;\t\tput(size, e);\t&#125;\t//O(n) 在第一个位置添加数据\tpublic void addFirst(E e) &#123;\t\tput(0, e);\t&#125;\t//O(1) 获取最后一个位置的数据\tpublic E getLast() &#123;\t\treturn data[size - 1];\t&#125;\t//O(1) 获取某个位置的数据\tpublic E get(int pos) &#123;\t\tif (pos &lt; 0 || pos &gt;= size)\t\t\tthrow new IllegalArgumentException(\"out of array, pos = \" + pos + \", size= \" + size);\t\treturn data[pos];\t&#125;\t//O(1) 设置某个位置上的数据\tpublic synchronized void set(int pos, E e) &#123;\t\tif (pos &lt; 0 || pos &gt;= size)\t\t\tthrow new IllegalArgumentException(\"set out of array, pos = \" + pos + \", size= \" + size);\t\tdata[pos] = e;\t&#125;\t//O(n) 放入一个数据，判断是否需要扩容，\tpublic synchronized void put(int pos, E e) &#123;\t\tif (pos &gt;= data.length)\t\t\tresize(data.length * 2);\t\tif (size == data.length || pos &lt; 0)\t\t\tthrow new IllegalArgumentException(\"add failed, array is already full pos = \" + pos + \" ,Size = \" + size + \" ,Capacity = \" + data.length);\t\tfor (int i = size - 1; i &gt;= pos; i--)\t\t\tdata[i + 1] = data[i];\t\tdata[pos] = e;\t\tsize++;\t&#125;\tpublic synchronized E deleteLast() &#123;\t\treturn delete(size - 1);\t&#125;\t//O(n)  删除某个位置元素，判断是否需要缩容\tpublic synchronized E delete(int pos) &#123;\t\tif (pos &lt; 0 || pos &gt;= size)\t\t\tthrow new IllegalArgumentException(\"delete failed, pos = \" + pos + \" ,Size = \" + size + \" ,Capacity = \" + data.length);\t\tE e = data[pos];\t\tif (pos != size - 1) &#123;\t\t\tfor (int i = pos; i &lt; size - 1; i++) &#123;\t\t\t\tdata[i] = data[i + 1];\t\t\t&#125;\t\t&#125;\t\tsize--;\t\tdata[size] = null;\t\tif (size &lt; data.length * limit)\t\t\tresize(data.length / 2);\t\treturn e;\t&#125;\t//O(n) 重制容器的容积\tprivate synchronized void resize(int capacity) &#123;\t\tif (capacity &lt; 5) &#123;\t\t\treturn;\t\t&#125;\t\tE[] newData = (E[]) new Object[capacity];\t\tfor (int i = 0; i &lt; size; i++) &#123;\t\t\tnewData[i] = data[i];\t\t&#125;\t\tdata = newData;\t&#125;\t@Override\tpublic String toString() &#123;\t\tStringBuilder res = new StringBuilder();\t\tres.append(String.format(\"Array: size = %d , capacity = %d\\n\", size, data.length));\t\tres.append('[');\t\tfor (int i = 0; i &lt; size; i++) &#123;\t\t\tres.append(data[i]);\t\t\tif (i != size - 1)\t\t\t\tres.append(\", \");\t\t&#125;\t\tres.append(']');\t\tSystem.out.println(\"内存中的数据&#123;\" + Arrays.toString(data) + \"&#125;\");\t\treturn res.toString();\t&#125;\tpublic static void main(String[] args) &#123;\t\tArray&lt;Integer&gt; array = new Array&lt;&gt;();\t\tfor (int i = 0; i &lt;= 20; i++)\t\t\tarray.put(i);\t\tfor (int i = 0; i &lt; 15; i++) &#123;\t\t\tarray.delete(0);\t\t\tSystem.out.println(array + \"\\n&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;\");\t\t&#125;\t&#125;&#125;\n以上就是一个可以装任意数据的组数结构的Java版本，那么有了这个结构，自然就衍生出来，堆结构和栈结构。\n第二篇数据结构就是堆栈结构的实战代码。\n","dateCreated":"2018-09-18T17:31:10+08:00","dateModified":"2018-09-19T09:18:58+08:00","datePublished":"2018-09-18T17:31:10+08:00","description":"Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!","headline":"Data Structure Array","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1537273413651&di=8b4639f3204c941e6ef026c910184646&imgtype=0&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2018/09/18/Data-Structure-Array/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg","logo":{"@type":"ImageObject","url":"eddie-personal.jpg"}},"url":"https://radiancel.github.io/2018/09/18/Data-Structure-Array/","keywords":"Data-Structure","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="Program = Data Structure + Algorithm所以，这篇系列博客，将从头记录数据结构从数组开始，到各种数据结构Let’s start it!">
 <meta name="keywords" content="Data-Structure">
 <meta property="og:type" content="blog">
@@ -29,7 +29,7 @@
         
     
     
-        <meta property="og:image" content="https://radiancel.github.io/assets/images/alan-walker.jpg"/>
+        <meta property="og:image" content="https://radiancel.github.io/assets/images/eddie-personal.jpg"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -41,7 +41,7 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
     <!--STYLES END-->
     
 
@@ -66,11 +66,10 @@
     </div>
     
         
-            <a  class="header-right-picture "
-                href="#about">
+            <a class="header-right-picture " href="#about">
         
         
-            <img class="header-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
         
         </a>
     
@@ -88,11 +87,11 @@
         
             <div class="sidebar-profile">
                 <a href="/#about">
-                    <img class="sidebar-profile-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
                 </a>
                 <h4 class="sidebar-profile-name">Eddie Lee</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
 </h5>
                 
             </div>
@@ -102,11 +101,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/ "
-                            
-                            title="Home"
-                        >
+                        <a class="sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -115,11 +110,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="Categories"
-                        >
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -128,11 +119,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="Tags"
-                        >
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -141,11 +128,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="Archives"
-                        >
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -154,11 +137,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="About"
-                        >
+                        <a class="sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -171,7 +150,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
+                        <a class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -186,9 +165,7 @@
             
         <div class="post-header-cover
                     text-left
-                    "
-             style="background-image:url('https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1537273413651&amp;di=8b4639f3204c941e6ef026c910184646&amp;imgtype=0&amp;src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg');"
-             data-behavior="4">
+                    " style="background-image:url('https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1537273413651&amp;di=8b4639f3204c941e6ef026c910184646&amp;imgtype=0&amp;src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg');" data-behavior="4">
             
                 <div class="post-header main-content-wrap text-left">
     
@@ -269,7 +246,7 @@
     <div id="post-footer" class="post-footer main-content-wrap">
         
             <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                <span class="text-color-light text-small">TAGGED IN</span><br>
                 
     <a class="tag tag--primary tag--small t-link" href="/tags/Data-Structure/">Data-Structure</a>
 
@@ -301,7 +278,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -311,7 +288,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -334,6 +311,7 @@
         Copyrights &copy; 2019 Eddie Lee. All Rights Reserved.
     </span>
 </footer>
+
             </div>
             
                 <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
@@ -362,7 +340,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -372,7 +350,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -382,12 +360,7 @@
 
 
                 </div>
-                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <i id="btn-close-shareoptions" class="fa fa-times"></i>
-    <ul class="share-options">
-        
-    </ul>
-</div>
+                
 
             
         </div>
@@ -404,25 +377,25 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
-            <div id="about-card-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+            <div id="about-card-bio"><p>author.bio</p>
 </div>
         
         
             <div id="about-card-job">
                 <i class="fa fa-briefcase"></i>
-                <br/>
-                <p>Developer</p>
+                <br>
+                <p>author.job</p>
 
             </div>
         
         
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
-                <br/>
+                <br>
                 LN
             </div>
         
@@ -433,7 +406,7 @@
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->
 
     

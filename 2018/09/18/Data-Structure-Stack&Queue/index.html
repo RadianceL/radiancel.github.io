@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"数据结构第二篇, Stack&amp;Queue\n何为栈&amp;队列结构\nStack 堆结构 常用于系统层面进程管理 有着先进后出的原则 例如Android程序View的展示 总是展示栈顶页面 按back键关闭的是栈顶页面\nQueue 队列结构 常用于系统间通信 保证先发先到 有先进先出的原则 例如消息中间件MQ\n\n实现原理分析栈结构和堆结构，底层也是一个泛型的数组，只不过我们定了一些规则，保证其符合先进后出与先进后出的原则即可，并额外提供一些便捷方法。\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566//栈结构public final class EStack&lt;E&gt; implements TStack&lt;E&gt; &#123;    private Array&lt;E&gt; stack;    public EStack(int capacity) &#123;        stack = new Array&lt;&gt;(capacity, 0.4f);    &#125;    public EStack() &#123;        stack = new Array&lt;&gt;();    &#125;    @Override    public int getSize() &#123;        return stack.getSize();    &#125;    @Override    public boolean isEmpty() &#123;        return stack.isEmpty();    &#125;    /**     * O(1) 均摊复杂度     * @param e     */    @Override    public void push(E e) &#123;        stack.put(e);    &#125;    /**     * O(1)     * @return     */    @Override    public E pop() &#123;        return stack.deleteLast();    &#125;    /**     * O(1)     * @return     */    @Override    public E peek() &#123;        return stack.getLast();    &#125;    @Override    public String toString() &#123;        StringBuilder res = new StringBuilder();        res.append(\"Stack: \");        res.append('[');        for (int i = 0; i &lt; stack.getSize(); i++) &#123;            res.append(stack.get(i));            if (i != stack.getSize() - 1) &#123;                res.append(\", \");            &#125;        &#125;        res.append(\"] top\");        return res.toString();    &#125;    &#125;\n123456789101112131415161718192021222324252627282930313233343536373839404142//队列结构public final class EQueue&lt;E&gt; implements TQueue&lt;E&gt; &#123;    private Array&lt;E&gt; data;    public EQueue() &#123;        data = new Array&lt;&gt;();    &#125;    public EQueue(int capacity) &#123;        data = new Array&lt;&gt;(capacity);    &#125;    public EQueue(int capacity, float limit) &#123;        data = new Array&lt;&gt;(capacity, limit);    &#125;    @Override    public void put(E e) &#123;        data.put(e);    &#125;    @Override    public E remove() &#123;        return data.delete(0);    &#125;    @Override    public int count() &#123;        return data.getSize();    &#125;    @Override    public int getSize() &#123;        return data.getCapacity();    &#125;    @Override    public boolean isEmpty() &#123;        return data.isEmpty();    &#125;&#125;\n其中Array这个数据结构,来自于上篇文章’Data Structure Array’，其实就是数组的底层实现，非常简单从代码中可以看到，无论是栈结构还是队列结构均是对Array的封装，对外屏蔽了Array的部分方法，添加了各自独有的方法从而实现了栈和队列。\n其他\n本文源码的com.eddie.structure中\n下篇文章将开始更复杂的数据结构\n\n","dateCreated":"2018-09-18T17:31:10+08:00","dateModified":"2018-10-14T13:35:24+08:00","datePublished":"2018-09-18T17:31:10+08:00","description":"数据结构第二篇, Stack&amp;Queue","headline":"Data Structure Stack&Queue","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1537273413651&di=8b4639f3204c941e6ef026c910184646&imgtype=0&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2018/09/18/Data-Structure-Stack&Queue/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"https://radiancel.github.io/2018/09/18/Data-Structure-Stack&Queue/","keywords":"Data-Structure","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg"},"articleBody":"数据结构第二篇, Stack&amp;Queue\n何为栈&amp;队列结构\nStack 堆结构 常用于系统层面进程管理 有着先进后出的原则 例如Android程序View的展示 总是展示栈顶页面 按back键关闭的是栈顶页面\nQueue 队列结构 常用于系统间通信 保证先发先到 有先进先出的原则 例如消息中间件MQ\n\n实现原理分析栈结构和堆结构，底层也是一个泛型的数组，只不过我们定了一些规则，保证其符合先进后出与先进后出的原则即可，并额外提供一些便捷方法。\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566//栈结构public final class EStack&lt;E&gt; implements TStack&lt;E&gt; &#123;    private Array&lt;E&gt; stack;    public EStack(int capacity) &#123;        stack = new Array&lt;&gt;(capacity, 0.4f);    &#125;    public EStack() &#123;        stack = new Array&lt;&gt;();    &#125;    @Override    public int getSize() &#123;        return stack.getSize();    &#125;    @Override    public boolean isEmpty() &#123;        return stack.isEmpty();    &#125;    /**     * O(1) 均摊复杂度     * @param e     */    @Override    public void push(E e) &#123;        stack.put(e);    &#125;    /**     * O(1)     * @return     */    @Override    public E pop() &#123;        return stack.deleteLast();    &#125;    /**     * O(1)     * @return     */    @Override    public E peek() &#123;        return stack.getLast();    &#125;    @Override    public String toString() &#123;        StringBuilder res = new StringBuilder();        res.append(\"Stack: \");        res.append('[');        for (int i = 0; i &lt; stack.getSize(); i++) &#123;            res.append(stack.get(i));            if (i != stack.getSize() - 1) &#123;                res.append(\", \");            &#125;        &#125;        res.append(\"] top\");        return res.toString();    &#125;    &#125;\n123456789101112131415161718192021222324252627282930313233343536373839404142//队列结构public final class EQueue&lt;E&gt; implements TQueue&lt;E&gt; &#123;    private Array&lt;E&gt; data;    public EQueue() &#123;        data = new Array&lt;&gt;();    &#125;    public EQueue(int capacity) &#123;        data = new Array&lt;&gt;(capacity);    &#125;    public EQueue(int capacity, float limit) &#123;        data = new Array&lt;&gt;(capacity, limit);    &#125;    @Override    public void put(E e) &#123;        data.put(e);    &#125;    @Override    public E remove() &#123;        return data.delete(0);    &#125;    @Override    public int count() &#123;        return data.getSize();    &#125;    @Override    public int getSize() &#123;        return data.getCapacity();    &#125;    @Override    public boolean isEmpty() &#123;        return data.isEmpty();    &#125;&#125;\n其中Array这个数据结构,来自于上篇文章’Data Structure Array’，其实就是数组的底层实现，非常简单从代码中可以看到，无论是栈结构还是队列结构均是对Array的封装，对外屏蔽了Array的部分方法，添加了各自独有的方法从而实现了栈和队列。\n其他\n本文源码的com.eddie.structure中\n下篇文章将开始更复杂的数据结构\n\n","dateCreated":"2018-09-18T17:31:10+08:00","dateModified":"2018-10-14T13:35:24+08:00","datePublished":"2018-09-18T17:31:10+08:00","description":"数据结构第二篇, Stack&amp;Queue","headline":"Data Structure Stack&Queue","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1537273413651&di=8b4639f3204c941e6ef026c910184646&imgtype=0&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2018/09/18/Data-Structure-Stack&Queue/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg","logo":{"@type":"ImageObject","url":"eddie-personal.jpg"}},"url":"https://radiancel.github.io/2018/09/18/Data-Structure-Stack&Queue/","keywords":"Data-Structure","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="数据结构第二篇, Stack&amp;amp;Queue">
 <meta name="keywords" content="Data-Structure">
 <meta property="og:type" content="blog">
@@ -29,7 +29,7 @@
         
     
     
-        <meta property="og:image" content="https://radiancel.github.io/assets/images/alan-walker.jpg"/>
+        <meta property="og:image" content="https://radiancel.github.io/assets/images/eddie-personal.jpg"/>
     
     
         <meta property="og:image" content="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&amp;fm=27&amp;gp=0.jpg"/>
@@ -41,7 +41,7 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
     <!--STYLES END-->
     
 
@@ -66,11 +66,10 @@
     </div>
     
         
-            <a  class="header-right-picture "
-                href="#about">
+            <a class="header-right-picture " href="#about">
         
         
-            <img class="header-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
         
         </a>
     
@@ -88,11 +87,11 @@
         
             <div class="sidebar-profile">
                 <a href="/#about">
-                    <img class="sidebar-profile-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
                 </a>
                 <h4 class="sidebar-profile-name">Eddie Lee</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
 </h5>
                 
             </div>
@@ -102,11 +101,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/ "
-                            
-                            title="Home"
-                        >
+                        <a class="sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -115,11 +110,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="Categories"
-                        >
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -128,11 +119,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="Tags"
-                        >
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -141,11 +128,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="Archives"
-                        >
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -154,11 +137,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="About"
-                        >
+                        <a class="sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -171,7 +150,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
+                        <a class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -186,9 +165,7 @@
             
         <div class="post-header-cover
                     text-left
-                    "
-             style="background-image:url('https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1537273413651&amp;di=8b4639f3204c941e6ef026c910184646&amp;imgtype=0&amp;src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg');"
-             data-behavior="4">
+                    " style="background-image:url('https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1537273413651&amp;di=8b4639f3204c941e6ef026c910184646&amp;imgtype=0&amp;src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fa290858227c4444a8b804aeed41e79e2035340a0.jpg');" data-behavior="4">
             
                 <div class="post-header main-content-wrap text-left">
     
@@ -249,7 +226,7 @@
     <div id="post-footer" class="post-footer main-content-wrap">
         
             <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                <span class="text-color-light text-small">TAGGED IN</span><br>
                 
     <a class="tag tag--primary tag--small t-link" href="/tags/Data-Structure/">Data-Structure</a>
 
@@ -281,7 +258,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -291,7 +268,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -314,6 +291,7 @@
         Copyrights &copy; 2019 Eddie Lee. All Rights Reserved.
     </span>
 </footer>
+
             </div>
             
                 <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
@@ -342,7 +320,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -352,7 +330,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -362,12 +340,7 @@
 
 
                 </div>
-                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <i id="btn-close-shareoptions" class="fa fa-times"></i>
-    <ul class="share-options">
-        
-    </ul>
-</div>
+                
 
             
         </div>
@@ -384,25 +357,25 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
-            <div id="about-card-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+            <div id="about-card-bio"><p>author.bio</p>
 </div>
         
         
             <div id="about-card-job">
                 <i class="fa fa-briefcase"></i>
-                <br/>
-                <p>Developer</p>
+                <br>
+                <p>author.job</p>
 
             </div>
         
         
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
-                <br/>
+                <br>
                 LN
             </div>
         
@@ -413,7 +386,7 @@
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->
 
     

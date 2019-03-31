@@ -11,7 +11,7 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"UNIX is very simple, it just needs a genius to understand its simplicity.\n-Dennis MacAlistair Ritchie\nC语言引入静态库\n静态库：\n\n\n链接时将程序放进进可执行程序  \n会产生多分副本\n不依赖程序运行\n\n\n动态库：\n\n\n程序运行时，加载时才去动态库找函数\n多进程共享\n依赖程序运行\n\n通常我们的做法是：先对library.c与library.h进行编译gcc -c library.c然后ar rcs libTest.a library.o ....生成libTest.a文件，也就是静态库文件\n然后使用这个库的方法：在项目中编写一个lib_static.h文件，里面包含：extern void name(void);在main函数中引入这个头文件，就可以拿到这些方法了在编译项目时，需要把库文件指定给当前项目。\n使用gcc编译的方法是：-L指定搜索的路径，一般为项目的lib目录下，需要手动考入，-l指定具体文件，这个文件可以是自己编译的也可以是三方提供gcc -L/home/user/xxx/lib main.c -llibTest.a -o app\n但通常使用IDE时，使用cMake的方式编译，贴出CMakeList.txt的代码\n12345678910111213141516171819202122232425//设置最低版本cmake_minimum_required(VERSION 3.8)//项目名称project(webTest)//编译版本set(CMAKE_C_STANDARD 99)//包含的目录include_directories(lib/)//相当于-Llink_directories(lib/)//相当于-llink_libraries(libIMprotocol.a)//设置编译的源文件set(SOURCE_FILES main.c        SETCONFIG/CONNECTIONSET.h        FUNCTION/Connection.c FUNCTION/Connection.h FUNCTION/InitConnection.c FUNCTION/InitConnection.h        TOOL/GETConfig.c        lib/static_lib.h)add_executable(webTest $&#123;SOURCE_FILES&#125;)//防止linux下线程方法不可用，应该是某种机制target_link_libraries(webTest pthread)\n","dateCreated":"2017-12-28T13:49:07+08:00","dateModified":"2018-06-03T12:35:08+08:00","datePublished":"2017-12-28T13:49:07+08:00","description":"UNIX is very simple, it just needs a genius to understand its simplicity.\n-Dennis MacAlistair Ritchie","headline":"C-static-Library","image":["http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2017/12/28/C-static-Library/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"https://radiancel.github.io/2017/12/28/C-static-Library/","keywords":"C","thumbnailUrl":"http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg"},"articleBody":"UNIX is very simple, it just needs a genius to understand its simplicity.\n-Dennis MacAlistair Ritchie\nC语言引入静态库\n静态库：\n\n\n链接时将程序放进进可执行程序  \n会产生多分副本\n不依赖程序运行\n\n\n动态库：\n\n\n程序运行时，加载时才去动态库找函数\n多进程共享\n依赖程序运行\n\n通常我们的做法是：先对library.c与library.h进行编译gcc -c library.c然后ar rcs libTest.a library.o ....生成libTest.a文件，也就是静态库文件\n然后使用这个库的方法：在项目中编写一个lib_static.h文件，里面包含：extern void name(void);在main函数中引入这个头文件，就可以拿到这些方法了在编译项目时，需要把库文件指定给当前项目。\n使用gcc编译的方法是：-L指定搜索的路径，一般为项目的lib目录下，需要手动考入，-l指定具体文件，这个文件可以是自己编译的也可以是三方提供gcc -L/home/user/xxx/lib main.c -llibTest.a -o app\n但通常使用IDE时，使用cMake的方式编译，贴出CMakeList.txt的代码\n12345678910111213141516171819202122232425//设置最低版本cmake_minimum_required(VERSION 3.8)//项目名称project(webTest)//编译版本set(CMAKE_C_STANDARD 99)//包含的目录include_directories(lib/)//相当于-Llink_directories(lib/)//相当于-llink_libraries(libIMprotocol.a)//设置编译的源文件set(SOURCE_FILES main.c        SETCONFIG/CONNECTIONSET.h        FUNCTION/Connection.c FUNCTION/Connection.h FUNCTION/InitConnection.c FUNCTION/InitConnection.h        TOOL/GETConfig.c        lib/static_lib.h)add_executable(webTest $&#123;SOURCE_FILES&#125;)//防止linux下线程方法不可用，应该是某种机制target_link_libraries(webTest pthread)\n","dateCreated":"2017-12-28T13:49:07+08:00","dateModified":"2018-06-03T12:35:08+08:00","datePublished":"2017-12-28T13:49:07+08:00","description":"UNIX is very simple, it just needs a genius to understand its simplicity.\n-Dennis MacAlistair Ritchie","headline":"C-static-Library","image":["http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2017/12/28/C-static-Library/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg","logo":{"@type":"ImageObject","url":"eddie-personal.jpg"}},"url":"https://radiancel.github.io/2017/12/28/C-static-Library/","keywords":"C","thumbnailUrl":"http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg"}</script>
     <meta name="description" content="UNIX is very simple, it just needs a genius to understand its simplicity. -Dennis MacAlistair Ritchie">
 <meta name="keywords" content="C">
 <meta property="og:type" content="blog">
@@ -29,7 +29,7 @@
         
     
     
-        <meta property="og:image" content="https://radiancel.github.io/assets/images/alan-walker.jpg"/>
+        <meta property="og:image" content="https://radiancel.github.io/assets/images/eddie-personal.jpg"/>
     
     
         <meta property="og:image" content="http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&amp;fm=27&amp;gp=0.jpg"/>
@@ -41,7 +41,7 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
     <!--STYLES END-->
     
 
@@ -66,11 +66,10 @@
     </div>
     
         
-            <a  class="header-right-picture "
-                href="#about">
+            <a class="header-right-picture " href="#about">
         
         
-            <img class="header-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
         
         </a>
     
@@ -88,11 +87,11 @@
         
             <div class="sidebar-profile">
                 <a href="/#about">
-                    <img class="sidebar-profile-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
                 </a>
                 <h4 class="sidebar-profile-name">Eddie Lee</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
 </h5>
                 
             </div>
@@ -102,11 +101,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/ "
-                            
-                            title="Home"
-                        >
+                        <a class="sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -115,11 +110,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="Categories"
-                        >
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -128,11 +119,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="Tags"
-                        >
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -141,11 +128,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="Archives"
-                        >
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -154,11 +137,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="About"
-                        >
+                        <a class="sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -171,7 +150,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
+                        <a class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -186,9 +165,7 @@
             
         <div class="post-header-cover
                     text-left
-                    "
-             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg');"
-             data-behavior="4">
+                    " style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg');" data-behavior="4">
             
                 <div class="post-header main-content-wrap text-left">
     
@@ -259,7 +236,7 @@
     <div id="post-footer" class="post-footer main-content-wrap">
         
             <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                <span class="text-color-light text-small">TAGGED IN</span><br>
                 
     <a class="tag tag--primary tag--small t-link" href="/tags/C/">C</a>
 
@@ -291,7 +268,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -301,7 +278,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -324,6 +301,7 @@
         Copyrights &copy; 2019 Eddie Lee. All Rights Reserved.
     </span>
 </footer>
+
             </div>
             
                 <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
@@ -352,7 +330,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -362,7 +340,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -372,12 +350,7 @@
 
 
                 </div>
-                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <i id="btn-close-shareoptions" class="fa fa-times"></i>
-    <ul class="share-options">
-        
-    </ul>
-</div>
+                
 
             
         </div>
@@ -394,25 +367,25 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
-            <div id="about-card-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+            <div id="about-card-bio"><p>author.bio</p>
 </div>
         
         
             <div id="about-card-job">
                 <i class="fa fa-briefcase"></i>
-                <br/>
-                <p>Developer</p>
+                <br>
+                <p>author.job</p>
 
             </div>
         
         
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
-                <br/>
+                <br>
                 LN
             </div>
         
@@ -423,7 +396,7 @@
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->
 
     

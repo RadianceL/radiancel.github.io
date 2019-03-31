@@ -11,8 +11,8 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg"},"articleBody":"Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.\n—wikipedia\n本教程主要针对服务器配置，windows，mac不在范围之内centos 安装方法：\n使用uname -r检查kernel版本，如果低于3.10.0，则需要升级内核版本yum 方式安装\n1.使用sudo或root权限的用户登入系统,更新yumsudo yum update\n2.添加 yum 仓库12345678$ sudo tee /etc/yum.repos.d/docker.repo &lt;&lt;-‘EOF’[dockerrepo]name=Docker Repositorybaseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/enabled=1gpgcheck=1gpgkey=https://yum.dockerproject.org/gpgEOF\n3.安装 Docker 包$ sudo yum install docker-engine\n4.启动 docker 守护进程123456789101112131415161718192021222324$ sudo systemctl start docker.service配置让 docker 服务随系统自动启动$ sudo chkconfig docker on验证 docker 是否安装成功$ sudo systemctl enable docker.service安装一个hello-world镜像[xxxx@xxxxx ~]$ sudo docker run hello-worldHello from Docker.This message shows that your installation appears to be working correctly.To generate this message, Docker took the following steps:The Docker client contacted the Docker daemon.The Docker daemon pulled the &quot;hello-world&quot; image from the Docker Hub.The Docker daemon created a new container from that image which runs theexecutable that produces the output you are currently reading.The Docker daemon streamed that output to the Docker client, which sent itto your terminal.To try something more ambitious, you can run an Ubuntu container with:$ docker run -it ubuntu bashShare images, automate workflows, and more with a free Docker Hub account:https://hub.docker.comFor more examples and ideas, visit:https://docs.docker.com/userguide/\n整个过程是这样的：12345Docker 客户端连接到 Docker 守护进程；Docker 守护进程从 Docker Hub 中拉取名为 “hello-world” 的 image（镜像）；Docker 守护程序从该 image 中创建新的容器，该容器执行输出动作，输出的内容就是上面所看到的；Docker 守护程序将输出流到 Docker 客户端并发送你的终端显示。Docker Daemon是Docker架构中运行在后台的守护进程，大致可以分为Docker Server、Engine和Job三部分。Docker Daemon可以认为是通过Docker Server模块接受Docker Client的请求，并在Engine中处理请求，然后根据请求类型，创建出指定的Job并运行，运行过程的作用有以下几种可能：向Docker Registry获取镜像，通过graphdriver执行容器镜像的本地化操作，通过networkdriver执行容器网络环境的配置，通过execdriver执行容器内部运行的执行工作等。\n常用命令：1234567docker ps //查看所有运行中的dockerdocker images //查看所有镜像docker -d -p [this.port]:[docker.port] dockerName;docker -it run -it [Docker.Name] bashdocker tag [docker.Name] [userAccount]/[new Create Repository]docker push [userAccount]/[new Create Repository]Mysql 中文乱码问题: –character-set-server=utf8mb4 –collation-server=utf8mb4_unicode_ci\n","dateCreated":"2017-10-14T14:35:27+08:00","dateModified":"2017-11-29T10:20:44+08:00","datePublished":"2017-10-14T14:35:27+08:00","description":"Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.\n—wikipedia","headline":"Docker","image":["https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png","http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2017/10/14/Docker/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"alan-walker.jpg","logo":{"@type":"ImageObject","url":"alan-walker.jpg"}},"url":"https://radiancel.github.io/2017/10/14/Docker/","keywords":"CentOS","thumbnailUrl":"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png"}</script>
-    <meta name="description" content="Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of o">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg"},"articleBody":"Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.\n—wikipedia\n本教程主要针对服务器配置，windows，mac不在范围之内centos 安装方法：\n使用uname -r检查kernel版本，如果低于3.10.0，则需要升级内核版本yum 方式安装\n1.使用sudo或root权限的用户登入系统,更新yumsudo yum update\n2.添加 yum 仓库12345678$ sudo tee /etc/yum.repos.d/docker.repo &lt;&lt;-‘EOF’[dockerrepo]name=Docker Repositorybaseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/enabled=1gpgcheck=1gpgkey=https://yum.dockerproject.org/gpgEOF\n3.安装 Docker 包$ sudo yum install docker-engine\n4.启动 docker 守护进程123456789101112131415161718192021222324$ sudo systemctl start docker.service配置让 docker 服务随系统自动启动$ sudo chkconfig docker on验证 docker 是否安装成功$ sudo systemctl enable docker.service安装一个hello-world镜像[xxxx@xxxxx ~]$ sudo docker run hello-worldHello from Docker.This message shows that your installation appears to be working correctly.To generate this message, Docker took the following steps:The Docker client contacted the Docker daemon.The Docker daemon pulled the &quot;hello-world&quot; image from the Docker Hub.The Docker daemon created a new container from that image which runs theexecutable that produces the output you are currently reading.The Docker daemon streamed that output to the Docker client, which sent itto your terminal.To try something more ambitious, you can run an Ubuntu container with:$ docker run -it ubuntu bashShare images, automate workflows, and more with a free Docker Hub account:https://hub.docker.comFor more examples and ideas, visit:https://docs.docker.com/userguide/\n整个过程是这样的：12345Docker 客户端连接到 Docker 守护进程；Docker 守护进程从 Docker Hub 中拉取名为 “hello-world” 的 image（镜像）；Docker 守护程序从该 image 中创建新的容器，该容器执行输出动作，输出的内容就是上面所看到的；Docker 守护程序将输出流到 Docker 客户端并发送你的终端显示。Docker Daemon是Docker架构中运行在后台的守护进程，大致可以分为Docker Server、Engine和Job三部分。Docker Daemon可以认为是通过Docker Server模块接受Docker Client的请求，并在Engine中处理请求，然后根据请求类型，创建出指定的Job并运行，运行过程的作用有以下几种可能：向Docker Registry获取镜像，通过graphdriver执行容器镜像的本地化操作，通过networkdriver执行容器网络环境的配置，通过execdriver执行容器内部运行的执行工作等。\n常用命令：1234567docker ps //查看所有运行中的dockerdocker images //查看所有镜像docker -d -p [this.port]:[docker.port] dockerName;docker -it run -it [Docker.Name] bashdocker tag [docker.Name] [userAccount]/[new Create Repository]docker push [userAccount]/[new Create Repository]Mysql 中文乱码问题: –character-set-server=utf8mb4 –collation-server=utf8mb4_unicode_ci\n","dateCreated":"2017-10-14T14:35:27+08:00","dateModified":"2017-11-29T10:20:44+08:00","datePublished":"2017-10-14T14:35:27+08:00","description":"Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux.\n—wikipedia","headline":"Docker","image":["https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png","http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2017/10/14/Docker/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg","logo":{"@type":"ImageObject","url":"eddie-personal.jpg"}},"url":"https://radiancel.github.io/2017/10/14/Docker/","keywords":"CentOS","thumbnailUrl":"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1508139645889&di=9dc8a170c15298accaeb7aa617b66ad9&imgtype=0&src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png"}</script>
+    <meta name="description" content="Docker is a software technology providing containers, promoted by the company Docker, Inc.Docker provides an additional layer of abstraction and automation of operating-system-level virtualization on">
 <meta name="keywords" content="CentOS">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Docker">
@@ -29,7 +29,7 @@
         
     
     
-        <meta property="og:image" content="https://radiancel.github.io/assets/images/alan-walker.jpg"/>
+        <meta property="og:image" content="https://radiancel.github.io/assets/images/eddie-personal.jpg"/>
     
     
         <meta property="og:image" content="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1508139645889&amp;di=9dc8a170c15298accaeb7aa617b66ad9&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.rancher.com%2Fwp-content%2Fuploads%2F2015%2F03%2F03030532%2Fdocker-logo-square.png"/>
@@ -41,7 +41,7 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
     <!--STYLES END-->
     
 
@@ -66,11 +66,10 @@
     </div>
     
         
-            <a  class="header-right-picture "
-                href="#about">
+            <a class="header-right-picture " href="#about">
         
         
-            <img class="header-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
         
         </a>
     
@@ -88,11 +87,11 @@
         
             <div class="sidebar-profile">
                 <a href="/#about">
-                    <img class="sidebar-profile-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
                 </a>
                 <h4 class="sidebar-profile-name">Eddie Lee</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
 </h5>
                 
             </div>
@@ -102,11 +101,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/ "
-                            
-                            title="Home"
-                        >
+                        <a class="sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -115,11 +110,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="Categories"
-                        >
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -128,11 +119,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="Tags"
-                        >
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -141,11 +128,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="Archives"
-                        >
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -154,11 +137,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="About"
-                        >
+                        <a class="sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -171,7 +150,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
+                        <a class="sidebar-button-link " href="https://github.com/RadianceL" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -186,9 +165,7 @@
             
         <div class="post-header-cover
                     text-left
-                    "
-             style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg');"
-             data-behavior="4">
+                    " style="background-image:url('http://old.bz55.com/uploads/allimg/150719/139-150GZZ041.jpg');" data-behavior="4">
             
                 <div class="post-header main-content-wrap text-left">
     
@@ -246,7 +223,7 @@
     <div id="post-footer" class="post-footer main-content-wrap">
         
             <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                <span class="text-color-light text-small">TAGGED IN</span><br>
                 
     <a class="tag tag--primary tag--small t-link" href="/tags/CentOS/">CentOS</a>
 
@@ -277,7 +254,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -287,7 +264,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -310,6 +287,7 @@
         Copyrights &copy; 2019 Eddie Lee. All Rights Reserved.
     </span>
 </footer>
+
             </div>
             
                 <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
@@ -337,7 +315,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -347,7 +325,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -357,12 +335,7 @@
 
 
                 </div>
-                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <i id="btn-close-shareoptions" class="fa fa-times"></i>
-    <ul class="share-options">
-        
-    </ul>
-</div>
+                
 
             
         </div>
@@ -379,25 +352,25 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/assets/images/alan-walker.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="/assets/images/eddie-personal.jpg" alt="Author&#39;s picture">
         
             <h4 id="about-card-name">Eddie Lee</h4>
         
-            <div id="about-card-bio"><p>Once work as assistant teacher, and now in LN bld Technology Co. Ltd</p>
+            <div id="about-card-bio"><p>author.bio</p>
 </div>
         
         
             <div id="about-card-job">
                 <i class="fa fa-briefcase"></i>
-                <br/>
-                <p>Developer</p>
+                <br>
+                <p>author.job</p>
 
             </div>
         
         
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
-                <br/>
+                <br>
                 LN
             </div>
         
@@ -408,7 +381,7 @@
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->
 
     

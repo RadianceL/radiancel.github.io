@@ -6,24 +6,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Blog Bom!!BO!">
-    <title>Spring State Machine - Blog Bom!!BO!</title>
+    <title>Sliding-Time-Window - Blog Bom!!BO!</title>
     <meta name="author" content="Eddie Lee">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg"},"articleBody":"近期因为公司订单系统大多为定时任务轮寻，执行速度依赖于定时任务执行速度，希望能够改造成实时处理，所以我决定引入MQ同时使用Spring State Machine，来拆分业务与状态和数据之间的耦合\n首先技术选型，为什么要使用spring state machine：\n如果业务单一，生命周期闭环较为短，那么不太建议使用状态机，成本比较高如果业务复杂，且有可能频繁更改，那么在项目初期使用状态机，简直太有必要了，业务与状态解耦，最终由action处理数据\n关于状态机的选择，市面上状态机种类繁多，不过考虑到文档齐备，社区状态，最终选择了spring的周边产品spring state machine\n核心概念所谓状态机，其实就是状态管理，最核心的有两个部分，一是状态，二是事件，由事件驱动状态的变更，也就是状态机了\n\nstate：S-状态，订单状态，例如初始状态，待付款，已发货，待确认等等\nevent：E-事件，下单，付款，物流发货，确认收货等等\n\n一个状态机的定义就由这两个主要的元素组成，状态及对对应的事件（动作）。\n状态机配置相关Transition: 节点，是组成状态机引擎的核心source：当前状态target：目标状态event：触发节点从当前状态到目标状态的动作guard：校验是否可执行该事件action：实现该节点变更后对应的逻辑\n代码书写这部分个人有个人的习惯，我通常都是先写状态流程定义的部分。另外，官网上的例子实在是太简单了，不能满足项目中使用，我个人把流程定义写成了一饿Builder，可以多次构建。\nps： 因为一个状态机只能维护一个状态，所以如果同时处理，只有一个状态机是不够的，同时如果状态机到达最终节点，就完结了，任务处理都会拒接\n","dateCreated":"2019-07-10T14:11:32+08:00","dateModified":"2019-07-12T16:04:21+08:00","datePublished":"2019-07-10T14:11:32+08:00","description":"近期因为公司订单系统大多为定时任务轮寻，执行速度依赖于定时任务执行速度，希望能够改造成实时处理，所以我决定引入MQ同时使用Spring State Machine，来拆分业务与状态和数据之间的耦合","headline":"Spring State Machine","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2019/07/10/Spring-State-Machine/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg","logo":{"@type":"ImageObject","url":"eddie-personal.jpg"}},"url":"https://radiancel.github.io/2019/07/10/Spring-State-Machine/","keywords":"Java","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
-    <meta name="description" content="近期因为公司订单系统大多为定时任务轮寻，执行速度依赖于定时任务执行速度，希望能够改造成实时处理，所以我决定引入MQ同时使用Spring State Machine，来拆分业务与状态和数据之间的耦合">
-<meta name="keywords" content="Java">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg"},"articleBody":"","dateCreated":"2019-12-15T10:06:23+08:00","dateModified":"2019-12-15T10:07:02+08:00","datePublished":"2019-12-15T10:06:23+08:00","description":"","headline":"Sliding-Time-Window","image":["https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ039.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2019/12/15/Sliding-Time-Window/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg","logo":{"@type":"ImageObject","url":"eddie-personal.jpg"}},"url":"https://radiancel.github.io/2019/12/15/Sliding-Time-Window/","keywords":"Java","thumbnailUrl":"https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=960265520,2932106354&fm=27&gp=0.jpg"}</script>
+    <meta name="keywords" content="Java">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Spring State Machine">
-<meta property="og:url" content="https://radiancel.github.io/2019/07/10/Spring-State-Machine/index.html">
+<meta property="og:title" content="Sliding-Time-Window">
+<meta property="og:url" content="https://radiancel.github.io/2019/12/15/Sliding-Time-Window/index.html">
 <meta property="og:site_name" content="Blog Bom!!BO!">
-<meta property="og:description" content="近期因为公司订单系统大多为定时任务轮寻，执行速度依赖于定时任务执行速度，希望能够改造成实时处理，所以我决定引入MQ同时使用Spring State Machine，来拆分业务与状态和数据之间的耦合">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2019-07-12T08:04:21.000Z">
+<meta property="og:updated_time" content="2019-12-15T02:07:02.063Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spring State Machine">
-<meta name="twitter:description" content="近期因为公司订单系统大多为定时任务轮寻，执行速度依赖于定时任务执行速度，希望能够改造成实时处理，所以我决定引入MQ同时使用Spring State Machine，来拆分业务与状态和数据之间的耦合">
+<meta name="twitter:title" content="Sliding-Time-Window">
     
     
         
@@ -170,20 +167,20 @@
                 <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            Spring State Machine
+            Sliding-Time-Window
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2019-07-10T14:11:32+08:00">
+    <time datetime="2019-12-15T10:06:23+08:00">
 	
-		    Jul 10, 2019
+		    Dec 15, 2019
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/Spring/">Spring</a>
+    <a class="category-link" href="/categories/Java/">Java</a>
 
 
     
@@ -205,20 +202,7 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>近期因为公司订单系统大多为定时任务轮寻，执行速度依赖于定时任务执行速度，希望能够改造成实时处理，<br>所以我决定引入MQ同时使用Spring State Machine，来拆分业务与状态和数据之间的耦合<br><a id="more"></a></p>
-<p>首先技术选型，为什么要使用spring state machine：</p>
-<p>如果业务单一，生命周期闭环较为短，那么不太建议使用状态机，成本比较高<br>如果业务复杂，且有可能频繁更改，那么在项目初期使用状态机，简直太有必要了，业务与状态解耦，最终由action处理数据</p>
-<p>关于状态机的选择，市面上状态机种类繁多，不过考虑到文档齐备，社区状态，最终选择了spring的周边产品spring state machine</p>
-<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><p>所谓状态机，其实就是状态管理，最核心的有两个部分，一是状态，二是事件，由事件驱动状态的变更，也就是状态机了</p>
-<ul>
-<li>state：S-状态，订单状态，例如初始状态，待付款，已发货，待确认等等</li>
-<li>event：E-事件，下单，付款，物流发货，确认收货等等</li>
-</ul>
-<p>一个状态机的定义就由这两个主要的元素组成，状态及对对应的事件（动作）。</p>
-<p>状态机配置相关<br>Transition: 节点，是组成状态机引擎的核心<br>source：当前状态<br>target：目标状态<br>event：触发节点从当前状态到目标状态的动作<br>guard：校验是否可执行该事件<br>action：实现该节点变更后对应的逻辑</p>
-<h2 id="代码书写"><a href="#代码书写" class="headerlink" title="代码书写"></a>代码书写</h2><p>这部分个人有个人的习惯，我通常都是先写状态流程定义的部分。<br>另外，官网上的例子实在是太简单了，不能满足项目中使用，我个人把流程定义写成了一饿Builder，可以多次构建。</p>
-<p>ps： 因为一个状态机只能维护一个状态，所以如果同时处理，只有一个状态机是不够的，同时如果状态机到达最终节点，就完结了，任务处理都会拒接</p>
-
+            
             
 
         </div>
@@ -238,8 +222,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/12/15/Sliding-Time-Window/" data-tooltip="Sliding-Time-Window" aria-label="PREVIOUS: Sliding-Time-Window">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -248,7 +231,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/06/16/Exceptions/" data-tooltip="Exceptions" aria-label="NEXT: Exceptions">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/07/10/Spring-State-Machine/" data-tooltip="Spring State Machine" aria-label="NEXT: Spring State Machine">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -300,8 +283,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/12/15/Sliding-Time-Window/" data-tooltip="Sliding-Time-Window" aria-label="PREVIOUS: Sliding-Time-Window">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -310,7 +292,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/06/16/Exceptions/" data-tooltip="Exceptions" aria-label="NEXT: Exceptions">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/07/10/Spring-State-Machine/" data-tooltip="Spring State Machine" aria-label="NEXT: Spring State Machine">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>

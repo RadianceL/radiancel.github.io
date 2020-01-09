@@ -11,19 +11,19 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg"},"articleBody":"Today learn pointer form enthusiastic netizen,really appreciate.\n-土杜土杜\n指针的应用12char *p;p = \"test\";\n这是可以的，因为“test”已经分配了空间，所以指针指向了“test”内存空间的首地址\n12char *p;strcpy(p,\"test\");\n这时候就会报错，因为并没有给p分配内存空间不可以把“test”复制到指针变量里\n结构体指针的应用首先结构体里存指针\n123typedef struct test&#123;    char *test;&#125;test,*pTest;\nmain中测试：\n123pTest p = malloc(sizeof(test));p-&gt;test = \"test String\";printf(\"%s\\n\",p-&gt;test);\n需要注意的是，如果单纯使用malloc函数分配空间，分配的空间是结构体里指针的空间（指针64位，8byte），与指针代表的数据所占用空间无关\n但在测试程序中，直接=“fff”是可以的，因为这时候就已经为字符串开辟好了栈空间，test1-&gt;test直接指向这个空间的首地址。\n123typedef struct test&#123;    long *a;&#125;test;\n如果是正常情况下\n123456test *b = malloc(sizeof(test));long x = 10;//b中指针指向x的内存地址b-&gt;a = &amp;x;//取值需要用long value = *(b-&gt;a);\n\n指针是指针，如果想给指针赋值，必须要给指针分配对应的内存空间\n\n函数操作结构体指针的指针123456789101112131415161718//样例代码typedef struct &#123;    char *IP;&#125;LOGOUT_INFO;void send_client_logout_info(LOGOUT_INFO *logout_info,char *json) &#123;    cJSON *item;    cJSON *root = cJSON_Parse(json);    logout_info-&gt;IP = malloc(16);    item=cJSON_GetObjectItem(root,\"IP\");    strcpy(logout_info-&gt;IP,item-&gt;valuestring);    if (root)        cJSON_Delete(root);&#125;\n这是一段cJson解析json的代码，我需要这段代码填充LOGOUT_INFO这个对象，所以传入一个结构体指针，直接对内存空间进行操作，首先要先对logout_info-&gt;IP初始化，malloc函数为其分配空间，之后就可以使用strcpy进行copy。\n","dateCreated":"2017-12-28T13:49:07+08:00","dateModified":"2018-07-30T15:01:24+08:00","datePublished":"2017-12-28T13:49:07+08:00","description":"Today learn pointer form enthusiastic netizen,really appreciate.\n-土杜土杜","headline":"C-Pointer","image":["http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2017/12/28/C-Pointer/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg","logo":{"@type":"ImageObject","url":"eddie-personal.jpg"}},"url":"https://radiancel.github.io/2017/12/28/C-Pointer/","keywords":"C","thumbnailUrl":"http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg"}</script>
-    <meta name="description" content="Today learn pointer form enthusiastic netizen,really appreciate. -土杜土杜">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg"},"articleBody":"UNIX is very simple, it just needs a genius to understand its simplicity.\n-土杜土杜\n指针的应用12char *p;p = \"test\";\n这是可以的，因为“test”已经分配了空间，所以指针指向了“test”内存空间的首地址\n12char *p;strcpy(p,\"test\");\n这时候就会报错，因为并没有给p分配内存空间不可以把“test”复制到指针变量里\n结构体指针的应用首先结构体里存指针\n123typedef struct test&#123;    char *test;&#125;test,*pTest;\nmain中测试：\n123pTest p = malloc(sizeof(test));p-&gt;test = \"test String\";printf(\"%s\\n\",p-&gt;test);\n需要注意的是，如果单纯使用malloc函数分配空间，分配的空间是结构体里指针的空间（指针64位，8byte），与指针代表的数据所占用空间无关\n但在测试程序中，直接=“fff”是可以的，因为这时候就已经为字符串开辟好了栈空间，test1-&gt;test直接指向这个空间的首地址。\n123typedef struct test&#123;    long *a;&#125;test;\n如果是正常情况下\n123456test *b = malloc(sizeof(test));long x = 10;//b中指针指向x的内存地址b-&gt;a = &amp;x;//取值需要用long value = *(b-&gt;a);\n\n指针是指针，如果想给指针赋值，必须要给指针分配对应的内存空间\n\n函数操作结构体指针的指针123456789101112131415161718//样例代码typedef struct &#123;    char *IP;&#125;LOGOUT_INFO;void send_client_logout_info(LOGOUT_INFO *logout_info,char *json) &#123;    cJSON *item;    cJSON *root = cJSON_Parse(json);    logout_info-&gt;IP = malloc(16);    item=cJSON_GetObjectItem(root,\"IP\");    strcpy(logout_info-&gt;IP,item-&gt;valuestring);    if (root)        cJSON_Delete(root);&#125;\n这是一段cJson解析json的代码，我需要这段代码填充LOGOUT_INFO这个对象，所以传入一个结构体指针，直接对内存空间进行操作，首先要先对logout_info-&gt;IP初始化，malloc函数为其分配空间，之后就可以使用strcpy进行copy。\nC语言引入静态库\n静态库：\n\n\n链接时将程序放进进可执行程序  \n会产生多分副本\n不依赖程序运行\n\n\n动态库：\n\n\n程序运行时，加载时才去动态库找函数\n多进程共享\n依赖程序运行\n\n通常我们的做法是：先对library.c与library.h进行编译gcc -c library.c然后ar rcs libTest.a library.o ....生成libTest.a文件，也就是静态库文件\n然后使用这个库的方法：在项目中编写一个lib_static.h文件，里面包含：extern void name(void);在main函数中引入这个头文件，就可以拿到这些方法了在编译项目时，需要把库文件指定给当前项目。\n使用gcc编译的方法是：-L指定搜索的路径，一般为项目的lib目录下，需要手动考入，-l指定具体文件，这个文件可以是自己编译的也可以是三方提供gcc -L/home/user/xxx/lib main.c -llibTest.a -o app\n但通常使用IDE时，使用cMake的方式编译，贴出CMakeList.txt的代码\n12345678910111213141516171819202122232425//设置最低版本cmake_minimum_required(VERSION 3.8)//项目名称project(webTest)//编译版本set(CMAKE_C_STANDARD 99)//包含的目录include_directories(lib/)//相当于-Llink_directories(lib/)//相当于-llink_libraries(libIMprotocol.a)//设置编译的源文件set(SOURCE_FILES main.c        SETCONFIG/CONNECTIONSET.h        FUNCTION/Connection.c FUNCTION/Connection.h FUNCTION/InitConnection.c FUNCTION/InitConnection.h        TOOL/GETConfig.c        lib/static_lib.h)add_executable(webTest $&#123;SOURCE_FILES&#125;)//防止linux下线程方法不可用，应该是某种机制target_link_libraries(webTest pthread)\n","dateCreated":"2017-12-28T13:49:07+08:00","dateModified":"2020-01-09T22:19:37+08:00","datePublished":"2017-12-28T13:49:07+08:00","description":"UNIX is very simple, it just needs a genius to understand its simplicity.\n-土杜土杜","headline":"C-Pointer","image":["http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg","http://old.bz55.com/uploads/allimg/150719/139-150GZZ035.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://radiancel.github.io/2017/12/28/C-Note/"},"publisher":{"@type":"Organization","name":"Eddie Lee","sameAs":["https://github.com/RadianceL"],"image":"eddie-personal.jpg","logo":{"@type":"ImageObject","url":"eddie-personal.jpg"}},"url":"https://radiancel.github.io/2017/12/28/C-Note/","keywords":"C","thumbnailUrl":"http://img1.imgtn.bdimg.com/it/u=3116892426,491484301&fm=27&gp=0.jpg"}</script>
+    <meta name="description" content="UNIX is very simple, it just needs a genius to understand its simplicity. -土杜土杜">
 <meta name="keywords" content="C">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="C-Pointer">
-<meta property="og:url" content="https://radiancel.github.io/2017/12/28/C-Pointer/index.html">
+<meta property="og:url" content="https://radiancel.github.io/2017/12/28/C-Note/index.html">
 <meta property="og:site_name" content="Blog Bom!!BO!">
-<meta property="og:description" content="Today learn pointer form enthusiastic netizen,really appreciate. -土杜土杜">
+<meta property="og:description" content="UNIX is very simple, it just needs a genius to understand its simplicity. -土杜土杜">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-07-30T07:01:24.000Z">
+<meta property="og:updated_time" content="2020-01-09T14:19:37.708Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C-Pointer">
-<meta name="twitter:description" content="Today learn pointer form enthusiastic netizen,really appreciate. -土杜土杜">
+<meta name="twitter:description" content="UNIX is very simple, it just needs a genius to understand its simplicity. -土杜土杜">
     
     
         
@@ -205,7 +205,7 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>Today learn pointer form enthusiastic netizen,really appreciate.</p>
+            <p>UNIX is very simple, it just needs a genius to understand its simplicity.</p>
 <p><div align="right">-土杜土杜</div><br><a id="more"></a></p>
 <h1 id="指针的应用"><a href="#指针的应用" class="headerlink" title="指针的应用"></a>指针的应用</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *p;</span><br><span class="line">p = <span class="string">"test"</span>;</span><br></pre></td></tr></table></figure>
 <p>这是可以的，因为“test”已经分配了空间，所以指针指向了“test”内存空间的首地址</p>
@@ -225,6 +225,27 @@
 </ul>
 <h1 id="函数操作结构体指针的指针"><a href="#函数操作结构体指针的指针" class="headerlink" title="函数操作结构体指针的指针"></a>函数操作结构体指针的指针</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//样例代码</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">char</span> *IP;</span><br><span class="line">&#125;LOGOUT_INFO;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">send_client_logout_info</span><span class="params">(LOGOUT_INFO *logout_info,<span class="keyword">char</span> *json)</span> </span>&#123;</span><br><span class="line">    cJSON *item;</span><br><span class="line">    cJSON *root = cJSON_Parse(json);</span><br><span class="line"></span><br><span class="line">    logout_info-&gt;IP = <span class="built_in">malloc</span>(<span class="number">16</span>);</span><br><span class="line"></span><br><span class="line">    item=cJSON_GetObjectItem(root,<span class="string">"IP"</span>);</span><br><span class="line">    <span class="built_in">strcpy</span>(logout_info-&gt;IP,item-&gt;valuestring);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (root)</span><br><span class="line">        cJSON_Delete(root);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这是一段cJson解析json的代码，我需要这段代码填充LOGOUT_INFO这个对象，所以传入一个结构体指针，直接对内存空间进行操作，首先要先对logout_info-&gt;IP初始化，malloc函数为其分配空间，之后就可以使用strcpy进行copy。</p>
+<h2 id="C语言引入静态库"><a href="#C语言引入静态库" class="headerlink" title="C语言引入静态库"></a>C语言引入静态库</h2><ul>
+<li>静态库：</li>
+</ul>
+<ol>
+<li>链接时将程序放进进可执行程序  </li>
+<li>会产生多分副本</li>
+<li>不依赖程序运行</li>
+</ol>
+<ul>
+<li>动态库：</li>
+</ul>
+<ol>
+<li>程序运行时，加载时才去动态库找函数</li>
+<li>多进程共享</li>
+<li>依赖程序运行</li>
+</ol>
+<p>通常我们的做法是：<br>先对library.c与library.h进行编译<br><code>gcc -c library.c</code><br>然后<br><code>ar rcs libTest.a library.o ....</code><br>生成libTest.a文件，也就是静态库文件</p>
+<p>然后使用这个库的方法：<br>在项目中编写一个lib_static.h文件，里面包含：<br><code>extern void name(void);</code><br>在main函数中引入这个头文件，就可以拿到这些方法了<br>在编译项目时，需要把库文件指定给当前项目。</p>
+<p>使用gcc编译的方法是：<br>-L指定搜索的路径，一般为项目的lib目录下，需要手动考入，<br>-l指定具体文件，这个文件可以是自己编译的也可以是三方提供<br><code>gcc -L/home/user/xxx/lib main.c -llibTest.a -o app</code></p>
+<p>但通常使用IDE时，使用cMake的方式编译，贴出CMakeList.txt的代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置最低版本</span></span><br><span class="line">cmake_minimum_required(VERSION <span class="number">3.8</span>)</span><br><span class="line"><span class="comment">//项目名称</span></span><br><span class="line">project(webTest)</span><br><span class="line"></span><br><span class="line"><span class="comment">//编译版本</span></span><br><span class="line"><span class="built_in">set</span>(CMAKE_C_STANDARD <span class="number">99</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//包含的目录</span></span><br><span class="line">include_directories(lib/)</span><br><span class="line"><span class="comment">//相当于-L</span></span><br><span class="line">link_directories(lib/)</span><br><span class="line"><span class="comment">//相当于-l</span></span><br><span class="line">link_libraries(libIMprotocol.a)</span><br><span class="line"></span><br><span class="line"><span class="comment">//设置编译的源文件</span></span><br><span class="line"><span class="built_in">set</span>(SOURCE_FILES main.c</span><br><span class="line">        SETCONFIG/CONNECTIONSET.h</span><br><span class="line">        FUNCTION/Connection.c FUNCTION/Connection.h FUNCTION/InitConnection.c FUNCTION/InitConnection.h</span><br><span class="line">        TOOL/GETConfig.c</span><br><span class="line">        lib/static_lib.h)</span><br><span class="line"></span><br><span class="line">add_executable(webTest $&#123;SOURCE_FILES&#125;)</span><br><span class="line"><span class="comment">//防止linux下线程方法不可用，应该是某种机制</span></span><br><span class="line">target_link_libraries(webTest pthread)</span><br></pre></td></tr></table></figure>
 
             
 
@@ -246,7 +267,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/03/20/Redis/" data-tooltip="Redis" aria-label="PREVIOUS: Redis">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/06/03/Java-Annotation/" data-tooltip="Java-Annotation" aria-label="PREVIOUS: Java-Annotation">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -255,7 +276,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/12/28/C-static-Library/" data-tooltip="C-static-Library" aria-label="NEXT: C-static-Library">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/29/Java-Reference-Object/" data-tooltip="Java Reference Object" aria-label="NEXT: Java Reference Object">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -308,7 +329,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/03/20/Redis/" data-tooltip="Redis" aria-label="PREVIOUS: Redis">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/06/03/Java-Annotation/" data-tooltip="Java-Annotation" aria-label="PREVIOUS: Java-Annotation">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -317,7 +338,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/12/28/C-static-Library/" data-tooltip="C-static-Library" aria-label="NEXT: C-static-Library">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/29/Java-Reference-Object/" data-tooltip="Java Reference Object" aria-label="NEXT: Java Reference Object">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
